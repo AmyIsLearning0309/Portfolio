@@ -1,0 +1,86 @@
+/* ============================================================
+   HERO — Full Spline background
+   ============================================================ */
+
+.hero {
+  position: relative;
+  height: 100svh;      /* exactly one viewport — no min-height overflow */
+  display: flex;
+  align-items: center;
+  padding-top: var(--navbar-height);
+  padding-bottom: var(--space-20);
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
+/* Text content sits above the Spline canvas */
+.hero__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 820px;
+  /* Left half only so text doesn't overlap the 3D scene centre */
+  width: 55%;
+}
+
+.hero__eyebrow {
+  animation: fadeUpIn 0.5s ease both;
+  animation-delay: 0.1s;
+  margin-bottom: var(--space-5);
+}
+
+.hero__heading {
+  animation: fadeUpIn 0.5s ease both;
+  animation-delay: 0.2s;
+  margin-bottom: var(--space-6);
+  font-size: var(--text-hero);
+  font-weight: var(--weight-semi);
+  letter-spacing: -0.03em;
+  line-height: var(--leading-tight);
+  color: var(--color-ink);
+}
+
+.hero__heading em {
+  font-style: italic;
+  color: var(--color-ink);
+  font-weight: var(--weight-light);
+}
+
+.hero__subtitle {
+  animation: fadeUpIn 0.5s ease both;
+  animation-delay: 0.35s;
+  font-size: var(--text-lg);
+  line-height: var(--leading-loose);
+  color: var(--color-ink-secondary);
+  margin-bottom: var(--space-10);
+  max-width: 480px;
+  font-weight: var(--weight-regular);
+}
+
+.hero__ctas {
+  animation: fadeUpIn 0.5s ease both;
+  animation-delay: 0.5s;
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 1023px) {
+  .hero__inner {
+    width: 70%;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero__inner {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero__ctas {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

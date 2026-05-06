@@ -1,0 +1,53 @@
+/* ============================================================
+   SELECTED WORKS — Apple grey background section
+   ============================================================ */
+
+.selected-works {
+  padding-block: var(--space-32);
+  scroll-margin-top: var(--navbar-height);
+  background: var(--color-bg-alt);  /* #F5F5F7 — signals section transition */
+}
+
+/* When used as a standalone page, add top padding for the navbar */
+.selected-works--page {
+  padding-top: calc(var(--navbar-height) + var(--space-16));
+}
+
+.selected-works__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-bottom: var(--space-12);
+  flex-wrap: wrap;
+}
+
+.selected-works__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-5);
+  transition: opacity var(--transition-base);
+}
+
+.selected-works__grid.is-filtering {
+  opacity: 0.4;
+}
+
+.selected-works__empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--space-16);
+  color: var(--color-ink-muted);
+  font-size: var(--text-base);
+}
+
+@media (max-width: 767px) {
+  .selected-works__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .selected-works__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

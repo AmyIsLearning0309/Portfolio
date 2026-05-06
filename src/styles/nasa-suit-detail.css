@@ -1,0 +1,1218 @@
+/* ============================================================
+   NASA SUIT DETAIL PAGE — Custom section styles
+   Aesthetic: deep space dark, glowing HUD cyan/orange, cinematic
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700&display=swap');
+
+/* ── Color tokens ── */
+:root {
+  --ns-bg:           #080C14;
+  --ns-bg-mid:       #0A1020;
+  --ns-card:         #0F1520;
+  --ns-card-border:  rgba(0, 212, 255, 0.14);
+  --ns-card-border-o:rgba(255, 107, 53, 0.18);
+  --ns-cyan:         #00D4FF;
+  --ns-cyan-dim:     rgba(0, 212, 255, 0.18);
+  --ns-orange:       #FF6B35;
+  --ns-orange-dim:   rgba(255, 107, 53, 0.15);
+  --ns-text:         #E8EDF5;
+  --ns-text-mid:     #A0AABF;
+  --ns-text-muted:   #7B8CAA;
+  --ns-border:       rgba(255, 255, 255, 0.07);
+  --ns-glow-cyan:    0 0 24px rgba(0, 212, 255, 0.25), 0 0 2px rgba(0, 212, 255, 0.5);
+  --ns-glow-orange:  0 0 24px rgba(255, 107, 53, 0.25), 0 0 2px rgba(255, 107, 53, 0.5);
+}
+
+/* ── Root wrapper ── */
+.nasa-suit-detail {
+  padding-top: var(--navbar-height);
+  margin-left: 200px;
+  background: var(--ns-bg);
+  position: relative;
+  min-height: 100vh;
+}
+
+/* ── Animated star field (CSS-only, ::before pseudo) ── */
+.nasa-suit-detail::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    /* Layer 1 — bright foreground stars */
+    radial-gradient(1.5px 1.5px at 5% 12%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 14% 38%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(2px 2px at 23% 7%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 31% 55%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 44% 22%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 52% 68%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(2px 2px at 63% 15%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 71% 44%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 82% 9%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 91% 62%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(2px 2px at 97% 31%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 8% 77%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 19% 88%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 36% 92%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(2px 2px at 57% 85%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 78% 79%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 93% 91%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    /* Layer 2 — mid-brightness stars */
+    radial-gradient(1px 1px at 3% 28%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 11% 52%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 17% 19%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 25% 73%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 33% 41%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 41% 63%, rgba(255,255,255,0.28) 0%, transparent 100%),
+    radial-gradient(1px 1px at 48% 34%, rgba(255,255,255,0.32) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 51%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 66% 29%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 74% 71%, rgba(255,255,255,0.28) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 48%, rgba(255,255,255,0.32) 0%, transparent 100%),
+    radial-gradient(1px 1px at 94% 17%, rgba(255,255,255,0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 7% 94%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 29% 83%, rgba(255,255,255,0.28) 0%, transparent 100%),
+    radial-gradient(1px 1px at 46% 96%, rgba(255,255,255,0.32) 0%, transparent 100%),
+    radial-gradient(1px 1px at 69% 87%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 88% 73%, rgba(255,255,255,0.28) 0%, transparent 100%),
+    /* Layer 3 — faint background stars */
+    radial-gradient(1px 1px at 2% 45%, rgba(255,255,255,0.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 9% 67%, rgba(255,255,255,0.12) 0%, transparent 100%),
+    radial-gradient(1px 1px at 16% 31%, rgba(255,255,255,0.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 22% 59%, rgba(255,255,255,0.12) 0%, transparent 100%),
+    radial-gradient(1px 1px at 28% 14%, rgba(255,255,255,0.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 38% 78%, rgba(255,255,255,0.1) 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 26%, rgba(255,255,255,0.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 59% 47%, rgba(255,255,255,0.12) 0%, transparent 100%),
+    radial-gradient(1px 1px at 68% 6%, rgba(255,255,255,0.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 76% 57%, rgba(255,255,255,0.1) 0%, transparent 100%),
+    radial-gradient(1px 1px at 83% 36%, rgba(255,255,255,0.12) 0%, transparent 100%),
+    radial-gradient(1px 1px at 89% 81%, rgba(255,255,255,0.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 96% 54%, rgba(255,255,255,0.1) 0%, transparent 100%),
+    /* Faint nebula glow hints */
+    radial-gradient(120px 80px at 15% 30%, rgba(0,212,255,0.03) 0%, transparent 100%),
+    radial-gradient(100px 60px at 75% 60%, rgba(0,100,255,0.03) 0%, transparent 100%),
+    radial-gradient(80px 80px at 45% 80%, rgba(100,50,200,0.02) 0%, transparent 100%);
+  animation: ns-stars-drift 120s linear infinite;
+}
+
+@keyframes ns-stars-drift {
+  from { transform: translateY(0);    }
+  to   { transform: translateY(-20px); }
+}
+
+/* All content above the star field */
+.nasa-suit-detail > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Content column: wider than generic template ── */
+.nasa-suit-detail .pd-container {
+  max-width: 1020px;
+}
+
+/* ── Heading color helpers ── */
+.ns-heading-cyan   { color: var(--ns-cyan)   !important; }
+.ns-heading-white  { color: var(--ns-text)   !important; }
+.ns-heading-orange { color: var(--ns-orange) !important; }
+
+/* ── Global overrides for project-detail scaffold ── */
+.nasa-suit-detail .pd-header__title {
+  color: var(--ns-text);
+  font-family: 'Exo 2', var(--font-display);
+}
+
+.nasa-suit-detail .pd-header__subtitle {
+  color: var(--ns-text-mid);
+}
+
+.nasa-suit-detail .pd-header__year {
+  color: var(--ns-text-muted);
+}
+
+.nasa-suit-detail .pd-section__label {
+  color: var(--ns-cyan);
+  letter-spacing: 0.12em;
+}
+
+.nasa-suit-detail .pd-section__heading {
+  color: var(--ns-text);
+  font-family: 'Exo 2', var(--font-display);
+}
+
+.nasa-suit-detail .pd-section__body {
+  color: var(--ns-text-mid);
+}
+
+.nasa-suit-detail .pd-summary {
+  color: var(--ns-text-mid);
+}
+
+.nasa-suit-detail .pd-credits {
+  background: transparent;
+  border: none;
+  border-top:    1px solid var(--ns-card-border);
+  border-bottom: 1px solid var(--ns-card-border);
+  box-shadow: none;
+  border-radius: 0;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.nasa-suit-detail .pd-credits__label {
+  color: var(--ns-text-muted);
+}
+
+.nasa-suit-detail .pd-credits__value {
+  color: var(--ns-text);
+}
+
+.nasa-suit-detail .pd-tags {
+  margin-bottom: var(--space-16);
+}
+
+.nasa-suit-detail .pd-outcomes__item {
+  border-bottom-color: var(--ns-card-border);
+}
+
+.nasa-suit-detail .pd-outcomes__item:first-child {
+  border-top-color: var(--ns-card-border);
+}
+
+.nasa-suit-detail .pd-outcomes__num {
+  color: var(--ns-cyan);
+}
+
+.nasa-suit-detail .pd-outcomes__text {
+  color: var(--ns-text-mid);
+}
+
+.nasa-suit-detail .pd-pagination {
+  border-top-color: var(--ns-card-border);
+  background: var(--ns-bg);
+}
+
+.nasa-suit-detail .pd-pagination__dir {
+  color: var(--ns-text-muted);
+}
+
+.nasa-suit-detail .pd-pagination__title {
+  color: var(--ns-text);
+}
+
+/* ── Hero image — cinematic 21:9 ── */
+.ns-hero-image {
+  margin-inline: calc(var(--space-12) * -1);
+  margin-top: var(--space-12);
+  margin-bottom: var(--space-16);
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  position: relative;
+}
+
+.ns-hero-image .placeholder-image {
+  border-radius: var(--radius-xl);
+  min-height: 45vh;
+  max-height: 70vh;
+}
+
+/* Scan-line overlay on hero */
+.ns-hero-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.06) 3px,
+    rgba(0, 0, 0, 0.06) 4px
+  );
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+/* ── HUD corner bracket decoration ── */
+.ns-hud-bracket {
+  position: relative;
+}
+
+.ns-hud-bracket::before,
+.ns-hud-bracket::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: var(--ns-cyan);
+  border-style: solid;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ns-hud-bracket::before {
+  top: 0;
+  left: 0;
+  border-width: 2px 0 0 2px;
+}
+
+.ns-hud-bracket::after {
+  bottom: 0;
+  right: 0;
+  border-width: 0 2px 2px 0;
+}
+
+.ns-hud-bracket--orange::before,
+.ns-hud-bracket--orange::after {
+  border-color: var(--ns-orange);
+}
+
+/* ── Scan-line utility class ── */
+.ns-scanline {
+  position: relative;
+  overflow: hidden;
+}
+
+.ns-scanline::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.05) 3px,
+    rgba(0, 0, 0, 0.05) 4px
+  );
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+/* ── Reveal animation ── */
+.ns-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+.ns-reveal--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================
+   SECTION 1 — PROBLEM
+   ============================================================ */
+
+/* HMW callout card */
+.ns-hmw-card {
+  margin-block: var(--space-10);
+  padding: var(--space-10) var(--space-10);
+  background: var(--ns-card);
+  border: 1px solid var(--ns-card-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--ns-glow-cyan);
+  text-align: center;
+}
+
+.ns-hmw-label {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ns-cyan);
+  margin-bottom: var(--space-5);
+}
+
+.ns-hmw-text {
+  font-family: 'Exo 2', var(--font-display);
+  font-size: clamp(1.15rem, 2.5vw, 1.6rem);
+  font-weight: 600;
+  color: var(--ns-text);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* Constraint grid */
+.ns-constraint-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin-block: var(--space-10);
+}
+
+.ns-constraint-card {
+  padding: var(--space-7);
+  background: var(--ns-card);
+  border: 1px solid var(--ns-border);
+  border-radius: var(--radius-lg);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ns-constraint-card:hover {
+  border-color: var(--ns-card-border);
+  box-shadow: var(--ns-glow-cyan);
+}
+
+.ns-constraint-icon {
+  font-size: 1.6rem;
+  margin-bottom: var(--space-4);
+  line-height: 1;
+}
+
+.ns-constraint-title {
+  font-family: 'Exo 2', var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--ns-text);
+  margin-bottom: var(--space-3);
+}
+
+.ns-constraint-card p {
+  font-size: var(--text-sm);
+  line-height: 1.75;
+  color: var(--ns-text-mid);
+  margin: 0;
+}
+
+/* ============================================================
+   SECTION 2 — DESIGN OBJECTIVES
+   ============================================================ */
+
+.ns-objectives-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+}
+
+.ns-objective-card {
+  display: flex;
+  gap: var(--space-8);
+  align-items: flex-start;
+  padding: var(--space-8) var(--space-8);
+  background: var(--ns-card);
+  border: 1px solid var(--ns-card-border);
+  border-radius: var(--radius-xl);
+}
+
+.ns-objective-card--orange {
+  border-color: var(--ns-card-border-o);
+}
+
+.ns-objective-num {
+  font-family: 'Exo 2', var(--font-display);
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--ns-cyan);
+  opacity: 0.25;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 64px;
+  text-align: right;
+  letter-spacing: -0.04em;
+}
+
+.ns-objective-card--orange .ns-objective-num {
+  color: var(--ns-orange);
+}
+
+.ns-objective-body {
+  flex: 1;
+}
+
+.ns-objective-title {
+  font-family: 'Exo 2', var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  margin-bottom: var(--space-3);
+  letter-spacing: -0.01em;
+}
+
+.ns-objective-body p {
+  font-size: var(--text-base);
+  line-height: 1.8;
+  color: var(--ns-text-mid);
+  margin: 0;
+}
+
+/* ============================================================
+   SECTION 3 — RESEARCH INSIGHTS
+   ============================================================ */
+
+.ns-insight-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+}
+
+.ns-insight-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-7);
+  background: var(--ns-card);
+  border: 1px solid var(--ns-card-border);
+  border-radius: var(--radius-xl);
+}
+
+.ns-insight-card--orange {
+  border-color: var(--ns-card-border-o);
+}
+
+.ns-insight-num {
+  font-family: 'Exo 2', var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ns-cyan);
+  text-transform: uppercase;
+}
+
+.ns-insight-card--orange .ns-insight-num {
+  color: var(--ns-orange);
+}
+
+.ns-insight-quote {
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  color: var(--ns-text);
+  font-style: italic;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.ns-insight-source {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ns-text-muted);
+}
+
+.ns-insight-implication {
+  font-size: var(--text-sm);
+  line-height: 1.75;
+  color: var(--ns-text-mid);
+  margin: 0;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--ns-border);
+}
+
+/* ============================================================
+   SECTION 4 — CORE FEATURES
+   ============================================================ */
+
+.ns-features-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin-top: var(--space-8);
+}
+
+.ns-feature-panel {
+  position: relative;
+}
+
+.ns-feature-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+  position: sticky;
+  top: calc(var(--navbar-height) + 12px);
+  z-index: 10;
+}
+
+.ns-feature-num {
+  font-family: 'Exo 2', var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--ns-cyan);
+  letter-spacing: 0.12em;
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid var(--ns-card-border);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.ns-feature-panel--orange .ns-feature-num {
+  color: var(--ns-orange);
+  background: rgba(255, 107, 53, 0.08);
+  border-color: var(--ns-card-border-o);
+}
+
+.ns-feature-tag {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ns-text-muted);
+}
+
+.ns-feature-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+  align-items: start;
+  padding: var(--space-8);
+  background: var(--ns-card);
+  border: 1px solid var(--ns-card-border);
+  border-radius: var(--radius-xl);
+}
+
+.ns-feature-panel--orange .ns-feature-layout {
+  border-color: var(--ns-card-border-o);
+}
+
+.ns-feature-panel--flip .ns-feature-layout {
+  grid-template-columns: 1fr 1fr;
+}
+
+.ns-feature-panel--flip .ns-feature-copy {
+  order: 2;
+}
+
+.ns-feature-panel--flip .ns-feature-image {
+  order: 1;
+}
+
+.ns-feature-title {
+  font-family: 'Exo 2', var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--ns-cyan);
+  margin-bottom: var(--space-4);
+  letter-spacing: -0.01em;
+}
+
+.ns-feature-panel--orange .ns-feature-title {
+  color: var(--ns-orange);
+}
+
+.ns-feature-body {
+  font-size: var(--text-sm);
+  line-height: 1.8;
+  color: var(--ns-text-mid);
+  margin-bottom: var(--space-6);
+  margin-top: 0;
+}
+
+.ns-feature-specs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ns-spec-item {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--ns-border);
+  font-size: var(--text-xs);
+}
+
+.ns-spec-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.ns-spec-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ns-text-muted);
+  font-weight: var(--weight-medium);
+  padding-top: 1px;
+}
+
+.ns-spec-value {
+  color: var(--ns-text);
+  line-height: 1.55;
+}
+
+.ns-feature-image {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* ============================================================
+   SECTION 5 — ITERATIONS TIMELINE
+   ============================================================ */
+
+.ns-timeline-wrap {
+  position: relative;
+  margin-top: var(--space-10);
+  padding-left: var(--space-16);
+}
+
+/* Growing vertical spine */
+.ns-timeline-spine {
+  position: absolute;
+  left: 20px;
+  top: 12px;
+  width: 2px;
+  bottom: 0;
+  background: linear-gradient(to bottom, var(--ns-cyan), transparent 95%);
+  transform-origin: top;
+  transform: scaleY(0);
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.4;
+}
+
+/* Step-driven spine growth */
+.ns-timeline-wrap[data-step="0"] .ns-timeline-spine { transform: scaleY(0.09); }
+.ns-timeline-wrap[data-step="1"] .ns-timeline-spine { transform: scaleY(0.22); }
+.ns-timeline-wrap[data-step="2"] .ns-timeline-spine { transform: scaleY(0.38); }
+.ns-timeline-wrap[data-step="3"] .ns-timeline-spine { transform: scaleY(0.55); }
+.ns-timeline-wrap[data-step="4"] .ns-timeline-spine { transform: scaleY(0.72); }
+.ns-timeline-wrap[data-step="5"] .ns-timeline-spine { transform: scaleY(0.88); }
+.ns-timeline-wrap[data-step="6"] .ns-timeline-spine { transform: scaleY(1);    }
+
+/* Individual iteration rows */
+.ns-iteration-row {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+  align-items: start;
+  opacity: 0;
+  transform: translateX(-14px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+/* Staggered reveal via data-step */
+.ns-timeline-wrap[data-step="0"] .ns-iteration-row[data-show-at="0"] { opacity: 1; transform: translateX(0); }
+.ns-timeline-wrap[data-step="1"] .ns-iteration-row[data-show-at="0"],
+.ns-timeline-wrap[data-step="1"] .ns-iteration-row[data-show-at="1"] { opacity: 1; transform: translateX(0); }
+.ns-timeline-wrap[data-step="2"] .ns-iteration-row[data-show-at="0"],
+.ns-timeline-wrap[data-step="2"] .ns-iteration-row[data-show-at="1"],
+.ns-timeline-wrap[data-step="2"] .ns-iteration-row[data-show-at="2"] { opacity: 1; transform: translateX(0); }
+.ns-timeline-wrap[data-step="3"] .ns-iteration-row[data-show-at="0"],
+.ns-timeline-wrap[data-step="3"] .ns-iteration-row[data-show-at="1"],
+.ns-timeline-wrap[data-step="3"] .ns-iteration-row[data-show-at="2"],
+.ns-timeline-wrap[data-step="3"] .ns-iteration-row[data-show-at="3"] { opacity: 1; transform: translateX(0); }
+.ns-timeline-wrap[data-step="4"] .ns-iteration-row[data-show-at="0"],
+.ns-timeline-wrap[data-step="4"] .ns-iteration-row[data-show-at="1"],
+.ns-timeline-wrap[data-step="4"] .ns-iteration-row[data-show-at="2"],
+.ns-timeline-wrap[data-step="4"] .ns-iteration-row[data-show-at="3"],
+.ns-timeline-wrap[data-step="4"] .ns-iteration-row[data-show-at="4"] { opacity: 1; transform: translateX(0); }
+.ns-timeline-wrap[data-step="5"] .ns-iteration-row,
+.ns-timeline-wrap[data-step="6"] .ns-iteration-row { opacity: 1; transform: translateX(0); }
+
+/* Badge node */
+.ns-iter-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--ns-card);
+  border: 2px solid var(--ns-card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Exo 2', var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--ns-cyan);
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  box-shadow: var(--ns-glow-cyan);
+}
+
+/* Iteration content */
+.ns-iter-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.ns-iter-card {
+  padding: var(--space-6);
+  background: var(--ns-card);
+  border: 1px solid var(--ns-card-border);
+  border-radius: var(--radius-lg);
+}
+
+.ns-iter-title {
+  font-family: 'Exo 2', var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ns-text);
+  margin-bottom: var(--space-3);
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.ns-iter-body {
+  font-size: var(--text-xs);
+  line-height: 1.75;
+  color: var(--ns-text-mid);
+  margin-bottom: var(--space-5);
+}
+
+.ns-iter-delta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  background: rgba(0, 212, 255, 0.06);
+  border-radius: var(--radius-md);
+  border-left: 2px solid var(--ns-cyan);
+}
+
+.ns-iter-delta-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ns-cyan);
+  font-weight: var(--weight-medium);
+}
+
+.ns-iter-delta-value {
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  color: var(--ns-text-mid);
+}
+
+.ns-iter-image {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+/* ============================================================
+   SECTION 6 — FIELD TESTING
+   ============================================================ */
+
+.ns-phase-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+}
+
+.ns-phase-card {
+  padding: var(--space-7);
+  background: var(--ns-card);
+  border: 1px solid var(--ns-card-border);
+  border-radius: var(--radius-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.ns-phase-num {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ns-cyan);
+}
+
+.ns-phase-title {
+  font-family: 'Exo 2', var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--ns-text);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.ns-phase-card p {
+  font-size: var(--text-sm);
+  line-height: 1.75;
+  color: var(--ns-text-mid);
+  margin: 0;
+}
+
+.ns-phase-image {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.ns-field-quote {
+  margin-top: var(--space-10);
+  padding: var(--space-8) var(--space-10);
+  background: var(--ns-card);
+  border: 1px solid var(--ns-card-border);
+  border-radius: var(--radius-xl);
+  text-align: center;
+  box-shadow: var(--ns-glow-cyan);
+}
+
+.ns-field-quote p {
+  font-family: 'Exo 2', var(--font-display);
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: 600;
+  color: var(--ns-text);
+  line-height: 1.55;
+  font-style: italic;
+  margin: 0 0 var(--space-3);
+}
+
+.ns-field-quote span {
+  font-size: var(--text-xs);
+  color: var(--ns-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ============================================================
+   SECTION 7 — DESIGN SYSTEM
+   ============================================================ */
+
+.ns-system-block {
+  margin-bottom: var(--space-10);
+  padding: var(--space-8);
+  background: var(--ns-card);
+  border: 1px solid var(--ns-card-border);
+  border-radius: var(--radius-xl);
+}
+
+.ns-system-block-title {
+  font-family: 'Exo 2', var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ns-cyan);
+  margin-bottom: var(--space-6);
+}
+
+/* Typography scale */
+.ns-type-scale {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.ns-type-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  align-items: center;
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--ns-border);
+}
+
+.ns-type-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.ns-type-sample--hero {
+  font-family: 'Exo 2', var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ns-cyan);
+  letter-spacing: 0.1em;
+}
+
+.ns-type-sample--heading {
+  font-family: 'Exo 2', var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ns-text);
+}
+
+.ns-type-sample--body {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--ns-text-mid);
+}
+
+.ns-type-meta {
+  font-size: 0.7rem;
+  color: var(--ns-text-muted);
+  line-height: 1.6;
+}
+
+/* Color language chips */
+.ns-color-row {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.ns-color-chip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 100px;
+}
+
+.ns-color-chip__swatch {
+  width: 100%;
+  height: 48px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--ns-border);
+}
+
+.ns-color-chip__hex {
+  font-size: 0.7rem;
+  font-weight: var(--weight-medium);
+  color: var(--ns-text);
+  letter-spacing: 0.03em;
+}
+
+.ns-color-chip__name {
+  font-size: 0.7rem;
+  color: var(--ns-text-mid);
+}
+
+.ns-color-chip__role {
+  font-size: 0.65rem;
+  color: var(--ns-text-muted);
+  line-height: 1.5;
+}
+
+/* ============================================================
+   SECTION 8 — OUTCOMES
+   ============================================================ */
+
+/* Stat row */
+.ns-stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-10);
+}
+
+.ns-stat-card {
+  position: relative;
+  padding: var(--space-8) var(--space-6);
+  background: var(--ns-card);
+  border: 1px solid var(--ns-card-border);
+  border-radius: var(--radius-xl);
+  text-align: center;
+  overflow: visible;
+}
+
+/* Pulse ring animation */
+.ns-stat-pulse {
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 1px solid var(--ns-cyan);
+  opacity: 0;
+  pointer-events: none;
+  animation: ns-pulse 2.8s ease-out infinite;
+}
+
+@keyframes ns-pulse {
+  0%   { transform: scale(0.92); opacity: 0.5; }
+  100% { transform: scale(1.18); opacity: 0;   }
+}
+
+.ns-stat-number {
+  font-family: 'Exo 2', var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 700;
+  color: var(--ns-cyan);
+  line-height: 1;
+  margin-bottom: var(--space-3);
+  letter-spacing: -0.03em;
+}
+
+.ns-stat-label {
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  color: var(--ns-text-muted);
+}
+
+/* Reflection callout */
+.ns-reflection-callout {
+  margin-top: var(--space-10);
+  padding: var(--space-10);
+  background: var(--ns-card);
+  border: 1px solid var(--ns-card-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--ns-glow-cyan);
+}
+
+.ns-reflection-callout__label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ns-cyan);
+  margin-bottom: var(--space-4);
+}
+
+.ns-reflection-callout__text {
+  font-family: 'Exo 2', var(--font-display);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--ns-text);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ============================================================
+   SECTION 9 — FUTURE FEATURES
+   ============================================================ */
+
+.ns-future-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+}
+
+.ns-future-card {
+  padding: var(--space-7);
+  background: var(--ns-card);
+  border: 1px dashed rgba(0, 212, 255, 0.28);
+  border-radius: var(--radius-xl);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ns-future-card:hover {
+  border-color: rgba(0, 212, 255, 0.55);
+  box-shadow: var(--ns-glow-cyan);
+}
+
+.ns-future-icon {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: var(--space-4);
+  line-height: 1;
+}
+
+.ns-future-title {
+  font-family: 'Exo 2', var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--ns-text);
+  margin-bottom: var(--space-3);
+  letter-spacing: -0.01em;
+}
+
+.ns-future-card p {
+  font-size: var(--text-sm);
+  line-height: 1.75;
+  color: var(--ns-text-mid);
+  margin: 0;
+}
+
+/* ============================================================
+   WIDE BREAKOUT UTILITY
+   ============================================================ */
+
+.ns-wide {
+  margin-inline: calc(var(--space-12) * -1);
+}
+
+/* Image spacer between sections */
+.ns-section-image {
+  margin-block: var(--space-10);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1023px) {
+  .nasa-suit-detail {
+    margin-left: 0;
+  }
+
+  .ns-hero-image,
+  .ns-wide {
+    margin-inline: calc(var(--space-8) * -1);
+  }
+
+  .nasa-suit-detail .pd-credits {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .ns-constraint-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ns-insight-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ns-feature-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .ns-feature-panel--flip .ns-feature-copy {
+    order: 0;
+  }
+
+  .ns-feature-panel--flip .ns-feature-image {
+    order: 0;
+  }
+
+  .ns-phase-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ns-stat-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ns-future-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .ns-hero-image,
+  .ns-wide {
+    margin-inline: calc(var(--space-5) * -1);
+  }
+
+  .nasa-suit-detail .pd-credits {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+
+  .ns-timeline-wrap {
+    padding-left: var(--space-10);
+  }
+
+  .ns-iter-content {
+    grid-template-columns: 1fr;
+  }
+
+  .ns-objective-card {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .ns-objective-num {
+    width: auto;
+    text-align: left;
+    font-size: 1.8rem;
+  }
+
+  .ns-type-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+
+  .ns-hmw-text {
+    font-size: 1.1rem;
+  }
+
+  .ns-color-row {
+    gap: var(--space-3);
+  }
+
+  .ns-color-chip {
+    min-width: 80px;
+  }
+}

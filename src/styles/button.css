@@ -1,0 +1,84 @@
+/* ============================================================
+   BUTTON — Apple style
+   ============================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-full);
+  transition: background var(--transition-base), color var(--transition-base),
+    opacity var(--transition-base), transform 150ms ease;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  border: none;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* Sizes */
+.btn--sm {
+  font-size: var(--text-sm);
+  padding: 7px 16px;
+}
+
+.btn--md {
+  font-size: var(--text-sm);
+  padding: 10px 20px;
+}
+
+.btn--lg {
+  font-size: var(--text-base);
+  padding: 13px 26px;
+}
+
+/* ── Primary: Apple dark pill ── */
+.btn--primary {
+  background: var(--color-ink);
+  color: #ffffff;
+}
+
+.btn--primary:hover {
+  background: #3d3d3f;
+}
+
+/* ── Outline: clean 1px border ── */
+.btn--outline {
+  background: transparent;
+  color: var(--color-ink);
+  border: 1px solid rgba(0, 0, 0, 0.22);
+}
+
+.btn--outline:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.38);
+}
+
+/* ── Ghost: minimal ── */
+.btn--ghost {
+  background: transparent;
+  color: var(--color-ink-secondary);
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.btn--ghost:hover {
+  color: var(--color-ink);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* ── Accent: Apple blue — used sparingly ── */
+.btn--accent {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.btn--accent:hover {
+  background: var(--color-accent-dark);
+}

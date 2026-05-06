@@ -1,0 +1,43 @@
+/* ============================================================
+   SPLINE BACKGROUND — Full hero background cover
+   ============================================================ */
+
+.spline-blob {
+  position: absolute;
+  inset: 0;              /* stretch to cover entire hero */
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* The Spline canvas itself — fills the container */
+/* pointer-events: all so mouse movement reaches the scene for cursor tracking */
+/* scroll/wheel events are blocked via JS capture listeners in SplineBlob.jsx */
+.spline-blob__canvas {
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: all;
+  touch-action: none;
+}
+
+/* Hide the "Built with Spline" badge injected into the shadow DOM */
+spline-viewer::part(logo) {
+  display: none !important;
+}
+
+/* Gradient fallback shown while Spline loads */
+.spline-blob__fallback {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 70% 40%,
+    rgba(100, 210, 255, 0.22) 0%,
+    rgba(180, 130, 255, 0.14) 40%,
+    rgba(255, 100, 180, 0.08) 65%,
+    transparent 80%
+  );
+  filter: blur(60px);
+  pointer-events: none;
+}

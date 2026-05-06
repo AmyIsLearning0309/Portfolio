@@ -1,0 +1,34 @@
+/* ============================================================
+   FILTER TABS — Monochrome Apple style
+   ============================================================ */
+
+.filter-tabs {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.filter-tabs__btn {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink-muted);
+  padding: 7px 16px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: transparent;
+  transition: color var(--transition-fast), background var(--transition-fast);
+  cursor: pointer;
+  letter-spacing: -0.01em;
+}
+
+.filter-tabs__btn:hover {
+  color: var(--color-ink);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.filter-tabs__btn[aria-pressed='true'] {
+  color: var(--color-ink);
+  background: rgba(0, 0, 0, 0.08);
+  font-weight: var(--weight-semi);
+}

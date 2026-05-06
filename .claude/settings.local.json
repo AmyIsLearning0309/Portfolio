@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:amyai.framer.ai)",
+      "Bash(test:*)",
+      "Bash(npm create vite:*)",
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(node -e:*)",
+      "Bash(lsof:*)",
+      "Bash(npx vite:*)",
+      "Bash(curl:*)",
+      "WebFetch(domain:guglieri.com)",
+      "Bash(export PATH=\"/usr/local/bin:/opt/homebrew/bin:$PATH\")",
+      "Bash(node_modules/.bin/vite build:*)",
+      "Bash(export PATH=\"$PATH:/usr/local/bin:/opt/homebrew/bin\")",
+      "Bash(node node_modules/.bin/vite build --mode development)",
+      "Bash(node node_modules/.bin/vite build)",
+      "Bash(/usr/local/bin/node node_modules/.bin/vite build)",
+      "Bash(vercel --version)",
+      "Bash(npx vercel:*)"
+    ]
+  }
+}
