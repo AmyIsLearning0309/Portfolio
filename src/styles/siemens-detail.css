@@ -1051,3 +1051,340 @@
     margin: var(--space-1) auto;
   }
 }
+
+/* ============================================================
+   NEW SECTIONS — Findings, Benchmarks, Overall Gain,
+   Implementation, Reflection & Next Steps
+   ============================================================ */
+
+/* ── Findings Through Testing ── */
+.sd-findings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+}
+.sd-finding-card {
+  border: 1.5px solid var(--sd-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  background: var(--sd-card);
+  box-shadow: var(--sd-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  position: relative;
+  overflow: hidden;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.sd-finding-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+.sd-finding-card__num {
+  position: absolute;
+  top: var(--space-5);
+  right: var(--space-6);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--sd-teal);
+  font-weight: var(--weight-semi);
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+  opacity: .45;
+}
+.sd-finding-card__label {
+  font-size: 0.65rem;
+  font-weight: var(--weight-semi);
+  color: var(--sd-teal);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.sd-finding-card__title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semi);
+  color: var(--sd-heading-dark);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.sd-finding-card__body {
+  font-size: var(--text-sm);
+  color: var(--sd-text-mid);
+  line-height: var(--leading-normal);
+}
+
+/* ── Benchmark Productivity Cards (shared by Notetaker & Scrum sections) ── */
+.sd-prod-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+  margin-top: var(--space-8);
+}
+.sd-prod-card {
+  border-radius: var(--radius-xl);
+  padding: var(--space-8) var(--space-6);
+  background: var(--sd-card);
+  border: 1.5px solid var(--sd-border);
+  box-shadow: var(--sd-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.sd-prod-card--ai {
+  background: var(--sd-teal-light);
+  border-color: var(--sd-teal-border);
+}
+.sd-prod-card__label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sd-text-muted);
+}
+.sd-prod-card--ai .sd-prod-card__label {
+  color: var(--sd-teal-dark);
+}
+.sd-prod-card__metric {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 7vw, 5rem);
+  font-weight: var(--weight-semi);
+  color: var(--sd-heading-dark);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.sd-prod-card--ai .sd-prod-card__metric {
+  color: var(--sd-teal-dark);
+}
+.sd-prod-card__unit {
+  font-size: var(--text-base);
+  color: var(--sd-text-mid);
+  font-weight: var(--weight-medium);
+}
+.sd-prod-card__caption {
+  font-size: var(--text-sm);
+  color: var(--sd-text-mid);
+  line-height: var(--leading-normal);
+  margin-top: var(--space-2);
+}
+.sd-prod-card__caption strong {
+  color: var(--sd-heading-dark);
+  font-weight: var(--weight-semi);
+}
+.sd-prod-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--sd-bg);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-top: var(--space-4);
+}
+.sd-prod-bar__fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 1.2s cubic-bezier(.22, 1, .36, 1);
+}
+.sd-prod-bar__fill--manual {
+  background: linear-gradient(90deg, var(--sd-text-muted), #aaa);
+  width: 100%;
+}
+.sd-prod-bar__fill--ai {
+  background: linear-gradient(90deg, var(--sd-teal-dark), var(--sd-teal));
+  width: 42%;
+}
+
+/* ── Benchmark stat-trio (replaces .sd-impl-bullet repurpose) ── */
+.sd-bench-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+.sd-bench-stat {
+  text-align: center;
+  padding: var(--space-6) var(--space-4);
+  border: 1px solid var(--sd-border);
+  border-radius: var(--radius-md);
+  background: var(--sd-card);
+}
+.sd-bench-stat--ai {
+  background: var(--sd-teal-light);
+  border-color: var(--sd-teal-border);
+}
+.sd-bench-stat__num {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: var(--weight-semi);
+  color: var(--sd-heading-dark);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.sd-bench-stat--ai .sd-bench-stat__num {
+  color: var(--sd-teal-dark);
+}
+.sd-bench-stat__label {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  color: var(--sd-teal);
+}
+.sd-bench-stat--ai .sd-bench-stat__label {
+  color: var(--sd-teal-dark);
+}
+.sd-bench-stat__body {
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--sd-text-mid);
+  line-height: var(--leading-normal);
+}
+
+/* ── "Why it matters" callout under Notetaker bench ── */
+.sd-prod-summary {
+  margin-top: var(--space-8);
+  padding: var(--space-5) var(--space-6);
+  background: var(--sd-card);
+  border: 2px solid var(--sd-teal);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sd-shadow);
+}
+.sd-prod-summary__label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sd-teal);
+  margin-bottom: var(--space-2);
+}
+.sd-prod-summary__text {
+  font-size: var(--text-base);
+  color: var(--sd-heading-dark);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+}
+
+/* ── Overall Gain & Implementation — image figure ── */
+.sd-journey-figure {
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  background: var(--sd-card);
+  border: 1.5px solid var(--sd-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sd-shadow);
+  overflow: hidden;
+}
+.sd-journey-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.sd-journey-figure figcaption {
+  padding: var(--space-3) var(--space-5);
+  font-size: 0.82rem;
+  color: var(--sd-text-muted);
+  font-style: italic;
+  text-align: center;
+  border-top: 1px solid var(--sd-border);
+  background: #fafbfc;
+}
+
+/* ── Implementation — bullets ── */
+.sd-impl-bullets {
+  margin-top: var(--space-8);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+.sd-impl-bullet {
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--sd-border);
+  background: var(--sd-card);
+}
+.sd-impl-bullet__num {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  color: var(--sd-teal);
+  font-weight: var(--weight-semi);
+  margin-bottom: var(--space-2);
+}
+.sd-impl-bullet__title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  color: var(--sd-heading-dark);
+  margin-bottom: var(--space-1);
+}
+.sd-impl-bullet__body {
+  font-size: var(--text-xs);
+  color: var(--sd-text-mid);
+  line-height: var(--leading-normal);
+}
+
+/* ── Next Steps cards ── */
+.sd-next-steps {
+  margin-top: var(--space-8);
+}
+.sd-next-steps__heading {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semi);
+  color: var(--sd-heading-dark);
+  margin-bottom: var(--space-5);
+  letter-spacing: -0.01em;
+}
+.sd-next-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+.sd-next-card {
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--sd-border);
+  background: var(--sd-card);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  transition: border-color .2s;
+}
+.sd-next-card:hover {
+  border-color: var(--sd-teal-border);
+}
+.sd-next-card__icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--sd-teal-light);
+  color: var(--sd-teal-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: var(--weight-semi);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.sd-next-card__text {
+  font-size: var(--text-sm);
+  color: var(--sd-text-mid);
+  line-height: var(--leading-normal);
+}
+.sd-next-card__text strong {
+  color: var(--sd-heading-dark);
+  font-weight: var(--weight-semi);
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .sd-findings-grid,
+  .sd-prod-grid,
+  .sd-bench-stats,
+  .sd-impl-bullets,
+  .sd-next-grid {
+    grid-template-columns: 1fr;
+  }
+}

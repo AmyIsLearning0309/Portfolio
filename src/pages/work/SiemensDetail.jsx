@@ -16,7 +16,13 @@ const TOC_SECTIONS = [
   { id: 'sd-solution', label: 'The Solution' },
   { id: 'sd-mapping', label: 'Pain Mapping' },
   { id: 'sd-results', label: 'Results' },
+  { id: 'sd-findings', label: 'Findings' },
+  { id: 'sd-bench-notetaker', label: 'Notetaker Benchmark' },
+  { id: 'sd-bench-scrum', label: 'Scrum UXer Benchmark' },
+  { id: 'sd-overall-gain', label: 'Overall Gain' },
+  { id: 'sd-implementation', label: 'Implementation' },
   { id: 'sd-impact', label: 'Impact' },
+  { id: 'sd-reflection', label: 'Reflection' },
 ];
 
 /* ── SVG Line Chart ── */
@@ -900,6 +906,248 @@ export default function SiemensDetail() {
           </section>
 
           {/* ──────────────────────────────────────────
+              NEW — Findings Through Testing
+              ────────────────────────────────────────── */}
+          <section id="sd-findings" className="pd-section">
+            <p className="pd-section__label">Iteration</p>
+            <h2 className="pd-section__heading">
+              <span className="sd-heading-dark">Four findings</span>{' '}
+              <span className="sd-heading-mint">that shaped</span>{' '}
+              <span className="sd-heading-dark">how the assistant evolved</span>
+            </h2>
+            <p className="pd-section__body">
+              By observing how researchers interacted with the tool — where confusion occurred, how outputs were interpreted, what they trusted and what they questioned — four themes emerged. Each one shifted a piece of the design.
+            </p>
+
+            <div className="sd-findings-grid">
+              <div className="sd-finding-card">
+                <span className="sd-finding-card__num">01</span>
+                <span className="sd-finding-card__label">Theme 01</span>
+                <h3 className="sd-finding-card__title">Contextualization</h3>
+                <p className="sd-finding-card__body">
+                  The assistant performed best when given <strong>session-specific context</strong> up front — product area, test goal, persona. Without it, outputs were generic; with it, the assistant pattern-matched closer to how a senior notetaker reads a session.
+                </p>
+              </div>
+
+              <div className="sd-finding-card">
+                <span className="sd-finding-card__num">02</span>
+                <span className="sd-finding-card__label">Theme 02</span>
+                <h3 className="sd-finding-card__title">Specification</h3>
+                <p className="sd-finding-card__body">
+                  Vague instructions like <em>"summarize issues"</em> produced inconsistent outputs. <strong>Explicit field schemas</strong> — what counts as an issue, what counts as severity, what counts as a quote — turned a fuzzy task into a deterministic one.
+                </p>
+              </div>
+
+              <div className="sd-finding-card">
+                <span className="sd-finding-card__num">03</span>
+                <span className="sd-finding-card__label">Theme 03</span>
+                <h3 className="sd-finding-card__title">Verification</h3>
+                <p className="sd-finding-card__body">
+                  Researchers needed to <strong>see the receipt</strong> — what part of the transcript a finding came from. Adding inline citations and timestamps shifted the assistant from a black box to something a UXer could review and defend.
+                </p>
+              </div>
+
+              <div className="sd-finding-card">
+                <span className="sd-finding-card__num">04</span>
+                <span className="sd-finding-card__label">Theme 04</span>
+                <h3 className="sd-finding-card__title">Comparative Analysis</h3>
+                <p className="sd-finding-card__body">
+                  The most useful behavior wasn't the assistant working alone — it was the assistant <strong>diffing its own output against the notetaker's script</strong>, surfacing what neither had on their own. That's where the 4× lift came from.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* ──────────────────────────────────────────
+              NEW — Notetaker Assistant Benchmark
+              ────────────────────────────────────────── */}
+          <section id="sd-bench-notetaker" className="pd-section">
+            <p className="pd-section__label">Benchmark — Notetaker Assistant</p>
+            <h2 className="pd-section__heading">
+              <span className="sd-heading-dark">Mitigating experience gaps</span>{' '}
+              <span className="sd-heading-mint">between Notetaker–Moderator pairs</span>
+            </h2>
+            <p className="pd-section__body">
+              Benchmarked against the original manual notetaking workflow, the assistant cut session-completion time nearly in half, surfaced 31% more validated issues, and aligned 100% with expert review.
+            </p>
+
+            <div className="sd-prod-grid">
+              <div className="sd-prod-card">
+                <span className="sd-prod-card__label">Without Assistant</span>
+                <div>
+                  <span className="sd-prod-card__metric">~26</span>
+                  <span className="sd-prod-card__unit">&nbsp;minutes</span>
+                </div>
+                <p className="sd-prod-card__caption">
+                  <strong>Complete Notetaker's Script</strong><br />
+                  Usability issues capturing · top quotes capturing · debrief with moderator · file session issue · issue counts.
+                </p>
+                <div className="sd-prod-bar"><div className="sd-prod-bar__fill sd-prod-bar__fill--manual" /></div>
+              </div>
+
+              <div className="sd-prod-card sd-prod-card--ai">
+                <span className="sd-prod-card__label">With Assistant</span>
+                <div>
+                  <span className="sd-prod-card__metric">&lt;15</span>
+                  <span className="sd-prod-card__unit">&nbsp;minutes</span>
+                </div>
+                <p className="sd-prod-card__caption">
+                  <strong>Complete High-Quality Notetaker's Script</strong><br />
+                  Detailed issues capturing · relevant top quotes · issue coverage reassurance · accurate issue counts.
+                </p>
+                <div className="sd-prod-bar"><div className="sd-prod-bar__fill sd-prod-bar__fill--ai" style={{ width: '58%' }} /></div>
+              </div>
+            </div>
+
+            <div className="sd-bench-stats">
+              <div className="sd-bench-stat">
+                <div className="sd-bench-stat__num">100%</div>
+                <div className="sd-bench-stat__label">Alignment Rate</div>
+                <div className="sd-bench-stat__body">Every issue surfaced by the assistant was confirmed valid by expert reviewers.</div>
+              </div>
+              <div className="sd-bench-stat sd-bench-stat--ai">
+                <div className="sd-bench-stat__num">−47%</div>
+                <div className="sd-bench-stat__label">Reduction in time</div>
+                <div className="sd-bench-stat__body">Session-completion time cut nearly in half compared to the manual workflow.</div>
+              </div>
+              <div className="sd-bench-stat">
+                <div className="sd-bench-stat__num">+31%</div>
+                <div className="sd-bench-stat__label">New Issues Found</div>
+                <div className="sd-bench-stat__body">Additional validated usability issues surfaced beyond what the notetaker captured alone.</div>
+              </div>
+            </div>
+
+            <div className="sd-prod-summary">
+              <div className="sd-prod-summary__label">Why it matters</div>
+              <div className="sd-prod-summary__text">"Mitigate the experience levels between different pairs of Notetaker and Moderator." — junior pairings now produce documentation on par with senior ones.</div>
+            </div>
+          </section>
+
+          {/* ──────────────────────────────────────────
+              NEW — Scrum UXer Assistant Benchmark
+              ────────────────────────────────────────── */}
+          <section id="sd-bench-scrum" className="pd-section">
+            <p className="pd-section__label">Benchmark — Scrum UXer Assistant</p>
+            <h2 className="pd-section__heading">
+              <span className="sd-heading-dark">From 18 hours of categorization,</span>{' '}
+              <span className="sd-heading-mint">to under 1.</span>
+            </h2>
+            <p className="pd-section__body">
+              For the Scrum UXer's cross-domain analysis, the agent reorganized hundreds of issues into browsable themes in a fraction of the time — while preserving full traceability back to source sessions.
+            </p>
+
+            <div className="sd-prod-grid">
+              <div className="sd-prod-card">
+                <span className="sd-prod-card__label">Without Assistant</span>
+                <div>
+                  <span className="sd-prod-card__metric">~18</span>
+                  <span className="sd-prod-card__unit">&nbsp;hours</span>
+                </div>
+                <p className="sd-prod-card__caption">
+                  <strong>Categorization of Issues</strong><br />
+                  Review all issues · organize all issues · identify reoccurring themes manually across 10 product domains.
+                </p>
+                <div className="sd-prod-bar"><div className="sd-prod-bar__fill sd-prod-bar__fill--manual" /></div>
+              </div>
+
+              <div className="sd-prod-card sd-prod-card--ai">
+                <span className="sd-prod-card__label">With Assistant</span>
+                <div>
+                  <span className="sd-prod-card__metric">&lt;1</span>
+                  <span className="sd-prod-card__unit">&nbsp;hour</span>
+                </div>
+                <p className="sd-prod-card__caption">
+                  <strong>Categorization with Agent</strong><br />
+                  Browsable themes · enables fast filtering · maintains full traceability · smart search for issue targeting.
+                </p>
+                <div className="sd-prod-bar"><div className="sd-prod-bar__fill sd-prod-bar__fill--ai" style={{ width: '6%' }} /></div>
+              </div>
+            </div>
+
+            <div className="sd-bench-stats">
+              <div className="sd-bench-stat">
+                <div className="sd-bench-stat__num">100%</div>
+                <div className="sd-bench-stat__label">Alignment Rate</div>
+                <div className="sd-bench-stat__body">Every theme produced by the agent matched expert thematic groupings.</div>
+              </div>
+              <div className="sd-bench-stat sd-bench-stat--ai">
+                <div className="sd-bench-stat__num">−98%</div>
+                <div className="sd-bench-stat__label">Reduction in time</div>
+                <div className="sd-bench-stat__body">From a full sprint of categorization work to under an hour of human review.</div>
+              </div>
+              <div className="sd-bench-stat">
+                <div className="sd-bench-stat__num">+5</div>
+                <div className="sd-bench-stat__label">New Themes Found</div>
+                <div className="sd-bench-stat__body">Cross-domain themes the agent surfaced that human reviewers had originally missed.</div>
+              </div>
+            </div>
+          </section>
+
+          {/* ──────────────────────────────────────────
+              NEW — Overall Productivity Gain
+              ────────────────────────────────────────── */}
+          <section id="sd-overall-gain" className="pd-section">
+            <p className="pd-section__label">Overall Productivity Gain</p>
+            <h2 className="pd-section__heading">
+              <span className="sd-heading-dark">Two weeks of beta testing,</span>{' '}
+              <span className="sd-heading-mint">compressed into days.</span>
+            </h2>
+            <p className="pd-section__body">
+              Stitching the two assistants into the full beta-week pipeline — moderation, notetaking, debrief, categorization, and synthesis — collapsed the timeline from a fortnight of dedicated UX work into a few focused days, freeing researchers to return to their primary projects sooner.
+            </p>
+
+            <figure className="sd-journey-figure">
+              <img src="/journey-comparison.png" alt="Manual and Automated User Journey Comparison — full pipeline matrix across User Testing Session, Session Debrief, Report, Issue Categorization, and Thematic Categorization." />
+              <figcaption>Manual and Automated User Journey Comparison — full beta-week pipeline.</figcaption>
+            </figure>
+          </section>
+
+          {/* ──────────────────────────────────────────
+              NEW — Implementation
+              ────────────────────────────────────────── */}
+          <section id="sd-implementation" className="pd-section">
+            <p className="pd-section__label">Implementation</p>
+            <h2 className="pd-section__heading">
+              <span className="sd-heading-dark">Rewriting the playbook</span>{' '}
+              <span className="sd-heading-mint">for AI legibility</span>
+            </h2>
+            <p className="pd-section__body">
+              To make the assistants reliable, I produced a step-by-step guideline alongside two enhanced research scripts — one for Notetakers, one for Moderators — both restructured so the agents could parse, reference, and cross-check each section without ambiguity.
+            </p>
+            <p className="pd-section__body">
+              Every script follows the same skeleton: <strong>Session Metadata</strong> (filled before the session), <strong>Task Instructions</strong> as standardized prompts, and a <strong>Post-Test Survey</strong>. The Moderator version layers in <strong>Preparation</strong> and <strong>Introduction</strong> blocks. Identical structure across all 10 product domains is what lets the agents output comparable JSON every time.
+            </p>
+
+            <figure className="sd-journey-figure" style={{ marginTop: 'var(--space-8)' }}>
+              <img src="/impl-scripts-overview.png" alt="Enhanced Scrum UXer Playbook + Notetaker & Moderator scripts — uniform structure across every domain." />
+              <figcaption>Enhanced Scrum UXer Playbook + Notetaker &amp; Moderator scripts — uniform structure across every domain.</figcaption>
+            </figure>
+
+            <figure className="sd-journey-figure" style={{ marginTop: 'var(--space-6)' }}>
+              <img src="/impl-playbook-detail.png" alt="Inside the playbook: explicit prompts for the UX Notetakers Helper and JSON Search Agent." />
+              <figcaption>Inside the playbook: explicit prompts for the UX Notetakers Helper and JSON Search Agent — researchers follow numbered steps, not prose.</figcaption>
+            </figure>
+
+            <div className="sd-impl-bullets">
+              <div className="sd-impl-bullet">
+                <div className="sd-impl-bullet__num">01</div>
+                <div className="sd-impl-bullet__title">Standardized prompts</div>
+                <div className="sd-impl-bullet__body">Every task instruction is written as a reusable prompt — the assistant receives identical phrasing whether the domain is Change Management or Workflow Tasks.</div>
+              </div>
+              <div className="sd-impl-bullet">
+                <div className="sd-impl-bullet__num">02</div>
+                <div className="sd-impl-bullet__title">Numbered, prompt-card workflow</div>
+                <div className="sd-impl-bullet__body">The playbook walks researchers through Standby → Compare → JSON Translation step by step, so the assistant flow is reproducible without prompt-engineering knowledge.</div>
+              </div>
+              <div className="sd-impl-bullet">
+                <div className="sd-impl-bullet__num">03</div>
+                <div className="sd-impl-bullet__title">One template, ten domains</div>
+                <div className="sd-impl-bullet__body">A single Notetaker and Moderator template — researchers only swap in the Domain Name and tasks. Output stays comparable across the entire beta cycle.</div>
+              </div>
+            </div>
+          </section>
+
+          {/* ──────────────────────────────────────────
               SECTION 6 — Impact
               ────────────────────────────────────────── */}
           <section id="sd-impact" className="pd-section">
@@ -928,6 +1176,45 @@ export default function SiemensDetail() {
               <p className="sd-callout__text">
                 "The hardest part wasn't designing the tool — it was convincing a team under deadline pressure that slowing down to validate the research process would save time downstream. Earning that buy-in, as an intern, required making the cost of the current system visible. That's the lesson I carry into every research engagement: the data has to speak before the solution can."
               </p>
+            </div>
+          </section>
+
+          {/* ──────────────────────────────────────────
+              NEW — Reflection & Next Steps
+              ────────────────────────────────────────── */}
+          <section id="sd-reflection" className="pd-section">
+            <p className="pd-section__label">Reflection &amp; Next Steps</p>
+            <h2 className="pd-section__heading">
+              <span className="sd-heading-dark">AI as a tool,</span>{' '}
+              <span className="sd-heading-mint">not a substitute</span>
+            </h2>
+            <p className="pd-section__body">
+              This project reinforced for me that the value of AI is not in full automation, but in how it supports human decision-making. The assistant doesn't <em>understand</em> research goals on its own — its effectiveness depends on the clarity, intent, and judgment of the person using it.
+            </p>
+            <p className="pd-section__body" style={{ marginTop: 'var(--space-4)' }}>
+              Keeping humans in the loop was essential throughout — both to guide the system and to validate its outputs. Framing AI as a tool rather than a self-sufficient solution was what kept it complementing existing workflows instead of replacing them.
+            </p>
+
+            <div className="sd-next-steps">
+              <h3 className="sd-next-steps__heading">Next steps</h3>
+              <div className="sd-next-grid">
+                <div className="sd-next-card">
+                  <div className="sd-next-card__icon">①</div>
+                  <div className="sd-next-card__text"><strong>Publish the research paper</strong>Through Siemens' internal White Paper platform — formalizing the assistant's methodology for other research teams.</div>
+                </div>
+                <div className="sd-next-card">
+                  <div className="sd-next-card__icon">②</div>
+                  <div className="sd-next-card__text"><strong>Explore Notebook LMs</strong>As a way to support more flexible analysis and iteration beyond fixed Copilot prompts.</div>
+                </div>
+                <div className="sd-next-card">
+                  <div className="sd-next-card__icon">③</div>
+                  <div className="sd-next-card__text"><strong>Refine prompt engineering practices</strong>To improve consistency and reliability of the assistant's outputs across product domains.</div>
+                </div>
+                <div className="sd-next-card">
+                  <div className="sd-next-card__icon">④</div>
+                  <div className="sd-next-card__text"><strong>Build training &amp; onboarding resources</strong>So researchers across the org can use the assistant effectively without prompt-engineering expertise.</div>
+                </div>
+              </div>
             </div>
           </section>
 
