@@ -1,0 +1,133 @@
+/* ============================================================
+   HORIZONTAL PROJECTS — vertical scroll → horizontal track
+   ============================================================ */
+
+.hx {
+  position: relative;
+}
+
+.hx__stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: #f3f3f5;
+  padding-top: var(--navbar-height);
+}
+
+.hx__track {
+  display: flex;
+  align-items: stretch;
+  gap: clamp(1.5rem, 3vw, 2.75rem);
+  padding: 0 var(--container-pad);
+  will-change: transform;
+  transition: none;
+}
+
+.hx__card {
+  flex: 0 0 auto;
+  width: min(72vw, 820px);
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+
+.hx__card-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--color-bg-alt);
+}
+
+.hx__card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.hx__card-wash {
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+}
+
+.hx__card:hover .hx__card-img {
+  transform: scale(1.03);
+}
+
+.hx__card-body {
+  padding-top: var(--space-5);
+  max-width: 36rem;
+}
+
+.hx__card-title {
+  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+  font-weight: var(--weight-semi);
+  letter-spacing: -0.02em;
+  line-height: var(--leading-snug);
+  color: var(--color-ink);
+  margin-bottom: var(--space-2);
+}
+
+.hx__card-subtitle {
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--color-ink-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.hx__card-meta {
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+
+.hx__hint {
+  position: absolute;
+  left: var(--container-pad);
+  bottom: var(--space-8);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+  pointer-events: none;
+}
+
+@media (max-width: 767px) {
+  .hx {
+    height: auto !important;
+  }
+
+  .hx__stage {
+    position: relative;
+    height: auto;
+    padding: calc(var(--navbar-height) + var(--space-8)) 0 var(--space-16);
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+
+  .hx__track {
+    transform: none !important;
+    padding-right: var(--container-pad);
+  }
+
+  .hx__card {
+    width: min(85vw, 420px);
+    scroll-snap-align: start;
+  }
+
+  .hx__hint {
+    display: none;
+  }
+}

@@ -1,35 +1,32 @@
-import Button from '../ui/Button';
-import SplineBlob from '../ui/SplineBlob';
 import '../../styles/hero.css';
 
 export default function Hero() {
-  const scrollToWork = (e) => {
-    e.preventDefault();
-    document.getElementById('selected-works')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
-    <section className="hero">
-      <SplineBlob />
+    <section className="hero" aria-label="Introduction">
+      <div className="hero__bg" aria-hidden="true" />
       <div className="container">
         <div className="hero__inner">
           <p className="eyebrow hero__eyebrow">
-            Providence, Rhode Island &nbsp;·&nbsp; UX Design System Intern @ Siemens
+            Providence, RI · UX Design System Intern @ Siemens
           </p>
           <h1 className="hero__heading">
-            Hello, I'm <em>Amy Ai.</em>
+            Hello, I&apos;m <em>Amy Ai.</em>
           </h1>
           <p className="hero__subtitle">
             I craft products, interactions &amp; design systems.
           </p>
-          <div className="hero__ctas">
-            <Button variant="primary" size="lg" href="#selected-works" onClick={scrollToWork}>
-              View My Work
-            </Button>
-            <Button variant="outline" size="lg" to="/about">
-              About Me
-            </Button>
-          </div>
+          <p className="hero__scroll-cue" aria-hidden="true">
+            <span>Scroll to explore work</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M8 3v10M4 9l4 4 4-4"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </p>
         </div>
       </div>
     </section>
