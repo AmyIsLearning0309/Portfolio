@@ -1,15 +1,13 @@
 import Navbar from '../components/layout/Navbar';
-import Footer from '../components/layout/Footer';
-import HeroStage from '../components/home/HeroStage';
+import HorizontalProjects from '../components/home/HorizontalProjects';
 
 export default function Home() {
   return (
     <>
       <Navbar />
       <main>
-        <HeroStage />
+        <HorizontalProjects />
       </main>
-      <Footer />
     </>
   );
 }

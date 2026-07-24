@@ -1,11 +1,12 @@
 /* ============================================================
-   FOOTER — Apple grey background
+   FOOTER — paper ground
    ============================================================ */
 
 .footer {
-  background: var(--color-bg-alt);  /* #F5F5F7 */
+  background: var(--color-bg-dark);
+  color: var(--color-ink-light);
   border-top: none;
-  padding-block: var(--space-12) var(--space-8);
+  padding-block: var(--space-16) var(--space-10);
 }
 
 .footer__inner {
@@ -13,23 +14,38 @@
   grid-template-columns: 1fr 1fr;
   gap: var(--space-8);
   align-items: start;
-  padding-bottom: var(--space-8);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding-bottom: var(--space-10);
+  border-bottom: 1px solid rgba(247, 246, 242, 0.12);
   margin-bottom: var(--space-6);
+}
+
+.footer__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: var(--space-2);
+}
+
+.footer__logo {
+  display: block;
+  width: 2.25rem;
+  height: auto;
+  color: var(--color-ink-light);
+  flex-shrink: 0;
 }
 
 .footer__brand-name {
   font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: var(--weight-semi);
-  color: var(--color-ink);
-  letter-spacing: -0.02em;
-  margin-bottom: var(--space-2);
+  font-size: 1.35rem;
+  font-weight: var(--weight-bold);
+  color: var(--color-ink-light);
+  letter-spacing: -0.04em;
+  margin: 0;
 }
 
 .footer__brand-tagline {
   font-size: var(--text-sm);
-  color: var(--color-ink-muted);
+  color: rgba(247, 246, 242, 0.55);
 }
 
 .footer__nav {
@@ -41,12 +57,12 @@
 
 .footer__nav-link {
   font-size: var(--text-sm);
-  color: var(--color-ink-secondary);
+  color: rgba(247, 246, 242, 0.65);
   transition: color var(--transition-fast);
 }
 
 .footer__nav-link:hover {
-  color: var(--color-ink);
+  color: var(--color-accent);
 }
 
 .footer__bottom {
@@ -57,7 +73,7 @@
 
 .footer__copy {
   font-size: var(--text-xs);
-  color: var(--color-ink-muted);
+  color: rgba(247, 246, 242, 0.4);
 }
 
 .footer__socials {
@@ -68,14 +84,14 @@
 .footer__social-link {
   font-size: var(--text-xs);
   font-weight: var(--weight-medium);
-  color: var(--color-ink-muted);
+  color: rgba(247, 246, 242, 0.5);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   transition: color var(--transition-fast);
 }
 
 .footer__social-link:hover {
-  color: var(--color-ink);
+  color: var(--color-accent);
 }
 
 @media (max-width: 600px) {

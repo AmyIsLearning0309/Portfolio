@@ -1,12 +1,19 @@
 /* ============================================================
    TABLE OF CONTENTS — fixed left sidebar, always visible
+   Optional auto-hide shell (see .toc-shell) for Siemens-style pages
    ============================================================ */
+
+:root {
+  --toc-width: 280px;
+  --toc-slide-ease: cubic-bezier(0.45, 0.05, 0.2, 1);
+  --toc-slide-duration: 780ms;
+}
 
 .toc {
   position: fixed;
   top: var(--navbar-height);
   left: 0;
-  width: 200px;
+  width: var(--toc-width);
   height: calc(100vh - var(--navbar-height));
   padding: var(--space-10) var(--space-6) var(--space-10) var(--space-8);
   display: flex;
@@ -18,16 +25,142 @@
   z-index: 50;
 }
 
+/* ── Auto-hide shell (opt-in via autoHideAfterId) ── */
+.toc-shell {
+  position: fixed;
+  top: var(--navbar-height);
+  left: 0;
+  width: var(--toc-width);
+  height: calc(100vh - var(--navbar-height));
+  z-index: 50;
+  transform: translateX(0);
+  transition: transform var(--toc-slide-duration) var(--toc-slide-ease);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.toc-shell > * {
+  pointer-events: auto;
+}
+
+.toc-shell--collapsed {
+  /* Panel fully off-canvas; reveal control stays on the viewport edge */
+  transform: translateX(-100%);
+}
+
+.toc-shell--collapsed .toc--in-shell {
+  pointer-events: none;
+}
+
+.toc--in-shell {
+  position: relative;
+  top: auto;
+  left: auto;
+  width: 100%;
+  height: 100%;
+  z-index: auto;
+}
+
+/* Subtle show/hide control (after first tuck) */
+.toc__reveal {
+  position: absolute;
+  top: var(--space-5);
+  right: var(--space-5);
+  left: auto;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: color-mix(in srgb, var(--color-ink-muted) 50%, transparent);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 220ms ease;
+}
+
+.toc__reveal:hover,
+.toc__reveal:focus-visible {
+  color: color-mix(in srgb, var(--color-ink-muted) 80%, transparent);
+  outline: none;
+}
+
+.toc__reveal:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Open state: icon-only collapse control */
+.toc__reveal--icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.toc__reveal--icon:focus-visible {
+  text-decoration: none;
+  outline: 1px solid color-mix(in srgb, var(--color-ink-muted) 50%, transparent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.toc__reveal-chevron {
+  display: inline-block;
+  font-size: 1.125rem;
+  font-weight: var(--weight-regular);
+  line-height: 1;
+  transform: scaleY(1.55);
+  transform-origin: center;
+}
+
+.toc__reveal--collapsed {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  right: auto;
+  left: 100%;
+  padding-left: var(--space-4);
+}
+
+.toc__reveal--collapsed .toc__reveal-chevron {
+  font-size: 0.95rem;
+}
+
+/* When TOC is hidden, center main content (shared project-detail offset) */
+html.toc-is-hidden .project-detail,
+html.toc-is-hidden .siemens-detail {
+  margin-left: 0;
+}
+
+.project-detail,
+.siemens-detail {
+  transition: margin-left var(--toc-slide-duration) var(--toc-slide-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toc-shell,
+  .project-detail,
+  .siemens-detail {
+    transition: none;
+  }
+}
+
 /* Project title at top of sidebar */
 .toc__project-title {
   font-family: var(--font-display);
   font-size: var(--text-sm);
   font-weight: var(--weight-semi);
-  color: var(--color-ink);
+  color: var(--toc-accent, var(--color-ink));
   letter-spacing: -0.01em;
   line-height: var(--leading-snug);
   margin-bottom: var(--space-6);
   padding-bottom: 0;
+  white-space: nowrap;
 }
 
 /* "On this page" label */
@@ -64,6 +197,7 @@
   line-height: var(--leading-snug);
   transition: color 200ms ease;
   width: 100%;
+  white-space: nowrap;
 }
 
 .toc__link:hover {
@@ -71,7 +205,7 @@
 }
 
 .toc__link--active {
-  color: var(--color-ink);
+  color: var(--toc-accent, var(--color-ink));
   font-weight: var(--weight-medium);
 }
 
@@ -87,7 +221,7 @@
 }
 
 .toc__link--active .toc__indicator {
-  background: var(--color-ink);
+  background: var(--toc-accent, var(--color-ink));
   height: 20px;
 }
 
@@ -125,9 +259,20 @@
   color: var(--color-ink);
 }
 
-/* Hide on tablet and mobile */
+/* Hide on tablet and mobile — unchanged for auto-hide pages */
 @media (max-width: 1023px) {
-  .toc {
+  .toc,
+  .toc-shell {
     display: none;
+  }
+
+  html.toc-is-hidden .project-detail,
+  html.toc-is-hidden .siemens-detail {
+    margin-left: 0;
+  }
+
+  .project-detail,
+  .siemens-detail {
+    transition: none;
   }
 }

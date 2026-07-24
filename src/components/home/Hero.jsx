@@ -1,36 +1,27 @@
-import Button from '../ui/Button';
-import SplineBlob from '../ui/SplineBlob';
 import '../../styles/hero.css';
 
 export default function Hero() {
-  const scrollToWork = (e) => {
-    e.preventDefault();
-    document.getElementById('selected-works')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
-    <section className="hero">
-      <SplineBlob />
-      <div className="container">
-        <div className="hero__inner">
-          <p className="eyebrow hero__eyebrow">
-            Providence, Rhode Island &nbsp;·&nbsp; UX Design System Intern @ Siemens
-          </p>
-          <h1 className="hero__heading">
-            Hello, I'm <em>Amy Ai.</em>
-          </h1>
-          <p className="hero__subtitle">
-            I craft products, interactions &amp; design systems.
-          </p>
-          <div className="hero__ctas">
-            <Button variant="primary" size="lg" href="#selected-works" onClick={scrollToWork}>
-              View My Work
-            </Button>
-            <Button variant="outline" size="lg" to="/about">
-              About Me
-            </Button>
-          </div>
-        </div>
+    <section className="hero" aria-label="Introduction">
+      <div className="hero__wash" aria-hidden="true" />
+      <div className="hero__frame">
+        <p className="eyebrow hero__eyebrow">
+          Providence, RI · UX Design System Intern @ Siemens
+        </p>
+
+        <h1 className="hero__heading">
+          <span className="hero__greeting">Hello, I&apos;m</span>
+          <span className="hero__name">Amy Ai.</span>
+        </h1>
+
+        <p className="hero__subtitle">
+          I craft products, interactions &amp; design systems.
+        </p>
+
+        <p className="hero__scroll-cue" aria-hidden="true">
+          <span className="hero__scroll-dot" />
+          <span>Scroll to explore work</span>
+        </p>
       </div>
     </section>
   );

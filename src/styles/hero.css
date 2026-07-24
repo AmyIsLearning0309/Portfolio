@@ -1,86 +1,145 @@
 /* ============================================================
-   HERO — Full Spline background
+   HERO — Opal-like scale + handmade paper ground
    ============================================================ */
 
 .hero {
   position: relative;
-  height: 100svh;      /* exactly one viewport — no min-height overflow */
+  min-height: 100svh;
   display: flex;
   align-items: center;
-  padding-top: var(--navbar-height);
-  padding-bottom: var(--space-20);
-  background: var(--color-bg);
+  padding:
+    calc(var(--navbar-height) + var(--space-8))
+    var(--container-pad)
+    clamp(3rem, 8vh, 5rem);
   overflow: hidden;
+  background: var(--color-bg);
 }
 
-/* Text content sits above the Spline canvas */
-.hero__inner {
+/* Soft yellow wash — handmade light, not purple mesh */
+.hero__wash {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 45% at 78% 22%, rgba(255, 219, 1, 0.28) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 12% 78%, rgba(255, 252, 230, 0.7) 0%, transparent 65%),
+    linear-gradient(180deg, #f7f6f2 0%, #f3f1ea 100%);
+}
+
+.hero__frame {
   position: relative;
   z-index: 1;
+  width: min(100%, 72rem);
   display: grid;
-  grid-template-columns: 1fr;
-  max-width: 820px;
-  /* Left half only so text doesn't overlap the 3D scene centre */
-  width: 55%;
+  /* Opal-ish ratio: type dominates left ~2/3, air on the right */
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+  grid-template-areas:
+    'eyebrow eyebrow'
+    'heading .'
+    'subtitle cue';
+  column-gap: clamp(1.5rem, 4vw, 4rem);
+  row-gap: var(--space-5);
+  align-items: end;
 }
 
 .hero__eyebrow {
-  animation: fadeUpIn 0.5s ease both;
-  animation-delay: 0.1s;
-  margin-bottom: var(--space-5);
+  grid-area: eyebrow;
+  animation: fadeUpIn 0.55s ease both;
+  animation-delay: 0.05s;
+  margin-bottom: var(--space-2);
 }
 
 .hero__heading {
-  animation: fadeUpIn 0.5s ease both;
-  animation-delay: 0.2s;
-  margin-bottom: var(--space-6);
+  grid-area: heading;
+  animation: fadeUpIn 0.6s ease both;
+  animation-delay: 0.12s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.08em;
+  margin: 0;
+  max-width: 14ch;
+}
+
+.hero__greeting {
+  display: block;
+  font-size: clamp(1.15rem, 2.4vw, 1.85rem);
+  font-weight: var(--weight-medium);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--color-ink-secondary);
+}
+
+.hero__name {
+  display: block;
   font-size: var(--text-hero);
-  font-weight: var(--weight-semi);
-  letter-spacing: -0.03em;
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.05em;
   line-height: var(--leading-tight);
   color: var(--color-ink);
 }
 
-.hero__heading em {
-  font-style: italic;
-  color: var(--color-ink);
-  font-weight: var(--weight-light);
-}
-
 .hero__subtitle {
-  animation: fadeUpIn 0.5s ease both;
-  animation-delay: 0.35s;
-  font-size: var(--text-lg);
+  grid-area: subtitle;
+  animation: fadeUpIn 0.55s ease both;
+  animation-delay: 0.28s;
+  font-size: clamp(1.05rem, 1.6vw, 1.35rem);
   line-height: var(--leading-loose);
   color: var(--color-ink-secondary);
-  margin-bottom: var(--space-10);
-  max-width: 480px;
-  font-weight: var(--weight-regular);
+  max-width: 28ch;
+  margin: 0;
+  padding-bottom: var(--space-2);
 }
 
-.hero__ctas {
-  animation: fadeUpIn 0.5s ease both;
-  animation-delay: 0.5s;
-  display: flex;
-  gap: var(--space-4);
-  flex-wrap: wrap;
+.hero__scroll-cue {
+  grid-area: cue;
+  animation: fadeUpIn 0.55s ease both;
+  animation-delay: 0.4s;
+  justify-self: end;
+  align-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-ink);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: var(--weight-medium);
+  margin: 0;
+  padding-bottom: 0.35rem;
 }
 
-@media (max-width: 1023px) {
-  .hero__inner {
-    width: 70%;
+.hero__scroll-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 4px rgba(255, 219, 1, 0.25);
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    align-items: center;
+    padding-bottom: var(--space-16);
   }
-}
 
-@media (max-width: 767px) {
-  .hero__inner {
-    width: 100%;
+  .hero__frame {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'eyebrow'
+      'heading'
+      'subtitle'
+      'cue';
+    row-gap: var(--space-6);
   }
-}
 
-@media (max-width: 480px) {
-  .hero__ctas {
-    flex-direction: column;
-    align-items: flex-start;
+  .hero__heading {
+    max-width: none;
+  }
+
+  .hero__scroll-cue {
+    justify-self: start;
+    margin-top: var(--space-4);
   }
 }

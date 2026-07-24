@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import Logo from '../ui/Logo';
 import '../../styles/footer.css';
 
 export default function Footer() {
@@ -7,7 +8,10 @@ export default function Footer() {
       <div className="container">
         <div className="footer__inner">
           <div>
-            <p className="footer__brand-name">Amy Ai</p>
+            <div className="footer__brand">
+              <Logo className="footer__logo" title="Amy Ai" />
+              <p className="footer__brand-name">Amy Ai</p>
+            </div>
             <p className="footer__brand-tagline">UX Designer · Providence, RI</p>
           </div>
           <nav className="footer__nav" aria-label="Footer navigation">

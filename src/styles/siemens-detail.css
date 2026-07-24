@@ -6,15 +6,15 @@
 
 :root {
   /* Slide-accurate palette */
-  --sd-bg:           #F0EFEC;          /* warm grey page bg */
+  --sd-bg:           #f7f6f2;          /* match navbar / --color-bg */
   --sd-card:         #FFFFFF;          /* white card surface */
   --sd-card-mint:    #D4EFE6;          /* mint highlight card */
-  --sd-heading-dark: #2C5F52;          /* dark teal — first word of headings */
-  --sd-heading-mint: #4CB98A;          /* bright mint — accent word */
-  --sd-teal:         #4CB98A;          /* primary teal/mint */
-  --sd-teal-dark:    #2C5F52;          /* deep teal */
+  --sd-heading-dark: #161616;          /* black — primary heading words */
+  --sd-heading-mint: #31CDC7;          /* matches progress / Notetaker UI teal */
+  --sd-teal:         #31CDC7;          /* primary teal */
+  --sd-teal-dark:    #31CDC7;          /* deep teal (aligned to hero) */
   --sd-teal-light:   #D4EFE6;          /* mint card bg */
-  --sd-teal-border:  rgba(76,185,138,0.3);
+  --sd-teal-border:  rgba(49,205,199,0.3);
   --sd-text:         #2D2D2D;          /* near-black body */
   --sd-text-mid:     #4A4A4A;          /* mid grey body */
   --sd-text-muted:   #7A7A7A;          /* muted labels */
@@ -28,18 +28,65 @@
 /* ── Root wrapper ── */
 .siemens-detail {
   padding-top: var(--navbar-height);
-  margin-left: 200px;
+  margin-left: var(--toc-width, 280px);
   background: var(--sd-bg);
 }
 
-/* ── Content column: wider than generic template ── */
+/* Landing intro — header + credits on first paint */
+.siemens-detail .sd-intro-block {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 780ms cubic-bezier(0.33, 0.1, 0.25, 1),
+    transform 780ms cubic-bezier(0.33, 0.1, 0.25, 1);
+}
+
+.siemens-detail .sd-intro-block--delay {
+  transition-delay: 140ms;
+}
+
+.siemens-detail .sd-intro-block.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Hero — waits for scroll, then slides up */
+.siemens-detail .sd-hero-slide {
+  opacity: 0;
+  transform: translateY(72px);
+  transition:
+    opacity 900ms cubic-bezier(0.33, 0.1, 0.25, 1),
+    transform 900ms cubic-bezier(0.33, 0.1, 0.25, 1);
+  will-change: transform, opacity;
+}
+
+.siemens-detail .sd-hero-slide.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .siemens-detail .sd-intro-block,
+  .siemens-detail .sd-hero-slide {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ── Content column: wider than generic template, tighter side padding ── */
 .siemens-detail .pd-container {
   max-width: 1020px;
+  padding-inline: var(--space-8);
 }
 
-/* ── Hero image bg blend ── */
-.siemens-detail .pd-hero-image {
-  background: var(--sd-bg);
+/* When TOC is tucked, use a bit more of the full viewport */
+html.toc-is-hidden .siemens-detail .pd-container {
+  max-width: 1100px;
+}
+
+.siemens-detail .pd-tags {
+  margin-bottom: var(--space-8);
 }
 
 /* ── Heading two-tone style ── */
@@ -59,11 +106,6 @@
   color: var(--sd-teal);
 }
 
-/* ── Summary text ── */
-.siemens-detail .pd-summary {
-  color: var(--sd-text-mid);
-}
-
 /* ── Credits — no background, just border lines ── */
 .siemens-detail .pd-credits {
   background: transparent;
@@ -76,7 +118,7 @@
 
 /* ── Wide-column wrapper ── */
 .sd-wide {
-  margin-inline: calc(var(--space-12) * -1);
+  margin-inline: calc(var(--space-8) * -1);
 }
 
 /* ────────────────────────────────────────────
@@ -412,7 +454,9 @@
      The animated number is absolutely positioned inside, fully out of document flow. */
   position: relative;
   height: 1.15em;
-  overflow: hidden;
+  width: max-content;
+  min-width: 2.6em;
+  overflow: visible;
 }
 
 .sd-rushed-label {
@@ -557,11 +601,15 @@
    never participates in document flow or triggers grid reflow */
 .sd-stat-number-wrap {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.08em;
+  width: max-content;
+  overflow: visible;
 }
 
 .sd-stat-denom {
@@ -570,6 +618,8 @@
   color: var(--sd-teal);
   letter-spacing: -0.02em;
   line-height: 1;
+  flex-shrink: 0;
+  overflow: visible;
 }
 
 /* ────────────────────────────────────────────
@@ -785,151 +835,8 @@
    SECTION 5 — Testing Results
    ──────────────────────────────────────────── */
 
-.sd-results-grid {
-  display: grid;
-  grid-template-columns: 1.3fr 1fr;
-  gap: var(--space-8);
+.sd-results-overview {
   margin-top: var(--space-8);
-  align-items: start;
-}
-
-.sd-chart-wrap {
-  width: 100%;
-  background: var(--sd-card);
-  border: 1px solid var(--sd-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--sd-shadow);
-  padding: var(--space-6);
-}
-
-.sd-chart-title {
-  font-family: var(--font-display);
-  font-size: var(--text-lg);
-  font-weight: var(--weight-semi);
-  color: var(--sd-heading-dark);
-  margin-bottom: var(--space-4);
-  letter-spacing: -0.02em;
-}
-
-.sd-chart-legend {
-  display: flex;
-  gap: var(--space-5);
-  margin-top: var(--space-4);
-  flex-wrap: wrap;
-}
-
-.sd-chart-legend__item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-xs);
-  color: var(--sd-text-mid);
-}
-
-.sd-chart-legend__line {
-  width: 22px;
-  height: 2px;
-  border-radius: 1px;
-}
-
-.sd-chart-legend__line--dashed {
-  background: repeating-linear-gradient(
-    to right,
-    #888 0,
-    #888 4px,
-    transparent 4px,
-    transparent 8px
-  );
-}
-
-.sd-results-callout {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.sd-results-headline {
-  border: 2px solid var(--sd-teal);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5) var(--space-5);
-  background: var(--sd-card);
-  box-shadow: var(--sd-shadow);
-}
-
-.sd-results-headline p {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semi);
-  color: var(--sd-heading-dark);
-  line-height: var(--leading-snug);
-}
-
-.sd-results-verified {
-  font-size: var(--text-xs);
-  color: var(--sd-teal);
-  font-weight: var(--weight-medium);
-  margin-top: var(--space-2);
-}
-
-.sd-results-table-wrap {
-  border: 1px solid var(--sd-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  position: relative;
-  background: var(--sd-card);
-  box-shadow: var(--sd-shadow);
-}
-
-.sd-results-table-wrap::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 56px;
-  background: linear-gradient(to bottom, transparent, var(--sd-card));
-  pointer-events: none;
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-}
-
-.sd-results-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.7rem;
-  color: var(--sd-text-mid);
-}
-
-.sd-results-table th {
-  background: var(--sd-bg);
-  font-weight: var(--weight-semi);
-  color: var(--sd-text);
-  text-align: left;
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--sd-border);
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  white-space: nowrap;
-}
-
-.sd-results-table td {
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--sd-border);
-  line-height: 1.45;
-  vertical-align: top;
-}
-
-.sd-results-table tr:last-child td {
-  border-bottom: none;
-}
-
-.sd-severity-major {
-  color: var(--sd-magenta);
-  font-weight: var(--weight-semi);
-}
-
-.sd-severity-irritant {
-  color: var(--sd-teal-dark);
-  font-weight: var(--weight-semi);
 }
 
 /* ────────────────────────────────────────────
@@ -996,9 +903,6 @@
   }
   .sd-right-col {
     grid-column: 1 / -1;
-  }
-  .sd-results-grid {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -1288,6 +1192,127 @@
   text-align: center;
   border-top: 1px solid var(--sd-border);
   background: #fafbfc;
+}
+
+/* ── Expand / collapse (Scale animated flow) ── */
+.sd-expand {
+  margin-top: var(--space-6);
+}
+
+.sd-expand__panel {
+  margin-bottom: var(--space-5);
+}
+
+.sd-expand__panel[hidden] {
+  display: none;
+}
+
+.sd-expand__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 0;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--sd-teal-border);
+  color: var(--sd-teal);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    color 400ms cubic-bezier(0.33, 0.1, 0.25, 1),
+    border-color 400ms cubic-bezier(0.33, 0.1, 0.25, 1);
+}
+
+.sd-expand__toggle:hover {
+  color: var(--sd-heading-dark);
+  border-bottom-color: rgba(49, 205, 199, 0.55);
+}
+
+.sd-expand__chevron {
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translateY(-1px);
+  transition: transform 400ms cubic-bezier(0.33, 0.1, 0.25, 1);
+}
+
+.sd-expand.is-open .sd-expand__chevron {
+  transform: rotate(225deg) translateY(-1px);
+}
+
+/* Horizontal figure strip — scroll while cursor is over it */
+.sd-hscroll-wrap {
+  margin-top: var(--space-8);
+}
+
+.sd-hscroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  outline: none;
+  cursor: grab;
+  container-type: inline-size;
+  container-name: sd-hscroll;
+  /* Hide native scrollbar — custom progress bar below tracks position */
+  scrollbar-width: none;
+}
+
+.sd-hscroll::-webkit-scrollbar {
+  display: none;
+}
+
+.sd-hscroll:active {
+  cursor: grabbing;
+}
+
+.sd-hscroll__track {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-5);
+  width: max-content;
+  min-width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.sd-hscroll__item {
+  /* Size against the scrollport (cqi), not the growing track */
+  flex: 0 0 min(820px, 88cqi);
+  width: min(820px, 88cqi);
+  margin: 0;
+  scroll-snap-align: start;
+}
+
+.sd-hscroll__item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.sd-hscroll__progress {
+  margin-top: var(--space-4);
+  height: 2px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.sd-hscroll__progress-bar {
+  height: 100%;
+  width: 100%;
+  background: var(--sd-teal);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 120ms linear;
+  will-change: transform;
 }
 
 /* ── Implementation — bullets ── */
