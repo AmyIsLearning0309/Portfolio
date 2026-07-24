@@ -1,57 +1,38 @@
+import { Link } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
-import Footer from '../components/layout/Footer';
-import Contact from '../components/home/Contact';
-import PlaceholderImage from '../components/ui/PlaceholderImage';
-import SectionHeading from '../components/ui/SectionHeading';
 import '../styles/about.css';
 
-const skills = [
-  {
-    icon: '🔍',
-    title: 'UX Research',
-    items: ['User interviews', 'Usability testing', 'Affinity mapping', 'Journey mapping'],
-  },
-  {
-    icon: '✦',
-    title: 'Interaction Design',
-    items: ['Wireframing', 'Prototyping', 'Micro-interactions', 'Information architecture'],
-  },
-  {
-    icon: '⬡',
-    title: 'Design Systems',
-    items: ['Component libraries', 'Token architecture', 'Design–dev handoff', 'Documentation'],
-  },
-  {
-    icon: '◈',
-    title: 'Visual / UI Design',
-    items: ['Typography', 'Color systems', 'Responsive layouts', 'Accessibility (WCAG)'],
-  },
+const photos = [
+  { src: '/about/photo-1.jpg', alt: 'Amy with a drum kit', side: 'left' },
+  { src: '/about/photo-2.png', alt: 'Green cocktail at a bar', side: 'right' },
+  { src: '/about/photo-3.jpg', alt: 'Workshop lathe', side: 'left' },
+  { src: '/about/photo-4.jpg', alt: 'Studio shelf with flowers', side: 'right' },
 ];
 
 const experience = [
   {
-    years: '2024',
-    role: 'UX Design System Intern',
     org: 'Siemens Industry Software Inc.',
-    desc: 'Extended the enterprise design system to support Microsoft 365 Copilot AI interactions. Delivered 18 net-new components adopted by multiple product teams.',
+    role: 'UX-Design System Intern',
+    dates: 'June 2025 – September 2025',
+    desc: 'Designed and prototyped a data-driven AI agent tool that accelerated UX team productivity by 97% during agile workflows.',
   },
   {
-    years: '2024',
-    role: 'UX Researcher & Designer',
-    org: 'NASA SUITS Challenge',
+    org: 'Good Measure',
+    role: 'Creative Designer',
+    dates: 'July 2024 – October 2024',
+    desc: "Designed brand identity for MBA player Vanderbilt's personal clothing brand Vando.",
+  },
+  {
+    org: 'NASA SUITS',
+    role: 'UI/UX Designer',
+    dates: 'September 2023 – May 2024',
     desc: 'Designed an AR heads-up display interface for astronaut spacesuit use cases. Reached the national top-10 finals.',
   },
   {
-    years: '2023',
-    role: 'UX Designer & Researcher',
-    org: 'REC-O — Academic Project',
-    desc: 'Led end-to-end design of a communication coaching system through two rounds of user testing and iterative prototyping.',
-  },
-  {
-    years: '2021–Present',
-    role: 'B.Sc. Industrial Design',
-    org: 'RISD / Brown University Area',
-    desc: 'Studying at the intersection of design, technology, and human behavior in Providence, Rhode Island.',
+    org: 'Guangzhou Automobile Group, Ltd.',
+    role: 'UI/UX Designer',
+    dates: 'June 2023 – September 2023',
+    desc: 'Designed UI dashboard and carbon fibre seating for the R&D Engineering team.',
   },
 ];
 
@@ -59,84 +40,118 @@ export default function About() {
   return (
     <>
       <Navbar />
-      <main>
-        {/* Intro: white */}
-        <section className="about__intro-section">
-          <div className="container">
-            <div className="about__intro">
-              <div>
-                <h1 className="about__intro-heading">
-                  Designer, researcher,<br />curious human.
-                </h1>
-                <p className="about__intro-text">
-                  I'm Amy Ai — a UX and product designer based in Providence, Rhode Island.
-                  I believe good design solves real problems while feeling effortless to use.
-                </p>
-                <p className="about__intro-text">
-                  My work lives at the intersection of systems thinking and human empathy.
-                  Whether I'm building component libraries for enterprise software or designing
-                  AR interfaces for astronauts, I bring the same approach: understand deeply,
-                  test honestly, and iterate until it's right.
-                </p>
-                <p className="about__intro-text">
-                  Most recently, I completed a UX Design System internship at Siemens Industry
-                  Software, where I helped extend the design system to accommodate emerging
-                  AI interaction patterns with Microsoft 365 Copilot.
-                </p>
-              </div>
-              <div className="about__intro-image">
-                <PlaceholderImage
-                  color="#F5F5F7"
-                  accentColor="#1D1D1F"
-                  aspect="3/4"
-                  label="Amy Ai"
+      <main className="about">
+        {/* ── Sticky bio + floating photo collage ── */}
+        <section className="about__story" aria-label="About Amy">
+          <div className="about__story-sticky">
+            <p className="about__label">About me</p>
+            <p className="about__bio">
+              I&apos;m Amy Ai, a product designer who is passionate about crafting
+              experiences that connect people with technology in intuitive ways.
+              Always curious, collaborative, and excited to push ideas into
+              reality 🚀. When I&apos;m not heads down at working on pixels,
+              you&apos;ll catch me running outdoor with the sunset, trying to find
+              the best speakeasy bar in town, or making random analog sounds with
+              ARP2500.
+            </p>
+            <p className="about__edu">
+              Currently pursuing 🎓: Industrial Design at{' '}
+              <a
+                href="https://www.risd.edu/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="about__edu-link"
+              >
+                RISD
+              </a>{' '}
+              + Computer Science at{' '}
+              <a
+                href="https://www.brown.edu/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="about__edu-link"
+              >
+                Brown
+              </a>
+            </p>
+          </div>
+
+          <div className="about__collage" aria-hidden="true">
+            {photos.map((photo) => (
+              <figure
+                key={photo.src}
+                className={`about__collage-item about__collage-item--${photo.side}`}
+              >
+                <img
+                  src={photo.src}
+                  alt=""
+                  className="about__collage-img"
+                  loading="lazy"
                 />
-              </div>
-            </div>
+              </figure>
+            ))}
           </div>
         </section>
 
-        {/* Skills: Apple grey */}
-        <section className="about__skills-section">
-          <div className="container">
-            <SectionHeading eyebrow="Capabilities" heading="What I do" />
-            <div className="about__skills-grid">
-              {skills.map((skill) => (
-                <div key={skill.title} className="about__skill-card">
-                  <div className="about__skill-icon">{skill.icon}</div>
-                  <h3 className="about__skill-title">{skill.title}</h3>
-                  <ul className="about__skill-list">
-                    {skill.items.map((item) => (
-                      <li key={item} className="about__skill-item">{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Experience: white */}
-        <section className="about__experience-section">
-          <div className="container">
-            <SectionHeading eyebrow="Resume" heading="Experience &amp; Education" />
-            <div className="about__timeline">
+        {/* ── Experience ── */}
+        <section className="about__experience" aria-labelledby="about-exp-heading">
+          <div className="container about__experience-inner">
+            <h2 id="about-exp-heading" className="about__experience-heading">
+              My Experience
+            </h2>
+            <ul className="about__exp-list">
               {experience.map((entry) => (
-                <div key={entry.role} className="about__timeline-item">
-                  <span className="about__timeline-years">{entry.years}</span>
-                  <div>
-                    <p className="about__timeline-role">{entry.role}</p>
-                    <p className="about__timeline-org">{entry.org}</p>
-                    <p className="about__timeline-desc">{entry.desc}</p>
+                <li key={entry.org} className="about__exp-item">
+                  <p className="about__exp-org">{entry.org}</p>
+                  <div className="about__exp-detail">
+                    <p className="about__exp-role">{entry.role}</p>
+                    <p className="about__exp-dates">{entry.dates}</p>
+                    <p className="about__exp-desc">{entry.desc}</p>
                   </div>
-                </div>
+                </li>
               ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* ── Let's Connect ── */}
+        <section className="about__connect" aria-labelledby="about-connect-heading">
+          <div className="container about__connect-inner">
+            <div className="about__connect-copy">
+              <h2 id="about-connect-heading" className="about__connect-heading">
+                Let&apos;s Connect
+              </h2>
+              <p className="about__connect-text">
+                Have a new project or just say hi?
+                <br />
+                Feel free to{' '}
+                <a href="mailto:amy@example.com" className="about__connect-link">
+                  reach out to me
+                </a>
+                .
+              </p>
+            </div>
+            <div className="about__connect-nav">
+              <nav className="about__connect-col" aria-label="Site">
+                <Link to="/">Work</Link>
+                <Link to="/about">About Me</Link>
+                <Link to="/playground">Playground</Link>
+                <a href="mailto:amy@example.com">Say hello</a>
+              </nav>
+              <nav className="about__connect-col" aria-label="Social">
+                <a
+                  href="https://www.linkedin.com/in/amyai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  LinkedIn
+                </a>
+                <a href="mailto:amy@example.com">Email</a>
+              </nav>
             </div>
           </div>
         </section>
       </main>
-      <Contact />
-      <Footer />
     </>
   );
 }

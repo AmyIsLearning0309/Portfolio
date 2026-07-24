@@ -1,17 +1,24 @@
 import { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
+import Logo from '../ui/Logo';
 import '../../styles/navbar.css';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [progress, setProgress] = useState(0);
   const location = useLocation();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 60);
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0);
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [location.pathname]);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -24,23 +31,39 @@ export default function Navbar() {
     return () => { document.body.style.overflow = ''; };
   }, [menuOpen]);
 
+  const isHome = location.pathname === '/';
+  const isSiemens = location.pathname === '/work/siemens';
+
   return (
     <>
-      <nav className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`}>
-        <div className="container navbar__inner">
-          <Link to="/" className="navbar__wordmark">Amy Ai</Link>
+      <nav
+        className={[
+          'navbar',
+          scrolled ? 'navbar--scrolled' : '',
+          isHome ? 'navbar--home' : '',
+          isSiemens ? 'navbar--siemens' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+      >
+        <div className="navbar__inner">
+          <Link to="/" className="navbar__brand" aria-label="Amy Ai — Home">
+            <Logo className="navbar__logo" />
+          </Link>
 
           <ul className="navbar__links">
-            <li>
-              <NavLink
-                to="/works"
-                className={({ isActive }) =>
-                  `navbar__link${isActive ? ' navbar__link--active' : ''}`
-                }
-              >
-                Works
-              </NavLink>
-            </li>
+            {!isHome && (
+              <li>
+                <NavLink
+                  to="/works"
+                  className={({ isActive }) =>
+                    `navbar__link${isActive ? ' navbar__link--active' : ''}`
+                  }
+                >
+                  Works
+                </NavLink>
+              </li>
+            )}
             <li>
               <NavLink
                 to="/about"
@@ -74,11 +97,29 @@ export default function Navbar() {
             <span />
           </button>
         </div>
+
+        {!isHome && (
+          <div
+            className="navbar__progress"
+            role="progressbar"
+            aria-label="Reading progress"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(progress * 100)}
+          >
+            <div
+              className="navbar__progress-bar"
+              style={{ transform: `scaleX(${progress})` }}
+            />
+          </div>
+        )}
       </nav>
 
       {/* Mobile overlay menu */}
       <div className={`navbar__mobile-menu ${menuOpen ? 'is-open' : ''}`}>
-        <Link to="/works" className="navbar__mobile-link">Works</Link>
+        {!isHome && (
+          <Link to="/works" className="navbar__mobile-link">Works</Link>
+        )}
         <Link to="/about" className="navbar__mobile-link">About Me</Link>
         <Link to="/playground" className="navbar__mobile-link">Playground</Link>
       </div>

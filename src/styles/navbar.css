@@ -1,5 +1,5 @@
 /* ============================================================
-   NAVBAR — Apple frosted glass style
+   NAVBAR — light paper bar, less Apple glass
    ============================================================ */
 
 .navbar {
@@ -9,21 +9,23 @@
   right: 0;
   z-index: 1000;
   height: var(--navbar-height);
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  transition: background var(--transition-base), border-color var(--transition-base),
-    backdrop-filter var(--transition-base);
-  /* Guarantee navbar always paints above animated/transformed page sections */
+  background: rgba(247, 246, 242, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid transparent;
+  transition: background var(--transition-base), border-color var(--transition-base);
   isolation: isolate;
 }
 
 .navbar--scrolled {
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom-color: rgba(0, 0, 0, 0.08);
+  background: rgba(247, 246, 242, 0.92);
+  border-bottom-color: var(--color-border);
+}
+
+/* Homepage — no bottom rule / progress track */
+.navbar--home,
+.navbar--home.navbar--scrolled {
+  border-bottom-color: transparent;
 }
 
 .navbar__inner {
@@ -31,22 +33,74 @@
   align-items: center;
   justify-content: space-between;
   height: 100%;
+  width: 100%;
+  max-width: none;
+  padding-inline: var(--container-pad);
+  box-sizing: border-box;
 }
 
-.navbar__wordmark {
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  font-weight: var(--weight-semi);
+/* Reading progress — grey track, black fill */
+.navbar__progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: rgba(20, 20, 20, 0.12);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.navbar__progress-bar {
+  height: 100%;
+  width: 100%;
+  background: var(--color-ink);
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
+}
+
+/* Siemens project — progress matches Notetaker UI teal */
+.navbar--siemens .navbar__progress-bar {
+  background: #31cdc7;
+}
+
+.navbar--siemens .navbar__brand {
+  color: #31cdc7;
+}
+
+.navbar--siemens .navbar__brand:hover {
+  color: #2bb8b2;
+}
+
+.navbar--siemens .navbar__link {
+  color: #31cdc7;
+}
+
+.navbar--siemens .navbar__link:hover,
+.navbar--siemens .navbar__link--active {
+  color: #2bb8b2;
+}
+
+.navbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
   color: var(--color-ink);
-  letter-spacing: -0.02em;
   transition: color var(--transition-fast);
 }
 
-.navbar__wordmark:hover {
+.navbar__brand:hover {
   color: var(--color-ink-secondary);
 }
 
-/* Desktop nav links */
+.navbar__logo {
+  display: block;
+  width: 2.1rem;
+  height: auto;
+  flex-shrink: 0;
+}
+
 .navbar__links {
   display: flex;
   align-items: center;
@@ -55,45 +109,27 @@
 
 .navbar__link {
   font-size: var(--text-sm);
-  font-weight: var(--weight-regular);
+  font-weight: var(--weight-medium);
   color: var(--color-ink-secondary);
-  transition: color var(--transition-fast);
-  position: relative;
-}
-
-.navbar__link::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: var(--color-ink);
-  transition: width var(--transition-base);
+  letter-spacing: -0.01em;
+  transition:
+    color var(--transition-fast),
+    font-weight var(--transition-fast);
 }
 
 .navbar__link:hover {
   color: var(--color-ink);
-}
-
-.navbar__link:hover::after {
-  width: 100%;
+  font-weight: var(--weight-bold);
 }
 
 .navbar__link--active {
   color: var(--color-ink);
 }
 
-.navbar__link--active::after {
-  width: 100%;
-}
-
-/* Hide "Say hello" button on desktop — clean text links only */
 .navbar__cta {
   display: none;
 }
 
-/* ── Hamburger (mobile) ── */
 .navbar__hamburger {
   display: none;
   flex-direction: column;
@@ -129,7 +165,6 @@
   transform: translateY(-6.5px) rotate(-45deg);
 }
 
-/* ── Mobile overlay menu ── */
 .navbar__mobile-menu {
   display: none;
   position: fixed;
@@ -153,9 +188,9 @@
 .navbar__mobile-link {
   font-family: var(--font-display);
   font-size: var(--text-3xl);
-  font-weight: var(--weight-semi);
+  font-weight: var(--weight-bold);
   color: var(--color-ink);
-  letter-spacing: -0.025em;
+  letter-spacing: -0.04em;
   transition: color var(--transition-fast);
 }
 

@@ -1,5 +1,4 @@
 import Navbar from '../components/layout/Navbar';
-import Footer from '../components/layout/Footer';
 import SectionHeading from '../components/ui/SectionHeading';
 import '../styles/playground.css';
 
@@ -44,7 +43,6 @@ export default function Playground() {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

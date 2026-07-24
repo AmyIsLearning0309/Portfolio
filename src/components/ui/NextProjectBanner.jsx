@@ -5,19 +5,6 @@ export default function NextProjectBanner({ nextProject, prevProject }) {
   return (
     <section className="npb-section">
 
-      {/* ── Previous project — slim, understated ── */}
-      {prevProject && (
-        <div className="npb-prev-bar">
-          <Link to={`/work/${prevProject.slug}`} className="npb-prev-link">
-            <span className="npb-prev-arrow">←</span>
-            <span className="npb-prev-text">
-              <span className="npb-prev-label">Previous</span>
-              <span className="npb-prev-title">{prevProject.title}</span>
-            </span>
-          </Link>
-        </div>
-      )}
-
       {/* ── Next project — immersive full-bleed banner ── */}
       {nextProject && (
         <Link to={`/work/${nextProject.slug}`} className="npb-banner">
@@ -45,7 +32,7 @@ export default function NextProjectBanner({ nextProject, prevProject }) {
           {/* Gradient overlay for text legibility */}
           <div className="npb-overlay" />
 
-          {/* Text content — bottom-left */}
+          {/* Text content — bottom-right */}
           <div className="npb-content">
             <span className="npb-eyebrow">Next Project</span>
             <h2 className="npb-title">{nextProject.title}</h2>
@@ -57,6 +44,19 @@ export default function NextProjectBanner({ nextProject, prevProject }) {
           </div>
 
         </Link>
+      )}
+
+      {/* ── Previous project — slim, understated ── */}
+      {prevProject && (
+        <div className="npb-prev-bar">
+          <Link to={`/work/${prevProject.slug}`} className="npb-prev-link">
+            <span className="npb-prev-arrow">←</span>
+            <span className="npb-prev-text">
+              <span className="npb-prev-label">Previous</span>
+              <span className="npb-prev-title">{prevProject.title}</span>
+            </span>
+          </Link>
+        </div>
       )}
 
     </section>

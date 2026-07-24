@@ -1,5 +1,5 @@
+import { Link } from 'react-router-dom';
 import Navbar from '../../components/layout/Navbar';
-import Footer from '../../components/layout/Footer';
 import PlaceholderImage from '../../components/ui/PlaceholderImage';
 import Tag from '../../components/ui/Tag';
 import TableOfContents from '../../components/ui/TableOfContents';
@@ -31,7 +31,6 @@ export default function ProjectDetailPage({ slug }) {
             <Link to="/">Back home</Link>
           </div>
         </main>
-        <Footer />
       </>
     );
   }
@@ -43,16 +42,6 @@ export default function ProjectDetailPage({ slug }) {
 
       <main className="project-detail">
         <div className="pd-container">
-
-          {/* ── Hero image ── */}
-          <div className="pd-hero-image">
-            <PlaceholderImage
-              color={project.placeholderColor}
-              accentColor={project.placeholderAccent}
-              aspect="16/9"
-              label={project.title}
-            />
-          </div>
 
           {/* ── Title block ── */}
           <header className="pd-header" id="pd-overview">
@@ -139,8 +128,6 @@ export default function ProjectDetailPage({ slug }) {
         {/* ── Next / Prev navigation ── */}
         <NextProjectBanner nextProject={nextProject} prevProject={prevProject} />
       </main>
-
-      <Footer />
     </>
   );
 }

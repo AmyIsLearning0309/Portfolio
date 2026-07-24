@@ -1,12 +1,12 @@
 /* ============================================================
    PROJECT DETAIL PAGE
    Clean single-column, generous whitespace — no color zones
-   Left 200px reserved for fixed TOC sidebar (wide screens)
+   Left TOC sidebar reserved (wide screens)
    ============================================================ */
 
 .project-detail {
   padding-top: var(--navbar-height);
-  margin-left: 200px;
+  margin-left: var(--toc-width, 280px);
   background: var(--color-bg);
 }
 
@@ -39,9 +39,17 @@
   border-radius: var(--radius-xl);
 }
 
+/* Hero placed between credits and tags — match content column width */
+.pd-hero-image--inline {
+  margin-top: 0;
+  margin-bottom: var(--space-12);
+  margin-inline: 0;
+}
+
 /* ── Title block ── */
 .pd-header {
-  margin-bottom: var(--space-12);
+  margin-top: var(--space-12);
+  margin-bottom: var(--space-8);
 }
 
 .pd-header__meta {
@@ -72,7 +80,8 @@
   color: var(--color-ink-secondary);
   font-weight: var(--weight-regular);
   line-height: var(--leading-normal);
-  max-width: 600px;
+  max-width: none;
+  white-space: nowrap;
 }
 
 /* ── Credits row ── */
@@ -310,5 +319,9 @@
 
   .pd-header__title {
     font-size: 1.9rem;
+  }
+
+  .pd-header__subtitle {
+    white-space: normal;
   }
 }

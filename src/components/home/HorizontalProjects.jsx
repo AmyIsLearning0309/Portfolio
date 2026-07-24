@@ -4,15 +4,16 @@ import { projects } from '../../data/projects.js';
 import '../../styles/horizontal-projects.css';
 
 /**
- * Vertical scroll drives a horizontal project track (diana.lu-style).
- * Tall tunnel + sticky stage; progress maps to translateX.
+ * Diana.lu–style stage:
+ * Vertical scroll drives one continuous horizontal track.
+ * Panel 0 = homepage intro; panels 1..N = projects.
  */
 export default function HorizontalProjects() {
   const tunnelRef = useRef(null);
   const trackRef = useRef(null);
   const [progress, setProgress] = useState(0);
   const [maxShift, setMaxShift] = useState(0);
-  const [tunnelHeight, setTunnelHeight] = useState('300vh');
+  const [tunnelHeight, setTunnelHeight] = useState('400vh');
 
   useEffect(() => {
     const measure = () => {
@@ -20,14 +21,16 @@ export default function HorizontalProjects() {
       if (!track) return;
       const overflow = Math.max(0, track.scrollWidth - window.innerWidth);
       setMaxShift(overflow);
-      // Extra scroll room proportional to how far the track must travel
-      const vh = Math.max(220, 100 + (overflow / Math.max(window.innerHeight, 1)) * 100 * 1.15);
+      // Scroll distance roughly matches horizontal travel (1px scroll ≈ 1px shift feel)
+      const vh = Math.max(
+        280,
+        100 + (overflow / Math.max(window.innerHeight, 1)) * 100 * 1.2
+      );
       setTunnelHeight(`${vh}vh`);
     };
 
     measure();
-    // Remeasure after fonts/images settle
-    const t = window.setTimeout(measure, 200);
+    const t = window.setTimeout(measure, 250);
     window.addEventListener('resize', measure);
     return () => {
       window.clearTimeout(t);
@@ -63,7 +66,7 @@ export default function HorizontalProjects() {
       id="selected-works"
       ref={tunnelRef}
       style={{ height: tunnelHeight }}
-      aria-label="Selected works"
+      aria-label="Introduction and selected works"
     >
       <div className="hx__stage">
         <div
@@ -71,6 +74,122 @@ export default function HorizontalProjects() {
           ref={trackRef}
           style={{ transform: `translate3d(${-shift}px, 0, 0)` }}
         >
+          {/* ── Intro — counter-translates so it stays pinned like the navbar ── */}
+          <article
+            className="hx__intro"
+            aria-label="Introduction"
+            style={
+              shift > 0
+                ? { transform: `translate3d(${shift}px, 0, 0)` }
+                : undefined
+            }
+          >
+            <div className="hx__intro-inner">
+              <p className="eyebrow hx__intro-eyebrow">
+                Bay Area, San Francisco, CA
+              </p>
+              <h1 className="hx__intro-heading">
+                <span className="hx__intro-greeting">Hello, I&apos;m</span>
+                <a
+                  className="hx__intro-photo-link"
+                  href="https://www.linkedin.com/in/amy-ai-a1b466229/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-cursor-label="Linkedin?"
+                  aria-label="Amy Ai on LinkedIn"
+                >
+                  <img
+                    className="hx__intro-photo"
+                    src="/about/linkedin-profile.jpg"
+                    alt="Amy Ai"
+                    width={200}
+                    height={200}
+                  />
+                </a>
+                <span className="hx__intro-name">Amy Ai.</span>
+              </h1>
+              <p className="eyebrow hx__intro-tagline">
+                Forward deployed product designer,
+                <br />
+                building and shipping AI-Native Tools.
+              </p>
+            </div>
+
+            <div className="hx__intro-foot">
+              <p className="eyebrow hx__intro-subtitle">
+                <span className="hx__intro-role">
+                  Product designer{' '}
+                  <a
+                    href="https://joinmochi.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hx__intro-link"
+                  >
+                    <span className="hx__intro-at" aria-hidden="true">@</span>
+                    <img
+                      className="hx__intro-favicon"
+                      src="/brands/mochi-icon.webp"
+                      alt=""
+                      width={14}
+                      height={14}
+                      decoding="async"
+                    />
+                    <span className="hx__intro-brand">Mochi Health</span>
+                  </a>
+                </span>
+                <span className="hx__intro-role">
+                  prev.{' '}
+                  <a
+                    href="https://www.sw.siemens.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hx__intro-link"
+                  >
+                    <span className="hx__intro-at" aria-hidden="true">@</span>
+                    <img
+                      className="hx__intro-favicon"
+                      src="/brands/siemens-icon.svg"
+                      alt=""
+                      width={14}
+                      height={14}
+                      decoding="async"
+                    />
+                    <span className="hx__intro-brand">
+                      Siemens Industrial Digital Software Inc.
+                    </span>
+                  </a>
+                </span>
+              </p>
+
+              <nav className="hx__contacts" aria-label="Contact">
+                <a
+                  href="tel:+18182556234"
+                  className="hx__contacts-link"
+                  data-cursor-label="+1 (818) 255-6234"
+                >
+                  Phone
+                </a>
+                <a
+                  href="mailto:aiamy0309@gmail.com"
+                  className="hx__contacts-link"
+                  data-cursor-label="aiamy0309@gmail.com"
+                >
+                  Email
+                </a>
+                <a
+                  href="/resume.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hx__contacts-link"
+                  data-cursor-label="View resume"
+                >
+                  Resume
+                </a>
+              </nav>
+            </div>
+          </article>
+
+          {/* ── Project panels ── */}
           {projects.map((project) => (
             <Link
               key={project.id}
@@ -94,31 +213,27 @@ export default function HorizontalProjects() {
                     style={{ background: project.placeholderAccent }}
                   />
                 )}
+
+                {project.pills?.length > 0 && (
+                  <div className="hx__card-pills" aria-hidden="true">
+                    {project.pills.map((pill) => (
+                      <span key={pill} className="hx__card-pill">
+                        {pill}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
-              <div className="hx__card-body">
+
+              <div className="hx__card-head">
                 <h3 className="hx__card-title">{project.title}</h3>
-                <p className="hx__card-subtitle">{project.subtitle}</p>
-                <p className="hx__card-meta">
-                  {project.category}
-                  {project.year ? ` · ${project.year}` : ''}
-                </p>
+                {project.year && (
+                  <span className="hx__card-year">{project.year}</span>
+                )}
               </div>
             </Link>
           ))}
         </div>
-
-        <p className="hx__hint" aria-hidden="true">
-          <span>Scroll</span>
-          <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-            <path
-              d="M3 8h10M9 4l4 4-4 4"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </p>
       </div>
     </section>
   );

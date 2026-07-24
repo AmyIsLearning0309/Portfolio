@@ -27,7 +27,7 @@
 /* ── Root wrapper ── */
 .nasa-suit-detail {
   padding-top: var(--navbar-height);
-  margin-left: 200px;
+  margin-left: var(--toc-width, 280px);
   background: var(--ns-bg);
   position: relative;
   min-height: 100vh;
@@ -1215,4 +1215,206 @@
   .ns-color-chip {
     min-width: 80px;
   }
+
+  .ns-proto {
+    margin-inline: 0;
+  }
+
+  .ns-proto iframe {
+    min-height: 420px;
+  }
+
+  .ns-feature-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .ns-gif-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ns-media--wide {
+    margin-inline: 0;
+  }
 }
+
+/* ============================================================
+   VISUAL-FIRST LAYOUT — media, proto embed, feature tiles
+   ============================================================ */
+
+.ns-media {
+  margin: var(--space-10) 0;
+}
+
+.ns-media--wide {
+  margin-inline: calc(var(--space-12) * -1);
+}
+
+.ns-media__frame {
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--ns-card-border);
+  background: var(--ns-card);
+  line-height: 0;
+}
+
+.ns-media__frame img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  vertical-align: top;
+}
+
+.ns-media__caption {
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--ns-text-muted);
+  letter-spacing: 0.01em;
+}
+
+.ns-proto {
+  margin: var(--space-8) 0 var(--space-3);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--ns-card-border);
+  overflow: hidden;
+  background: #000;
+  box-shadow: var(--ns-glow-cyan);
+  margin-inline: calc(var(--space-12) * -1);
+}
+
+.ns-proto iframe {
+  display: block;
+  width: 100%;
+  min-height: min(70vh, 720px);
+  border: 0;
+  background: #0a0a0a;
+}
+
+.ns-proto__hint {
+  font-size: var(--text-sm);
+  color: var(--ns-text-muted);
+  margin-bottom: var(--space-8);
+}
+
+.ns-proto__hint a {
+  color: var(--ns-cyan);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ns-feature-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+  margin-top: var(--space-10);
+}
+
+.ns-gif-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  margin: var(--space-8) 0;
+}
+
+.ns-gif-grid .ns-media {
+  margin: 0;
+}
+
+.ns-feature-tile {
+  background: var(--ns-card);
+  border: 1px solid var(--ns-card-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.ns-feature-tile__img {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #050810;
+}
+
+.ns-feature-tile__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ns-feature-tile__title {
+  margin: var(--space-5) var(--space-5) var(--space-2);
+  font-size: var(--text-lg);
+  color: var(--ns-cyan);
+}
+
+.ns-feature-tile p {
+  margin: 0 var(--space-5) var(--space-5);
+  font-size: var(--text-sm);
+  color: var(--ns-text-mid);
+  line-height: 1.55;
+}
+
+.ns-process-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-8) 0 var(--space-10);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.ns-process-list li {
+  padding: var(--space-5) var(--space-6);
+  background: var(--ns-card);
+  border: 1px solid var(--ns-card-border);
+  border-radius: var(--radius-lg);
+  color: var(--ns-text-mid);
+  font-size: var(--text-base);
+  line-height: 1.5;
+}
+
+.ns-process-list strong {
+  color: var(--ns-cyan);
+  margin-right: var(--space-2);
+}
+
+.ns-phase-grid--compact .ns-phase-image {
+  display: none;
+}
+
+.ns-phase-grid--compact .ns-phase-card {
+  min-height: auto;
+}
+
+.ns-outcome-bullets {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-10) 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.ns-outcome-bullets li {
+  position: relative;
+  padding-left: var(--space-6);
+  color: var(--ns-text-mid);
+  font-size: var(--text-base);
+  line-height: 1.5;
+}
+
+.ns-outcome-bullets li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
+  background: var(--ns-cyan);
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+}
+
+/* Constraint cards without icons */
+.ns-constraint-card .ns-constraint-title {
+  margin-top: 0;
+}
+
+

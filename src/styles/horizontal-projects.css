@@ -1,5 +1,6 @@
 /* ============================================================
-   HORIZONTAL PROJECTS — vertical scroll → horizontal track
+   HORIZONTAL STAGE — intro + projects on one track (diana.lu)
+   Vertical scroll → translateX on sticky stage
    ============================================================ */
 
 .hx {
@@ -11,37 +12,273 @@
   top: 0;
   height: 100svh;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   overflow: hidden;
-  background: #f3f3f5;
+  background: var(--color-bg);
+  /* Full-bleed canvas under the navbar */
   padding-top: var(--navbar-height);
+}
+
+/* Foot stack — affiliation + contacts pinned to bottom */
+.hx__intro-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-6);
+  margin-top: auto;
+  width: 100%;
+  padding-bottom: var(--space-6);
+}
+
+.hx__contacts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.hx__contacts-link {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink-secondary);
+  letter-spacing: -0.01em;
+  transition:
+    color var(--transition-fast),
+    font-weight var(--transition-fast);
+}
+
+.hx__contacts-link:hover {
+  color: var(--color-ink);
+  font-weight: var(--weight-bold);
 }
 
 .hx__track {
   display: flex;
   align-items: stretch;
-  gap: clamp(1.5rem, 3vw, 2.75rem);
-  padding: 0 var(--container-pad);
+  gap: clamp(2rem, 4vw, 3.5rem);
+  /* Edge-to-edge; only trailing pad so the last card can clear */
+  padding: 0;
+  padding-right: var(--container-pad);
   will-change: transform;
-  transition: none;
+  height: 100%;
+  box-sizing: border-box;
 }
 
-.hx__card {
+/* ── Intro panel — pinned left while projects scroll past ── */
+.hx__intro {
+  position: relative;
+  z-index: 3;
   flex: 0 0 auto;
-  width: min(72vw, 820px);
+  width: max-content;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  overflow: visible;
+  padding: var(--space-4) var(--space-8) var(--space-6) var(--container-pad);
+  box-sizing: border-box;
+  /* Cover cards as they slide underneath */
+  background: var(--color-bg);
+  will-change: transform;
+}
+
+.hx__intro-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  /* Shrink-wrap to “Amy Ai.” + extra air; other lines wrap to that width */
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  padding-right: 0;
+}
+
+.hx__intro-eyebrow {
+  margin-bottom: var(--space-5);
+  width: 0;
+  min-width: 100%;
+}
+
+.hx__intro-heading {
+  /* Greeting above; photo then name on the next row */
+  --hx-name-size: clamp(2.75rem, 6.5vw, 4.5rem);
+  display: grid;
+  grid-template-columns: auto max-content;
+  column-gap: var(--space-5);
+  row-gap: var(--space-6);
+  align-items: center;
+  margin: 0 0 var(--space-6);
+}
+
+.hx__intro-greeting {
+  grid-column: 1 / -1;
+  display: block;
+  font-size: clamp(1.15rem, 2.2vw, 1.75rem);
+  font-weight: var(--weight-medium);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--color-ink-secondary);
+}
+
+.hx__intro-photo-link {
+  grid-column: 1;
+  display: block;
+  line-height: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.hx__intro-photo-link:hover {
+  opacity: 0.85;
+}
+
+.hx__intro-photo {
+  width: clamp(3.25rem, 6.5vw, 4.75rem);
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  object-position: center top;
+  /* Soft corners for profile crop */
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(20, 20, 20, 0.12);
+}
+
+.hx__intro-name {
+  grid-column: 2;
+  display: block;
+  font-size: var(--hx-name-size);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.05em;
+  line-height: var(--leading-tight);
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+
+.hx__intro-tagline {
+  margin: 0 0 var(--space-5);
+  width: 0;
+  min-width: 100%;
+}
+
+.hx__intro-subtitle {
+  /* Same type size as .eyebrow tagline; keep sentence case */
+  text-transform: none;
+  letter-spacing: -0.01em;
+  line-height: var(--leading-loose);
+  color: var(--color-ink-secondary);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15em;
+  width: max-content;
+  max-width: 100%;
+}
+
+.hx__intro-role {
+  display: block;
+  white-space: nowrap;
+}
+
+.hx__intro-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.hx__intro-at {
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.hx__intro-brand {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+.hx__intro-favicon {
+  width: 0.95em;
+  height: 0.95em;
+  border-radius: 0.22em;
+  object-fit: cover;
+  flex-shrink: 0;
+  /* Sit optically with uppercase eyebrow text */
+  transform: translateY(-0.02em);
+}
+
+.hx__intro-link:hover {
+  color: var(--color-ink-secondary);
+}
+
+/* ── Project cards ── */
+.hx__card {
+  flex: 0 0 auto;
+  /* Fit viewport under navbar (full-bleed stage) */
+  --hx-card-avail-h: calc(100svh - var(--navbar-height) - 2rem);
+  --hx-card-head-h: 2.75rem;
+  --hx-card-scale: 0.8;
+  width: calc(
+    min(
+      calc(100vw - 160px),
+      calc((var(--hx-card-avail-h) - var(--hx-card-head-h) - var(--space-4)) * 16 / 10)
+    ) * var(--hx-card-scale)
+  );
+  max-width: none;
+  max-height: calc(var(--hx-card-avail-h) * var(--hx-card-scale));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
   text-decoration: none;
   color: inherit;
+  align-self: center;
+}
+
+.hx__card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-shrink: 0;
+}
+
+.hx__card-title {
+  font-size: clamp(1.35rem, 2.4vw, 2rem);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.035em;
+  line-height: var(--leading-snug);
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.hx__card-year {
+  flex-shrink: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.04em;
+  color: var(--color-ink-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .hx__card-media {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 10;
-  border-radius: var(--radius-lg);
+  max-height: calc(
+    (var(--hx-card-avail-h) - var(--hx-card-head-h) - var(--space-4)) * var(--hx-card-scale)
+  );
+  border-radius: 0;
   overflow: hidden;
-  background: var(--color-bg-alt);
+  background: var(--color-bg-surface);
+  box-shadow: none;
+  border: none;
+  flex: 0 1 auto;
 }
 
 .hx__card-img {
@@ -49,57 +286,43 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .hx__card-wash {
   position: absolute;
   inset: 0;
-  opacity: 0.18;
+  opacity: 0.16;
 }
 
 .hx__card:hover .hx__card-img {
   transform: scale(1.03);
 }
 
-.hx__card-body {
-  padding-top: var(--space-5);
-  max-width: 36rem;
-}
-
-.hx__card-title {
-  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
-  font-weight: var(--weight-semi);
-  letter-spacing: -0.02em;
-  line-height: var(--leading-snug);
-  color: var(--color-ink);
-  margin-bottom: var(--space-2);
-}
-
-.hx__card-subtitle {
-  font-size: var(--text-base);
-  line-height: var(--leading-normal);
-  color: var(--color-ink-secondary);
-  margin-bottom: var(--space-3);
-}
-
-.hx__card-meta {
-  font-size: var(--text-sm);
-  color: var(--color-ink-muted);
-}
-
-.hx__hint {
+.hx__card-pills {
   position: absolute;
-  left: var(--container-pad);
-  bottom: var(--space-8);
+  left: var(--space-4);
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+
+.hx__card-pill {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  padding: 0.4rem 0.85rem;
   font-size: var(--text-xs);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-ink-muted);
-  pointer-events: none;
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.02em;
+  color: var(--color-ink);
+  background: rgba(255, 252, 247, 0.92);
+  border: 1px solid rgba(20, 20, 20, 0.08);
+  /* Explicit pill shape — overrides global sharp-corner reset */
+  border-radius: 9999px !important;
 }
 
 @media (max-width: 767px) {
@@ -107,27 +330,69 @@
     height: auto !important;
   }
 
+  .hx__contacts {
+    margin-top: var(--space-10);
+    padding: 0;
+  }
+
   .hx__stage {
     position: relative;
     height: auto;
-    padding: calc(var(--navbar-height) + var(--space-8)) 0 var(--space-16);
+    padding: calc(var(--navbar-height)) 0 var(--space-16);
     overflow-x: auto;
     overflow-y: visible;
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x mandatory;
+    flex-direction: column;
   }
 
   .hx__track {
     transform: none !important;
-    padding-right: var(--container-pad);
+    height: auto;
+    align-items: stretch;
+    padding: var(--space-6) var(--container-pad) var(--space-10);
+  }
+
+  .hx__intro {
+    width: max-content;
+    max-width: min(92vw, 520px);
+    min-height: 60svh;
+    scroll-snap-align: start;
+    transform: none !important;
+    background: transparent;
+    will-change: auto;
+  }
+
+  .hx__intro-eyebrow {
+    white-space: normal;
+  }
+
+  .hx__intro-inner {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .hx__intro-heading,
+  .hx__intro-eyebrow,
+  .hx__intro-tagline,
+  .hx__intro-subtitle {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .hx__intro-name {
+    font-size: clamp(2.75rem, 14vw, 4.5rem);
+    white-space: normal;
   }
 
   .hx__card {
-    width: min(85vw, 420px);
+    --hx-card-avail-h: none;
+    width: calc(100vw - var(--container-pad) - 48px);
+    max-height: none;
     scroll-snap-align: start;
   }
 
-  .hx__hint {
-    display: none;
+  .hx__card-media {
+    max-height: none;
   }
 }

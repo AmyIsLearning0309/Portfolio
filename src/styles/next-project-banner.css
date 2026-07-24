@@ -98,7 +98,7 @@
   opacity: 1.1; /* slight intensify on hover */
 }
 
-/* Text content — anchored to bottom-left */
+/* Text content — anchored to bottom-right */
 .npb-content {
   position: absolute;
   bottom: 0;
@@ -107,7 +107,9 @@
   padding: var(--space-12) var(--space-12) var(--space-12);
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   gap: var(--space-2);
+  text-align: right;
 }
 
 /* "Next Project" small caps label */
@@ -137,6 +139,7 @@
   color: rgba(255, 255, 255, 0.58);
   margin: 0;
   margin-top: var(--space-1);
+  margin-left: auto;
   line-height: var(--leading-snug);
   max-width: 520px;
 }
