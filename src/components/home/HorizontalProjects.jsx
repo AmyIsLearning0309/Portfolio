@@ -26,6 +26,7 @@ function isThumbnailFullyVisible(mediaEl, introEl) {
 /** Tight follow — smooth without feeling delayed */
 const FLOW_LERP = 0.22;
 const GIF_FADE_MS = 450;
+const GIF_HOVER_DELAY_MS = 1200;
 
 const SNAP_COUNT = projects.length; // rest (first project visible) + each following project
 
@@ -50,6 +51,7 @@ export default function HorizontalProjects() {
   const hoveredIdRef = useRef(null);
   const gifPlayIdRef = useRef(null);
   const gifFadeTimerRef = useRef(null);
+  const gifHoverTimerRef = useRef(null);
 
   const clearGifFadeTimer = () => {
     if (gifFadeTimerRef.current != null) {
@@ -58,8 +60,16 @@ export default function HorizontalProjects() {
     }
   };
 
+  const clearGifHoverTimer = () => {
+    if (gifHoverTimerRef.current != null) {
+      window.clearTimeout(gifHoverTimerRef.current);
+      gifHoverTimerRef.current = null;
+    }
+  };
+
   const hideGif = (id, { immediate = false } = {}) => {
     clearGifFadeTimer();
+    clearGifHoverTimer();
 
     if (immediate) {
       if (gifPlayIdRef.current === id) gifPlayIdRef.current = null;
@@ -81,14 +91,13 @@ export default function HorizontalProjects() {
 
   const showGif = (project) => {
     if (!project.hoverImage) return;
+    if (hoveredIdRef.current !== project.id) return;
 
     const mediaEl = mediaRefs.current[project.id];
-    if (!isThumbnailFullyVisible(mediaEl, introRef.current)) {
-      hideGif(project.id);
-      return;
-    }
+    if (!isThumbnailFullyVisible(mediaEl, introRef.current)) return;
 
     clearGifFadeTimer();
+    clearGifHoverTimer();
     gifPlayIdRef.current = project.id;
 
     setGifState((prev) => {
@@ -107,19 +116,37 @@ export default function HorizontalProjects() {
     });
   };
 
-  const tryStartGif = (project) => {
-    showGif(project);
+  const scheduleGifStart = (project) => {
+    if (!project.hoverImage) return;
+    if (gifHoverTimerRef.current != null) return;
+
+    // Already playing — keep / refresh visibility
+    if (gifPlayIdRef.current === project.id) {
+      showGif(project);
+      return;
+    }
+
+    gifHoverTimerRef.current = window.setTimeout(() => {
+      gifHoverTimerRef.current = null;
+      if (hoveredIdRef.current !== project.id) return;
+      showGif(project);
+      // If still not fully visible, reschedule while hover continues
+      if (gifPlayIdRef.current !== project.id && hoveredIdRef.current === project.id) {
+        scheduleGifStart(project);
+      }
+    }, GIF_HOVER_DELAY_MS);
   };
 
   const handleCardEnter = (project) => {
     hoveredIdRef.current = project.id;
-    tryStartGif(project);
+    scheduleGifStart(project);
   };
 
   const handleCardLeave = (project) => {
     if (hoveredIdRef.current === project.id) {
       hoveredIdRef.current = null;
     }
+    clearGifHoverTimer();
     if (gifPlayIdRef.current === project.id) hideGif(project.id);
   };
 
@@ -129,6 +156,7 @@ export default function HorizontalProjects() {
     return () => {
       document.documentElement.classList.remove('hx-scroll-snap');
       clearGifFadeTimer();
+      clearGifHoverTimer();
     };
   }, []);
 
@@ -189,10 +217,14 @@ export default function HorizontalProjects() {
       const mediaEl = mediaRefs.current[id];
       const visible = isThumbnailFullyVisible(mediaEl, introRef.current);
       if (!visible) {
+        clearGifHoverTimer();
         if (gifPlayIdRef.current === id) hideGif(id);
         return;
       }
-      if (gifPlayIdRef.current !== id) showGif(project);
+      // Fully visible again while still hovering — wait the delay before (re)starting
+      if (gifPlayIdRef.current !== id && gifHoverTimerRef.current == null) {
+        scheduleGifStart(project);
+      }
     };
 
     const shiftFromProgress = (progress) => {
@@ -388,10 +420,6 @@ export default function HorizontalProjects() {
                   if (el) cardRefs.current[project.id] = el;
                   else delete cardRefs.current[project.id];
                 }}
-                onMouseEnter={() => handleCardEnter(project)}
-                onMouseLeave={() => handleCardLeave(project)}
-                onFocus={isPreviewOnly ? undefined : () => handleCardEnter(project)}
-                onBlur={isPreviewOnly ? undefined : () => handleCardLeave(project)}
               >
                 <div
                   className="hx__card-media"
@@ -400,6 +428,10 @@ export default function HorizontalProjects() {
                     else delete mediaRefs.current[project.id];
                   }}
                   style={{ background: project.placeholderColor }}
+                  onMouseEnter={() => handleCardEnter(project)}
+                  onMouseLeave={() => handleCardLeave(project)}
+                  onFocus={() => handleCardEnter(project)}
+                  onBlur={() => handleCardLeave(project)}
                   {...(isPreviewOnly
                     ? { 'data-cursor-label': project.externalUrl.replace(/^https?:\/\//, '').replace(/\/$/, '') }
                     : {})}
