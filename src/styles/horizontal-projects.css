@@ -297,6 +297,15 @@ html.hx-scroll-snap {
   align-self: center;
 }
 
+.hx__card--preview {
+  cursor: default;
+  pointer-events: auto;
+}
+
+.hx__card--preview .hx__card-media {
+  cursor: default;
+}
+
 .hx__card-head {
   display: flex;
   flex-direction: row;
@@ -369,16 +378,11 @@ html.hx-scroll-snap {
   height: 100%;
   opacity: 0;
   pointer-events: none;
-  animation: hx-gif-fade-in 450ms ease forwards;
+  transition: opacity 450ms ease;
 }
 
-@keyframes hx-gif-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.hx__card-img--hover-visible {
+  opacity: 1;
 }
 
 .hx__card-wash {
