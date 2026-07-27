@@ -1,5 +1,39 @@
 export const projects = [
   {
+    id: 'rec-o',
+    slug: 'rec-o',
+    title: 'REC-O',
+    subtitle: 'LLM-Backed Communication Coaching System',
+    category: 'UX',
+    categoryKey: 'ux',
+    year: '2023',
+    role: 'Journey Owner · UX Researcher · UI Designer · Developer',
+    company: 'Rhode Island School of Design',
+    duration: 'Academic project',
+    tags: ['Interaction Design', 'Accessibility', 'Hardware', 'LLM'],
+    summary:
+      'A communication-coaching system that pairs an LLM-backed app (Rec) with a wearable voice-recording pin (O) to help young professionals speak with clarity and confidence in high-stakes moments.',
+    challenge:
+      'Young professionals often lack structured feedback on how they communicate in networking and high-stakes conversations. Coaching is expensive, episodic, and rarely available in the moments that matter most.',
+    approach:
+      'Designed and built Rec-O as a dual-system product: Rec prepares and reflects with users before and after conversations, while O captures speech unobtrusively during events for transcription and LLM analysis. Explored form factors that read as accessories, and iterated hardware layouts for a compact recording stack.',
+    outcomes: [
+      'Shipped a functional LLM-backed coaching website with session analysis',
+      'Designed and prototyped wearable audio-recording hardware (O)',
+      'Mapped end-to-end system architecture from capture → analysis → feedback',
+    ],
+    placeholderColor: '#F3E5F5',
+    placeholderAccent: '#7B1FA2',
+    heroImage: '/rec-o/reco-thumbnail.png',
+    pills: ['Interaction Design', 'Accessibility'],
+    images: [
+      { label: 'System Overview', aspect: '16/9' },
+      { label: 'Feedback Interface', aspect: '4/3' },
+      { label: 'Session Dashboard', aspect: '16/9' },
+      { label: 'Hardware Prototypes', aspect: '3/2' },
+    ],
+  },
+  {
     id: 'siemens',
     slug: 'siemens',
     title: 'Siemens × M365 Copilot',
@@ -25,7 +59,8 @@ export const projects = [
     ],
     placeholderColor: '#DCDCDD',
     placeholderAccent: '#00BFA5',
-    heroImage: '/siemens-hero.jpg',
+    heroImage: '/siemens/homepage-thumbnail.png',
+    hoverImage: '/siemens/siemens-task-issue.gif',
     pills: ['AI-native tool', 'User Experience Research'],
     images: [
       { label: 'Beta Testing Process', aspect: '16/9' },
@@ -66,40 +101,6 @@ export const projects = [
       { label: 'Shared Map & Navigation', aspect: '4/3' },
       { label: 'Rover Authority Model', aspect: '16/9' },
       { label: 'HITL Field Testing', aspect: '3/2' },
-    ],
-  },
-  {
-    id: 'rec-o',
-    slug: 'rec-o',
-    title: 'REC-O',
-    subtitle: 'Communication Coaching System',
-    category: 'UX',
-    categoryKey: 'ux',
-    year: '2023',
-    role: 'UX Designer & Researcher',
-    company: 'Academic Project',
-    duration: '4 months',
-    tags: ['UX Research', 'Interaction Design', 'Accessibility', 'EdTech'],
-    summary:
-      'A communication coaching system designed to help users identify and improve non-verbal communication patterns through structured, real-time feedback.',
-    challenge:
-      'Communication coaching is expensive and largely inaccessible. Most people receive no structured feedback on non-verbal cues — posture, eye contact, pacing — during high-stakes conversations like interviews, presentations, or difficult discussions.',
-    approach:
-      'Ran discovery interviews with 12 participants and synthesized findings using affinity mapping. Designed three concept directions addressing different user mindsets, then user-tested high-fidelity prototypes across two rounds with participants spanning a range of accessibility needs.',
-    outcomes: [
-      'High-fidelity prototype validated across 2 rounds of user testing',
-      'Identified 6 core interaction principles for real-time behavioral feedback UI',
-      'Presented at department design showcase to faculty and industry guests',
-    ],
-    placeholderColor: '#F3E5F5',
-    placeholderAccent: '#7B1FA2',
-    heroImage: null,
-    pills: ['Interaction Design', 'Accessibility'],
-    images: [
-      { label: 'System Overview', aspect: '16/9' },
-      { label: 'Feedback Interface', aspect: '4/3' },
-      { label: 'Session Dashboard', aspect: '16/9' },
-      { label: 'Research Synthesis', aspect: '3/2' },
     ],
   },
   {

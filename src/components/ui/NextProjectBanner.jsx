@@ -5,11 +5,23 @@ export default function NextProjectBanner({ nextProject, prevProject }) {
   return (
     <section className="npb-section">
 
-      {/* ── Next project — immersive full-bleed banner ── */}
+      {/* ── Previous project — slim strip above next banner ── */}
+      {prevProject && (
+        <div className="npb-prev-bar">
+          <Link to={`/work/${prevProject.slug}`} className="npb-prev-link">
+            <span className="npb-prev-arrow">←</span>
+            <span className="npb-prev-text">
+              <span className="npb-prev-label">Previous</span>
+              <span className="npb-prev-title">{prevProject.title}</span>
+            </span>
+          </Link>
+        </div>
+      )}
+
+      {/* ── Next project — text-height banner with cover image ── */}
       {nextProject && (
         <Link to={`/work/${nextProject.slug}`} className="npb-banner">
 
-          {/* Background — hero photo if available, coloured grid pattern as fallback */}
           <div
             className="npb-bg"
             style={
@@ -29,10 +41,8 @@ export default function NextProjectBanner({ nextProject, prevProject }) {
             }
           />
 
-          {/* Gradient overlay for text legibility */}
           <div className="npb-overlay" />
 
-          {/* Text content — bottom-right */}
           <div className="npb-content">
             <span className="npb-eyebrow">Next Project</span>
             <h2 className="npb-title">{nextProject.title}</h2>
@@ -44,19 +54,6 @@ export default function NextProjectBanner({ nextProject, prevProject }) {
           </div>
 
         </Link>
-      )}
-
-      {/* ── Previous project — slim, understated ── */}
-      {prevProject && (
-        <div className="npb-prev-bar">
-          <Link to={`/work/${prevProject.slug}`} className="npb-prev-link">
-            <span className="npb-prev-arrow">←</span>
-            <span className="npb-prev-text">
-              <span className="npb-prev-label">Previous</span>
-              <span className="npb-prev-title">{prevProject.title}</span>
-            </span>
-          </Link>
-        </div>
       )}
 
     </section>

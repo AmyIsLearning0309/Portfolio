@@ -1,5 +1,5 @@
-import ProjectDetailPage from './ProjectDetailPage';
+import RecODetail from './RecODetail';
 
 export default function RecO() {
-  return <ProjectDetailPage slug="rec-o" />;
+  return <RecODetail />;
 }

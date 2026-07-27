@@ -1,0 +1,142 @@
+/* ============================================================
+   REC-O CASE STUDY
+   ============================================================ */
+
+.reco-detail {
+  --ro-accent: #c45c6a;
+  --ro-muted: rgba(20, 20, 20, 0.55);
+}
+
+/* Match Siemens content column width + side padding */
+.reco-detail .pd-container {
+  max-width: 1020px;
+  padding-inline: var(--space-8);
+}
+
+html.toc-is-hidden .reco-detail .pd-container {
+  max-width: 1100px;
+}
+
+.ro-title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ro-title-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.ro-live-cue {
+  margin: var(--space-4) 0 0;
+  font-size: var(--text-sm);
+}
+
+.ro-live-cue a {
+  color: var(--color-ink-secondary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ro-live-cue a:hover {
+  color: var(--color-ink);
+}
+
+.ro-media {
+  margin: var(--space-8) 0;
+}
+
+.ro-media--wide {
+  margin-inline: calc(var(--space-8) * -0.5);
+}
+
+.ro-media__frame {
+  overflow: hidden;
+  background: #eceae6;
+}
+
+.ro-media__frame img,
+.ro-media__frame video {
+  display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+.ro-media__frame--video {
+  background: #111;
+}
+
+.ro-media__caption {
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+  line-height: 1.45;
+}
+
+.ro-pair {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: var(--space-4);
+  margin: var(--space-8) 0;
+}
+
+.ro-pair .ro-media {
+  margin: 0;
+}
+
+.ro-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  margin: var(--space-10) 0 var(--space-4);
+}
+
+.ro-split__card {
+  padding: var(--space-6) 0 0;
+  border-top: 1px solid rgba(20, 20, 20, 0.12);
+}
+
+.ro-split__title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semi);
+  letter-spacing: -0.02em;
+}
+
+.ro-split__card p {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--color-ink-secondary);
+}
+
+.ro-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ro-reveal--visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 1023px) {
+  .reco-detail .pd-container {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .ro-media--wide {
+    margin-inline: 0;
+  }
+
+  .ro-pair,
+  .ro-split {
+    grid-template-columns: 1fr;
+  }
+}

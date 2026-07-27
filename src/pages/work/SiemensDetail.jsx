@@ -338,7 +338,7 @@ const DonutChart = memo(function DonutChart({ animated }) {
             dominantBaseline="middle"
             fontSize={15}
             fontWeight="700"
-            style={{ fill: segs[hoveredIdx].color, fontFamily: 'Inter, sans-serif', pointerEvents: 'none' }}
+            style={{ fill: segs[hoveredIdx].color, fontFamily: 'Instrument Sans, Helvetica Neue, Arial, sans-serif', pointerEvents: 'none' }}
           >
             {segs[hoveredIdx].count}
           </text>
@@ -347,7 +347,7 @@ const DonutChart = memo(function DonutChart({ animated }) {
             textAnchor="middle"
             dominantBaseline="middle"
             fontSize={7}
-            style={{ fill: segs[hoveredIdx].color, fontFamily: 'Inter, sans-serif', pointerEvents: 'none' }}
+            style={{ fill: segs[hoveredIdx].color, fontFamily: 'Instrument Sans, Helvetica Neue, Arial, sans-serif', pointerEvents: 'none' }}
           >
             votes
           </text>

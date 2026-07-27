@@ -38,7 +38,12 @@ export default function ProjectDetailPage({ slug }) {
   return (
     <>
       <Navbar />
-      <TableOfContents sections={TOC_SECTIONS} projectTitle={project.title} />
+      <TableOfContents
+        sections={TOC_SECTIONS}
+        projectTitle={project.title}
+        accent={project.placeholderAccent}
+        autoHideAfterId="pd-problem"
+      />
 
       <main className="project-detail">
         <div className="pd-container">

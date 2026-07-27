@@ -128,7 +128,12 @@ export default function NasaSuitDetail() {
   return (
     <>
       <Navbar />
-      <TableOfContents sections={TOC_SECTIONS} projectTitle={project.title} />
+      <TableOfContents
+        sections={TOC_SECTIONS}
+        projectTitle={project.title}
+        accent="#00D4FF"
+        autoHideAfterId="ns-prototype"
+      />
 
       <main className="project-detail nasa-suit-detail">
         <div className="pd-container">

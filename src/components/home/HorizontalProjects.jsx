@@ -3,30 +3,116 @@ import { Link } from 'react-router-dom';
 import { projects } from '../../data/projects.js';
 import '../../styles/horizontal-projects.css';
 
+/** True when the media box sits fully inside the clear stage (right of intro, inside viewport). */
+function isThumbnailFullyVisible(mediaEl, introEl) {
+  if (!mediaEl) return false;
+  const rect = mediaEl.getBoundingClientRect();
+  if (rect.width < 2 || rect.height < 2) return false;
+
+  const tol = 2;
+  const leftBound = introEl ? introEl.getBoundingClientRect().right : 0;
+  const rightBound = window.innerWidth;
+  const topBound = 0;
+  const bottomBound = window.innerHeight;
+
+  return (
+    rect.left >= leftBound - tol &&
+    rect.right <= rightBound + tol &&
+    rect.top >= topBound - tol &&
+    rect.bottom <= bottomBound + tol
+  );
+}
+
+/** Tight follow — smooth without feeling delayed */
+const FLOW_LERP = 0.22;
+
+const SNAP_COUNT = 1 + projects.length; // intro + each project
+
 /**
- * Diana.lu–style stage:
- * Vertical scroll drives one continuous horizontal track.
- * Panel 0 = homepage intro; panels 1..N = projects.
+ * Vertical scroll drives a horizontal track.
+ * Scroll progress maps continuously across card-centered snap points
+ * (native CSS scroll-snap) — no post-scroll recenter delay.
  */
 export default function HorizontalProjects() {
   const tunnelRef = useRef(null);
   const trackRef = useRef(null);
-  const [progress, setProgress] = useState(0);
-  const [maxShift, setMaxShift] = useState(0);
-  const [tunnelHeight, setTunnelHeight] = useState('400vh');
+  const introRef = useRef(null);
+  const mediaRefs = useRef({});
+  const cardRefs = useRef({});
+  const snapShiftsRef = useRef([0]);
+  const targetShiftRef = useRef(0);
+  const currentShiftRef = useRef(0);
+  const [tunnelHeight, setTunnelHeight] = useState(`${SNAP_COUNT * 100}svh`);
+  const [gifPlay, setGifPlay] = useState(null);
+  const hoveredIdRef = useRef(null);
+  const gifPlayIdRef = useRef(null);
 
+  const stopGif = () => {
+    gifPlayIdRef.current = null;
+    setGifPlay(null);
+  };
+
+  const tryStartGif = (project) => {
+    if (!project.hoverImage) return;
+    const mediaEl = mediaRefs.current[project.id];
+    if (!isThumbnailFullyVisible(mediaEl, introRef.current)) {
+      stopGif();
+      return;
+    }
+    const next = { id: project.id, key: Date.now() };
+    gifPlayIdRef.current = project.id;
+    setGifPlay(next);
+  };
+
+  const handleCardEnter = (project) => {
+    hoveredIdRef.current = project.id;
+    tryStartGif(project);
+  };
+
+  const handleCardLeave = (project) => {
+    if (hoveredIdRef.current === project.id) {
+      hoveredIdRef.current = null;
+    }
+    if (gifPlayIdRef.current === project.id) stopGif();
+  };
+
+  // Enable native vertical scroll-snap while this section is mounted
+  useEffect(() => {
+    document.documentElement.classList.add('hx-scroll-snap');
+    return () => document.documentElement.classList.remove('hx-scroll-snap');
+  }, []);
+
+  // Measure max travel + per-card center shifts (at rest transform)
   useEffect(() => {
     const measure = () => {
       const track = trackRef.current;
+      const intro = introRef.current;
       if (!track) return;
-      const overflow = Math.max(0, track.scrollWidth - window.innerWidth);
-      setMaxShift(overflow);
-      // Scroll distance roughly matches horizontal travel (1px scroll ≈ 1px shift feel)
-      const vh = Math.max(
-        280,
-        100 + (overflow / Math.max(window.innerHeight, 1)) * 100 * 1.2
-      );
-      setTunnelHeight(`${vh}vh`);
+
+      const prevTrack = track.style.transform;
+      const prevIntro = intro?.style.transform ?? '';
+      track.style.transform = 'translate3d(0,0,0)';
+      if (intro) intro.style.transform = 'none';
+
+      const max = Math.max(0, track.scrollWidth - window.innerWidth);
+      const introRight = intro?.getBoundingClientRect().right ?? 0;
+      const focusX = (introRight + window.innerWidth) / 2;
+
+      const snaps = [0];
+      projects.forEach((project) => {
+        const card = cardRefs.current[project.id];
+        if (!card) return;
+        const rect = card.getBoundingClientRect();
+        if (rect.width < 2) return;
+        const cx = rect.left + rect.width / 2;
+        snaps.push(Math.max(0, Math.min(max, cx - focusX)));
+      });
+
+      snapShiftsRef.current = snaps;
+      track.style.transform = prevTrack;
+      if (intro) intro.style.transform = prevIntro;
+
+      setTunnelHeight(`${SNAP_COUNT * 100}svh`);
     };
 
     measure();
@@ -38,27 +124,76 @@ export default function HorizontalProjects() {
     };
   }, []);
 
+  // Scroll progress → interpolate across snap shifts; tight lerp for polish
   useEffect(() => {
-    const tunnel = tunnelRef.current;
-    if (!tunnel) return;
+    let raf = 0;
 
-    const onScroll = () => {
-      const rect = tunnel.getBoundingClientRect();
-      const range = tunnel.offsetHeight - window.innerHeight;
-      if (range <= 0) {
-        setProgress(0);
+    const syncGifVisibility = () => {
+      const id = hoveredIdRef.current;
+      if (!id) return;
+      const project = projects.find((p) => p.id === id);
+      if (!project?.hoverImage) return;
+
+      const mediaEl = mediaRefs.current[id];
+      const visible = isThumbnailFullyVisible(mediaEl, introRef.current);
+      if (!visible) {
+        if (gifPlayIdRef.current === id) stopGif();
         return;
       }
-      const raw = -rect.top / range;
-      setProgress(Math.max(0, Math.min(1, raw)));
+      if (gifPlayIdRef.current !== id) {
+        const next = { id, key: Date.now() };
+        gifPlayIdRef.current = id;
+        setGifPlay(next);
+      }
     };
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [tunnelHeight]);
+    const shiftFromProgress = (progress) => {
+      const snaps = snapShiftsRef.current;
+      const n = snaps.length;
+      if (n === 0) return 0;
+      if (n === 1) return snaps[0];
 
-  const shift = progress * maxShift;
+      const scaled = Math.max(0, Math.min(1, progress)) * (n - 1);
+      const i = Math.min(n - 2, Math.floor(scaled));
+      const t = scaled - i;
+      return snaps[i] + (snaps[i + 1] - snaps[i]) * t;
+    };
+
+    const readProgress = () => {
+      const tunnel = tunnelRef.current;
+      if (!tunnel) return 0;
+      const rect = tunnel.getBoundingClientRect();
+      const range = tunnel.offsetHeight - window.innerHeight;
+      if (range <= 0) return 0;
+      return Math.max(0, Math.min(1, -rect.top / range));
+    };
+
+    const tick = () => {
+      targetShiftRef.current = shiftFromProgress(readProgress());
+
+      const track = trackRef.current;
+      const intro = introRef.current;
+      const target = targetShiftRef.current;
+      let current = currentShiftRef.current;
+      current += (target - current) * FLOW_LERP;
+      if (Math.abs(target - current) < 0.2) current = target;
+      currentShiftRef.current = current;
+
+      if (track) {
+        track.style.transform = `translate3d(${-current}px, 0, 0)`;
+      }
+      if (intro) {
+        intro.style.transform =
+          current > 0.5 ? `translate3d(${current}px, 0, 0)` : 'none';
+      }
+
+      syncGifVisibility();
+      raf = requestAnimationFrame(tick);
+    };
+
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [tunnelHeight]);
 
   return (
     <section
@@ -68,26 +203,17 @@ export default function HorizontalProjects() {
       style={{ height: tunnelHeight }}
       aria-label="Introduction and selected works"
     >
+      {/* Native snap stops — one viewport per intro/card */}
+      <div className="hx__snap-rail" aria-hidden="true">
+        {Array.from({ length: SNAP_COUNT }, (_, i) => (
+          <div key={i} className="hx__snap-stop" />
+        ))}
+      </div>
+
       <div className="hx__stage">
-        <div
-          className="hx__track"
-          ref={trackRef}
-          style={{ transform: `translate3d(${-shift}px, 0, 0)` }}
-        >
-          {/* ── Intro — counter-translates so it stays pinned like the navbar ── */}
-          <article
-            className="hx__intro"
-            aria-label="Introduction"
-            style={
-              shift > 0
-                ? { transform: `translate3d(${shift}px, 0, 0)` }
-                : undefined
-            }
-          >
+        <div className="hx__track" ref={trackRef}>
+          <article className="hx__intro" ref={introRef} aria-label="Introduction">
             <div className="hx__intro-inner">
-              <p className="eyebrow hx__intro-eyebrow">
-                Bay Area, San Francisco, CA
-              </p>
               <h1 className="hx__intro-heading">
                 <span className="hx__intro-greeting">Hello, I&apos;m</span>
                 <a
@@ -108,15 +234,15 @@ export default function HorizontalProjects() {
                 </a>
                 <span className="hx__intro-name">Amy Ai.</span>
               </h1>
-              <p className="eyebrow hx__intro-tagline">
+              <p className="hx__intro-tagline">
                 Forward deployed product designer,
                 <br />
-                building and shipping AI-Native Tools.
+                building and shipping AI-native tools.
               </p>
             </div>
 
             <div className="hx__intro-foot">
-              <p className="eyebrow hx__intro-subtitle">
+              <p className="hx__intro-subtitle">
                 <span className="hx__intro-role">
                   Product designer{' '}
                   <a
@@ -138,7 +264,7 @@ export default function HorizontalProjects() {
                   </a>
                 </span>
                 <span className="hx__intro-role">
-                  prev.{' '}
+                  Prev.{' '}
                   <a
                     href="https://www.sw.siemens.com/"
                     target="_blank"
@@ -189,50 +315,77 @@ export default function HorizontalProjects() {
             </div>
           </article>
 
-          {/* ── Project panels ── */}
-          {projects.map((project) => (
-            <Link
-              key={project.id}
-              to={`/work/${project.slug}`}
-              className="hx__card"
-              aria-label={`Open ${project.title} case study`}
-            >
-              <div
-                className="hx__card-media"
-                style={{ background: project.placeholderColor }}
+          {projects.map((project) => {
+            const isGifPlaying = gifPlay?.id === project.id;
+
+            return (
+              <Link
+                key={project.id}
+                to={`/work/${project.slug}`}
+                className={`hx__card${isGifPlaying ? ' hx__card--gif-playing' : ''}`}
+                aria-label={`Open ${project.title} case study`}
+                ref={(el) => {
+                  if (el) cardRefs.current[project.id] = el;
+                  else delete cardRefs.current[project.id];
+                }}
+                onMouseEnter={() => handleCardEnter(project)}
+                onMouseLeave={() => handleCardLeave(project)}
+                onFocus={() => handleCardEnter(project)}
+                onBlur={() => handleCardLeave(project)}
               >
-                {project.heroImage ? (
-                  <img
-                    src={project.heroImage}
-                    alt=""
-                    className="hx__card-img"
-                  />
-                ) : (
-                  <div
-                    className="hx__card-wash"
-                    style={{ background: project.placeholderAccent }}
-                  />
-                )}
+                <div
+                  className="hx__card-media"
+                  ref={(el) => {
+                    if (el) mediaRefs.current[project.id] = el;
+                    else delete mediaRefs.current[project.id];
+                  }}
+                  style={{ background: project.placeholderColor }}
+                >
+                  {project.heroImage ? (
+                    <>
+                      <img
+                        src={project.heroImage}
+                        alt=""
+                        className={`hx__card-img${project.slug === 'rec-o' ? ' hx__card-img--rec-o' : ''}`}
+                      />
+                      {project.hoverImage && isGifPlaying && (
+                        <img
+                          key={gifPlay.key}
+                          src={`${project.hoverImage}?restart=${gifPlay.key}`}
+                          alt=""
+                          className="hx__card-img hx__card-img--hover"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <div
+                      className="hx__card-wash"
+                      style={{ background: project.placeholderAccent }}
+                    />
+                  )}
+                </div>
 
-                {project.pills?.length > 0 && (
-                  <div className="hx__card-pills" aria-hidden="true">
-                    {project.pills.map((pill) => (
-                      <span key={pill} className="hx__card-pill">
-                        {pill}
-                      </span>
-                    ))}
+                <div className="hx__card-head">
+                  <h3 className="hx__card-title">{project.title}</h3>
+                  <div className="hx__card-meta">
+                    {project.pills?.length > 0 && (
+                      <div className="hx__card-pills" aria-hidden="true">
+                        {project.pills.map((pill) => (
+                          <span key={pill} className="hx__card-pill">
+                            {pill}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {project.year && (
+                      <span className="hx__card-year">{project.year}</span>
+                    )}
                   </div>
-                )}
-              </div>
-
-              <div className="hx__card-head">
-                <h3 className="hx__card-title">{project.title}</h3>
-                {project.year && (
-                  <span className="hx__card-year">{project.year}</span>
-                )}
-              </div>
-            </Link>
-          ))}
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>
