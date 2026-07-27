@@ -12,34 +12,45 @@ const TEAL_DIST_SQ = 110 * 110;
 /** When canvas sampling fails, force white over known teal media */
 const TEAL_FALLBACK_SEL =
   '.pd-hero-img, .sd-journey-figure img, .sd-hscroll__item img, .sd-hscroll__progress-bar';
+/** WCAG relative luminance — 0 (black) → 1 (white) */
+const relativeLuminance = ({ r, g, b }) => {
+  const lin = [r, g, b].map((c) => {
+    const n = c / 255;
+    return n <= 0.03928 ? n / 12.92 : ((n + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
+};
+
 /**
  * Circle cursor → rounded square on clickables,
  * or a black info pill when the target has data-cursor-label.
- * On Siemens, flips to white when over teal / low-contrast fills.
+ * Siemens: teal cursor, white over similar teal fills.
+ * Homepage: dark cursor, white over dark backgrounds / thumbnails.
  */
 export default function CursorCircle() {
   const ringRef = useRef(null);
   const pos = useRef({ x: 0, y: 0 });
   const target = useRef({ x: 0, y: 0 });
   const rafRef = useRef(0);
-  const isSiemensRef = useRef(false);
-  const onSimilarRef = useRef(false);
+  const contrastPageRef = useRef(null); // 'siemens' | 'home' | null
+  const invertRef = useRef(false);
   const sampleCache = useRef(new Map()); // img src → { canvas, ctx, w, h }
   const [enabled, setEnabled] = useState(false);
   const [hovering, setHovering] = useState(false);
   const [visible, setVisible] = useState(false);
   const [label, setLabel] = useState('');
-  const [onSimilar, setOnSimilar] = useState(false);
+  const [invert, setInvert] = useState(false);
   const { pathname } = useLocation();
   const isSiemens = pathname === '/work/siemens';
-  isSiemensRef.current = isSiemens;
+  const isHome = pathname === '/';
+  contrastPageRef.current = isSiemens ? 'siemens' : isHome ? 'home' : null;
 
   useEffect(() => {
-    if (!isSiemens && onSimilarRef.current) {
-      onSimilarRef.current = false;
-      setOnSimilar(false);
+    if (!contrastPageRef.current && invertRef.current) {
+      invertRef.current = false;
+      setInvert(false);
     }
-  }, [isSiemens]);
+  }, [pathname]);
 
   useEffect(() => {
     const fine = window.matchMedia('(pointer: fine)').matches;
@@ -157,28 +168,52 @@ export default function CursorCircle() {
       return parseRgb(getComputedStyle(document.body).backgroundColor);
     };
 
-    const sampleUnderCursor = (x, y) => {
+    const sampleColorUnder = (x, y) => {
       const stack = document.elementsFromPoint?.(x, y) || [];
       const hit =
         stack.find((n) => n.nodeType === 1 && !n.closest?.('.cursor-circle')) ||
         document.elementFromPoint(x, y);
-      if (!hit || hit.closest?.('.cursor-circle')) return false;
+      if (!hit || hit.closest?.('.cursor-circle')) return null;
 
-      // Prefer pixel sample on images (teal slide PNGs)
-      const img = hit.tagName === 'IMG' ? hit : null;
+      const img =
+        hit.tagName === 'IMG'
+          ? hit
+          : hit.querySelector?.('img') || stack.find((n) => n.tagName === 'IMG');
+
       if (img) {
         const px = sampleImagePixel(img, x, y);
-        if (px) return isTealLike(px);
-        // CORS / unload fallback: known teal slide regions
-        if (img.matches(TEAL_FALLBACK_SEL)) return true;
+        if (px) return px;
       }
 
-      if (hit.matches?.(TEAL_FALLBACK_SEL) || hit.closest?.(TEAL_FALLBACK_SEL)) {
-        return true;
-      }
+      return sampleBgUnder(hit);
+    };
 
-      const bg = sampleBgUnder(hit);
-      if (isTealLike(bg)) return true;
+    const needsLightCursor = (rgb, page) => {
+      if (!rgb) return false;
+      if (page === 'siemens') return isTealLike(rgb);
+      if (page === 'home') {
+        // Dark fills / thumbnails → white cursor for contrast
+        if (relativeLuminance(rgb) < 0.42) return true;
+        // Mid teal Siemens card thumbnail
+        if (isTealLike(rgb)) return true;
+        return false;
+      }
+      return false;
+    };
+
+    const shouldInvertAt = (x, y, page) => {
+      if (!page) return false;
+      const rgb = sampleColorUnder(x, y);
+      if (rgb && needsLightCursor(rgb, page)) return true;
+
+      // Siemens: selector fallback when canvas is tainted
+      if (page === 'siemens') {
+        const stack = document.elementsFromPoint?.(x, y) || [];
+        const hit = stack.find((n) => n.nodeType === 1 && !n.closest?.('.cursor-circle'));
+        if (hit?.matches?.(TEAL_FALLBACK_SEL) || hit?.closest?.(TEAL_FALLBACK_SEL)) {
+          return true;
+        }
+      }
 
       return false;
     };
@@ -202,9 +237,9 @@ export default function CursorCircle() {
       setVisible(false);
       setHovering(false);
       setLabel('');
-      if (onSimilarRef.current) {
-        onSimilarRef.current = false;
-        setOnSimilar(false);
+      if (invertRef.current) {
+        invertRef.current = false;
+        setInvert(false);
       }
     };
 
@@ -237,12 +272,13 @@ export default function CursorCircle() {
         el.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0)`;
       }
 
-      // Siemens only: sample under pointer once per frame (rAF-throttled)
-      if (isSiemensRef.current) {
-        const similar = sampleUnderCursor(target.current.x, target.current.y);
-        if (similar !== onSimilarRef.current) {
-          onSimilarRef.current = similar;
-          setOnSimilar(similar);
+      // Contrast-aware pages: sample under pointer once per frame
+      const page = contrastPageRef.current;
+      if (page) {
+        const nextInvert = shouldInvertAt(target.current.x, target.current.y, page);
+        if (nextInvert !== invertRef.current) {
+          invertRef.current = nextInvert;
+          setInvert(nextInvert);
         }
       }
 
@@ -276,7 +312,7 @@ export default function CursorCircle() {
       className={[
         'cursor-circle',
         isSiemens ? 'cursor-circle--siemens' : '',
-        isSiemens && onSimilar ? 'cursor-circle--on-similar' : '',
+        invert ? 'cursor-circle--invert' : '',
         visible ? 'is-visible' : '',
         hovering ? 'is-hover' : '',
         showPill ? 'is-pill' : '',

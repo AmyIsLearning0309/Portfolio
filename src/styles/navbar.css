@@ -22,10 +22,15 @@
   border-bottom-color: var(--color-border);
 }
 
-/* Homepage — no bottom rule / progress track */
+/* Homepage — no bottom rule / progress track; solid white bar */
 .navbar--home,
 .navbar--home.navbar--scrolled {
   border-bottom-color: transparent;
+  background: #ffffff;
+}
+
+.home-page .navbar__mobile-menu {
+  background: #ffffff;
 }
 
 .navbar__inner {

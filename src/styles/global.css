@@ -25,9 +25,10 @@
   --color-border: rgba(20, 20, 20, 0.1);
   --color-border-strong: rgba(20, 20, 20, 0.18);
 
-  /* ── Typography — Instrument Sans ≈ Roobert energy ── */
+  /* ── Typography — Instrument Sans site-wide ── */
   --font-display: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;
   --font-body: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: var(--font-body);
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -115,6 +116,13 @@ body {
   background-image:
     radial-gradient(rgba(20, 20, 20, 0.035) 0.6px, transparent 0.6px);
   background-size: 3px 3px;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
 }
 
 a {

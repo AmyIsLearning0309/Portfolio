@@ -1,8 +1,7 @@
 /* ============================================================
    NEXT PROJECT BANNER
-   Full-bleed immersive navigation at the bottom of case studies.
-   Prev project → minimal strip above.
-   Next project → large cover-image-style banner with overlay + text.
+   Prev project — slim strip above.
+   Next project — cover image sized to the text block.
    ============================================================ */
 
 .npb-section {
@@ -59,12 +58,11 @@
   line-height: 1.2;
 }
 
-/* ── Next project banner ── */
+/* ── Next project banner — height follows text ── */
 .npb-banner {
   display: block;
   position: relative;
   overflow: hidden;
-  height: min(54vh, 500px);
   text-decoration: none;
   cursor: pointer;
 }
@@ -87,24 +85,22 @@
   inset: 0;
   background: linear-gradient(
     165deg,
-    rgba(0, 0, 0, 0.04) 0%,
-    rgba(0, 0, 0, 0.22) 35%,
-    rgba(0, 0, 0, 0.70) 100%
+    rgba(0, 0, 0, 0.18) 0%,
+    rgba(0, 0, 0, 0.45) 45%,
+    rgba(0, 0, 0, 0.72) 100%
   );
   transition: opacity 0.5s ease;
 }
 
 .npb-banner:hover .npb-overlay {
-  opacity: 1.1; /* slight intensify on hover */
+  opacity: 1.1;
 }
 
-/* Text content — anchored to bottom-right */
+/* Text content — in flow so banner height matches the copy */
 .npb-content {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: var(--space-12) var(--space-12) var(--space-12);
+  position: relative;
+  z-index: 1;
+  padding: var(--space-8) var(--space-12);
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -124,11 +120,11 @@
 /* Project title — large display */
 .npb-title {
   font-family: var(--font-display);
-  font-size: clamp(2.2rem, 4.5vw, 3.75rem);
+  font-size: clamp(1.75rem, 3.2vw, 2.5rem);
   font-weight: var(--weight-semi);
   color: #ffffff;
   letter-spacing: -0.035em;
-  line-height: 1.0;
+  line-height: 1.05;
   margin: 0;
   margin-top: var(--space-1);
 }
@@ -149,7 +145,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  margin-top: var(--space-4);
+  margin-top: var(--space-3);
   font-size: var(--text-sm);
   font-weight: var(--weight-semi);
   color: rgba(255, 255, 255, 0.88);
@@ -168,7 +164,7 @@
 /* ── Responsive ── */
 @media (max-width: 1023px) {
   .npb-content {
-    padding: var(--space-8);
+    padding: var(--space-7) var(--space-8);
   }
 
   .npb-prev-bar {
@@ -177,10 +173,6 @@
 }
 
 @media (max-width: 767px) {
-  .npb-banner {
-    height: min(46vh, 360px);
-  }
-
   .npb-content {
     padding: var(--space-6);
   }
@@ -190,10 +182,10 @@
   }
 
   .npb-title {
-    font-size: clamp(1.8rem, 7vw, 2.4rem);
+    font-size: clamp(1.5rem, 6vw, 2rem);
   }
 
   .npb-subtitle {
-    display: none; /* keep it clean on small screens */
+    display: none;
   }
 }

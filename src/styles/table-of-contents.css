@@ -131,21 +131,18 @@
   font-size: 0.95rem;
 }
 
-/* When TOC is hidden, center main content (shared project-detail offset) */
-html.toc-is-hidden .project-detail,
-html.toc-is-hidden .siemens-detail {
+/* When TOC is hidden, center main content */
+html.toc-is-hidden .project-detail {
   margin-left: 0;
 }
 
-.project-detail,
-.siemens-detail {
+.project-detail {
   transition: margin-left var(--toc-slide-duration) var(--toc-slide-ease);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .toc-shell,
-  .project-detail,
-  .siemens-detail {
+  .project-detail {
     transition: none;
   }
 }
@@ -266,13 +263,11 @@ html.toc-is-hidden .siemens-detail {
     display: none;
   }
 
-  html.toc-is-hidden .project-detail,
-  html.toc-is-hidden .siemens-detail {
+  html.toc-is-hidden .project-detail {
     margin-left: 0;
   }
 
-  .project-detail,
-  .siemens-detail {
+  .project-detail {
     transition: none;
   }
 }

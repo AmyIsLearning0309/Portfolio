@@ -3,13 +3,14 @@ import '../../styles/table-of-contents.css';
 
 /**
  * Fixed left-side table of contents with scroll tracking + back-to-top.
+ * Uses Siemens-style auto-hide: slides away once the threshold section is
+ * in view; “Show Content” / “<” reveals or tucks it again.
+ *
  * Props:
  *   sections — array of { id: string, label: string }
  *   projectTitle — string shown above the section links
  *   accent — optional CSS color for active/progress accents
- *   autoHideAfterId — optional section id; when this section (or later) is the
- *                     active in-view section, the TOC slides away (Siemens-style).
- *                     Leave unset to keep always-visible TOC (NASA).
+ *   autoHideAfterId — section id that triggers tuck (defaults to 2nd section)
  */
 export default function TableOfContents({
   sections,
@@ -17,16 +18,18 @@ export default function TableOfContents({
   accent,
   autoHideAfterId,
 }) {
+  const hideAfterId = autoHideAfterId ?? sections[1]?.id ?? null;
+
   const [activeId, setActiveId] = useState(sections[0]?.id ?? '');
   const [showTop, setShowTop] = useState(false);
   /** Once true, TOC stays tucked until the user clicks Show Content (no auto-reopen). */
   const [dismissed, setDismissed] = useState(false);
-  /** User pinned the panel open via Show Content; cleared when crossing Scale again. */
+  /** User pinned the panel open via Show Content; cleared when crossing threshold again. */
   const [manualOpen, setManualOpen] = useState(false);
   const pastRef = useRef(false);
   const observerRef = useRef(null);
 
-  const isCollapsed = Boolean(autoHideAfterId) && dismissed && !manualOpen;
+  const isCollapsed = Boolean(hideAfterId) && dismissed && !manualOpen;
 
   /* ── Scroll tracking via IntersectionObserver ── */
   useEffect(() => {
@@ -61,31 +64,30 @@ export default function TableOfContents({
 
   /* ── Auto-hide when the threshold section (or later) is in view ── */
   useEffect(() => {
-    if (!autoHideAfterId) return;
+    if (!hideAfterId) return;
 
-    const thresholdIdx = sections.findIndex((s) => s.id === autoHideAfterId);
+    const thresholdIdx = sections.findIndex((s) => s.id === hideAfterId);
     if (thresholdIdx < 0) return;
 
     const activeIdx = sections.findIndex((s) => s.id === activeId);
     const atOrPast = activeIdx >= thresholdIdx;
 
-    // Edge-trigger: tuck when Scale first becomes the active (in-view) section
     if (atOrPast && !pastRef.current) {
       setDismissed(true);
       setManualOpen(false);
     }
     pastRef.current = atOrPast;
-  }, [autoHideAfterId, activeId, sections]);
+  }, [hideAfterId, activeId, sections]);
 
   /* ── Sync layout offset when TOC is collapsed ── */
   useEffect(() => {
-    if (!autoHideAfterId) return undefined;
+    if (!hideAfterId) return undefined;
 
     document.documentElement.classList.toggle('toc-is-hidden', isCollapsed);
     return () => {
       document.documentElement.classList.remove('toc-is-hidden');
     };
-  }, [autoHideAfterId, isCollapsed]);
+  }, [hideAfterId, isCollapsed]);
 
   const handleClick = (id) => {
     const el = document.getElementById(id);
@@ -146,8 +148,8 @@ export default function TableOfContents({
     </>
   );
 
-  /* Always-visible TOC (NASA / default) */
-  if (!autoHideAfterId) {
+  /* Single-section pages: static TOC without auto-hide */
+  if (!hideAfterId) {
     return (
       <aside className="toc" aria-label="Page navigation" style={accentStyle}>
         {panel}
@@ -155,7 +157,6 @@ export default function TableOfContents({
     );
   }
 
-  /* Auto-hide TOC shell (Siemens) */
   return (
     <aside
       className={`toc-shell${isCollapsed ? ' toc-shell--collapsed' : ''}`}
@@ -170,7 +171,6 @@ export default function TableOfContents({
         {panel}
       </div>
 
-      {/* Discreet show/hide control after the TOC has tucked away once */}
       {dismissed && (
         <button
           type="button"

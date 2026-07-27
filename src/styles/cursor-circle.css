@@ -134,9 +134,13 @@
   color: #31cdc7;
 }
 
-/* Low contrast with teal cursor (sampled / fallback) → white */
-.cursor-circle--siemens.cursor-circle--on-similar {
+/* Low contrast with background (dark / teal) → white cursor */
+.cursor-circle--invert {
   color: #ffffff;
+}
+
+.cursor-circle--invert .cursor-circle__svg {
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.35));
 }
 
 @media (pointer: coarse) {
