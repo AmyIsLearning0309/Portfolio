@@ -87,6 +87,28 @@
   color: #2bb8b2;
 }
 
+/* REC-O — matches TOC accent */
+.navbar--reco .navbar__progress-bar {
+  background: #c45c6a;
+}
+
+.navbar--reco .navbar__brand {
+  color: #c45c6a;
+}
+
+.navbar--reco .navbar__brand:hover {
+  color: #b04e5b;
+}
+
+.navbar--reco .navbar__link {
+  color: #c45c6a;
+}
+
+.navbar--reco .navbar__link:hover,
+.navbar--reco .navbar__link--active {
+  color: #b04e5b;
+}
+
 .navbar__brand {
   display: inline-flex;
   align-items: center;

@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import '../../styles/cursor-circle.css';
 
 const INTERACTIVE =
-  'a, button, [role="button"], input, textarea, select, label, summary';
+  'a, button, [role="button"], input, textarea, select, label, summary, [data-cursor-label]';
 
 /** Siemens cursor teal — matches progress bar / accents */
 const SIEMENS_TEAL = { r: 49, g: 205, b: 199 }; // #31CDC7

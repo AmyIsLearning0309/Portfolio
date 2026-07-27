@@ -25,13 +25,17 @@ function isThumbnailFullyVisible(mediaEl, introEl) {
 
 /** Tight follow — smooth without feeling delayed */
 const FLOW_LERP = 0.22;
+const GIF_FADE_MS = 450;
+const GIF_HOVER_DELAY_MS = 1200;
 
-const SNAP_COUNT = 1 + projects.length; // intro + each project
+const SNAP_COUNT = projects.length; // rest (first project visible) + each following project
 
 /**
  * Vertical scroll drives a horizontal track.
- * Scroll progress maps continuously across card-centered snap points
+ * Scroll progress maps continuously across snap points
  * (native CSS scroll-snap) — no post-scroll recenter delay.
+ * Starting view already shows the first project, so the first
+ * scroll advances to the second project immediately.
  */
 export default function HorizontalProjects() {
   const tunnelRef = useRef(null);
@@ -43,43 +47,117 @@ export default function HorizontalProjects() {
   const targetShiftRef = useRef(0);
   const currentShiftRef = useRef(0);
   const [tunnelHeight, setTunnelHeight] = useState(`${SNAP_COUNT * 100}svh`);
-  const [gifPlay, setGifPlay] = useState(null);
+  const [gifState, setGifState] = useState(null); // { id, key, visible }
   const hoveredIdRef = useRef(null);
   const gifPlayIdRef = useRef(null);
+  const gifFadeTimerRef = useRef(null);
+  const gifHoverTimerRef = useRef(null);
 
-  const stopGif = () => {
-    gifPlayIdRef.current = null;
-    setGifPlay(null);
+  const clearGifFadeTimer = () => {
+    if (gifFadeTimerRef.current != null) {
+      window.clearTimeout(gifFadeTimerRef.current);
+      gifFadeTimerRef.current = null;
+    }
   };
 
-  const tryStartGif = (project) => {
-    if (!project.hoverImage) return;
-    const mediaEl = mediaRefs.current[project.id];
-    if (!isThumbnailFullyVisible(mediaEl, introRef.current)) {
-      stopGif();
+  const clearGifHoverTimer = () => {
+    if (gifHoverTimerRef.current != null) {
+      window.clearTimeout(gifHoverTimerRef.current);
+      gifHoverTimerRef.current = null;
+    }
+  };
+
+  const hideGif = (id, { immediate = false } = {}) => {
+    clearGifFadeTimer();
+    clearGifHoverTimer();
+
+    if (immediate) {
+      if (gifPlayIdRef.current === id) gifPlayIdRef.current = null;
+      setGifState((prev) => (prev?.id === id ? null : prev));
       return;
     }
-    const next = { id: project.id, key: Date.now() };
+
+    setGifState((prev) => {
+      if (!prev || prev.id !== id) return prev;
+      return { ...prev, visible: false };
+    });
+
+    gifFadeTimerRef.current = window.setTimeout(() => {
+      gifFadeTimerRef.current = null;
+      setGifState((prev) => (prev?.id === id && !prev.visible ? null : prev));
+      if (gifPlayIdRef.current === id) gifPlayIdRef.current = null;
+    }, GIF_FADE_MS);
+  };
+
+  const showGif = (project) => {
+    if (!project.hoverImage) return;
+    if (hoveredIdRef.current !== project.id) return;
+
+    const mediaEl = mediaRefs.current[project.id];
+    if (!isThumbnailFullyVisible(mediaEl, introRef.current)) return;
+
+    clearGifFadeTimer();
+    clearGifHoverTimer();
     gifPlayIdRef.current = project.id;
-    setGifPlay(next);
+
+    setGifState((prev) => {
+      if (prev?.id === project.id) {
+        return { ...prev, visible: true };
+      }
+      return { id: project.id, key: Date.now(), visible: false };
+    });
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setGifState((prev) =>
+          prev?.id === project.id ? { ...prev, visible: true } : prev,
+        );
+      });
+    });
+  };
+
+  const scheduleGifStart = (project) => {
+    if (!project.hoverImage) return;
+    if (gifHoverTimerRef.current != null) return;
+
+    // Already playing — keep / refresh visibility
+    if (gifPlayIdRef.current === project.id) {
+      showGif(project);
+      return;
+    }
+
+    gifHoverTimerRef.current = window.setTimeout(() => {
+      gifHoverTimerRef.current = null;
+      if (hoveredIdRef.current !== project.id) return;
+      showGif(project);
+      // If still not fully visible, reschedule while hover continues
+      if (gifPlayIdRef.current !== project.id && hoveredIdRef.current === project.id) {
+        scheduleGifStart(project);
+      }
+    }, GIF_HOVER_DELAY_MS);
   };
 
   const handleCardEnter = (project) => {
     hoveredIdRef.current = project.id;
-    tryStartGif(project);
+    scheduleGifStart(project);
   };
 
   const handleCardLeave = (project) => {
     if (hoveredIdRef.current === project.id) {
       hoveredIdRef.current = null;
     }
-    if (gifPlayIdRef.current === project.id) stopGif();
+    clearGifHoverTimer();
+    if (gifPlayIdRef.current === project.id) hideGif(project.id);
   };
 
   // Enable native vertical scroll-snap while this section is mounted
   useEffect(() => {
     document.documentElement.classList.add('hx-scroll-snap');
-    return () => document.documentElement.classList.remove('hx-scroll-snap');
+    return () => {
+      document.documentElement.classList.remove('hx-scroll-snap');
+      clearGifFadeTimer();
+      clearGifHoverTimer();
+    };
   }, []);
 
   // Measure max travel + per-card center shifts (at rest transform)
@@ -99,7 +177,9 @@ export default function HorizontalProjects() {
       const focusX = (introRight + window.innerWidth) / 2;
 
       const snaps = [0];
-      projects.forEach((project) => {
+      projects.forEach((project, index) => {
+        // First card is already in the resting view — skip recentering it
+        if (index === 0) return;
         const card = cardRefs.current[project.id];
         if (!card) return;
         const rect = card.getBoundingClientRect();
@@ -137,13 +217,13 @@ export default function HorizontalProjects() {
       const mediaEl = mediaRefs.current[id];
       const visible = isThumbnailFullyVisible(mediaEl, introRef.current);
       if (!visible) {
-        if (gifPlayIdRef.current === id) stopGif();
+        clearGifHoverTimer();
+        if (gifPlayIdRef.current === id) hideGif(id);
         return;
       }
-      if (gifPlayIdRef.current !== id) {
-        const next = { id, key: Date.now() };
-        gifPlayIdRef.current = id;
-        setGifPlay(next);
+      // Fully visible again while still hovering — wait the delay before (re)starting
+      if (gifPlayIdRef.current !== id && gifHoverTimerRef.current == null) {
+        scheduleGifStart(project);
       }
     };
 
@@ -203,7 +283,7 @@ export default function HorizontalProjects() {
       style={{ height: tunnelHeight }}
       aria-label="Introduction and selected works"
     >
-      {/* Native snap stops — one viewport per intro/card */}
+      {/* Native snap stops — rest + one viewport per following project */}
       <div className="hx__snap-rail" aria-hidden="true">
         {Array.from({ length: SNAP_COUNT }, (_, i) => (
           <div key={i} className="hx__snap-stop" />
@@ -316,22 +396,30 @@ export default function HorizontalProjects() {
           </article>
 
           {projects.map((project) => {
-            const isGifPlaying = gifPlay?.id === project.id;
+            const isGifMounted = gifState?.id === project.id;
+            const isGifVisible = isGifMounted && gifState.visible;
+            const isPreviewOnly = Boolean(project.externalUrl);
+            const CardTag = isPreviewOnly ? 'div' : Link;
+            const cardProps = isPreviewOnly
+              ? {
+                  'aria-label': project.title,
+                }
+              : {
+                  to: `/work/${project.slug}`,
+                  'aria-label': `Open ${project.title} case study`,
+                };
 
             return (
-              <Link
+              <CardTag
                 key={project.id}
-                to={`/work/${project.slug}`}
-                className={`hx__card${isGifPlaying ? ' hx__card--gif-playing' : ''}`}
-                aria-label={`Open ${project.title} case study`}
+                {...cardProps}
+                className={`hx__card${isGifVisible ? ' hx__card--gif-playing' : ''}${
+                  isPreviewOnly ? ' hx__card--preview' : ''
+                }`}
                 ref={(el) => {
                   if (el) cardRefs.current[project.id] = el;
                   else delete cardRefs.current[project.id];
                 }}
-                onMouseEnter={() => handleCardEnter(project)}
-                onMouseLeave={() => handleCardLeave(project)}
-                onFocus={() => handleCardEnter(project)}
-                onBlur={() => handleCardLeave(project)}
               >
                 <div
                   className="hx__card-media"
@@ -340,6 +428,13 @@ export default function HorizontalProjects() {
                     else delete mediaRefs.current[project.id];
                   }}
                   style={{ background: project.placeholderColor }}
+                  onMouseEnter={() => handleCardEnter(project)}
+                  onMouseLeave={() => handleCardLeave(project)}
+                  onFocus={() => handleCardEnter(project)}
+                  onBlur={() => handleCardLeave(project)}
+                  {...(isPreviewOnly
+                    ? { 'data-cursor-label': project.externalUrl.replace(/^https?:\/\//, '').replace(/\/$/, '') }
+                    : {})}
                 >
                   {project.heroImage ? (
                     <>
@@ -348,12 +443,14 @@ export default function HorizontalProjects() {
                         alt=""
                         className={`hx__card-img${project.slug === 'rec-o' ? ' hx__card-img--rec-o' : ''}`}
                       />
-                      {project.hoverImage && isGifPlaying && (
+                      {project.hoverImage && isGifMounted && (
                         <img
-                          key={gifPlay.key}
-                          src={`${project.hoverImage}?restart=${gifPlay.key}`}
+                          key={gifState.key}
+                          src={`${project.hoverImage}?restart=${gifState.key}`}
                           alt=""
-                          className="hx__card-img hx__card-img--hover"
+                          className={`hx__card-img hx__card-img--hover${
+                            isGifVisible ? ' hx__card-img--hover-visible' : ''
+                          }`}
                           aria-hidden="true"
                         />
                       )}
@@ -383,7 +480,7 @@ export default function HorizontalProjects() {
                     )}
                   </div>
                 </div>
-              </Link>
+              </CardTag>
             );
           })}
         </div>

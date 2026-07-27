@@ -33,6 +33,7 @@ export default function Navbar() {
 
   const isHome = location.pathname === '/';
   const isSiemens = location.pathname === '/work/siemens';
+  const isRecO = location.pathname === '/work/rec-o';
 
   return (
     <>
@@ -42,6 +43,7 @@ export default function Navbar() {
           scrolled ? 'navbar--scrolled' : '',
           isHome ? 'navbar--home' : '',
           isSiemens ? 'navbar--siemens' : '',
+          isRecO ? 'navbar--reco' : '',
         ]
           .filter(Boolean)
           .join(' ')}
@@ -55,7 +57,8 @@ export default function Navbar() {
             {!isHome && (
               <li>
                 <NavLink
-                  to="/works"
+                  to="/"
+                  end
                   className={({ isActive }) =>
                     `navbar__link${isActive ? ' navbar__link--active' : ''}`
                   }
@@ -72,16 +75,6 @@ export default function Navbar() {
                 }
               >
                 About Me
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/playground"
-                className={({ isActive }) =>
-                  `navbar__link${isActive ? ' navbar__link--active' : ''}`
-                }
-              >
-                Playground
               </NavLink>
             </li>
           </ul>
@@ -118,10 +111,9 @@ export default function Navbar() {
       {/* Mobile overlay menu */}
       <div className={`navbar__mobile-menu ${menuOpen ? 'is-open' : ''}`}>
         {!isHome && (
-          <Link to="/works" className="navbar__mobile-link">Works</Link>
+          <Link to="/" className="navbar__mobile-link">Works</Link>
         )}
         <Link to="/about" className="navbar__mobile-link">About Me</Link>
-        <Link to="/playground" className="navbar__mobile-link">Playground</Link>
       </div>
     </>
   );
