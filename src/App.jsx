@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import CursorCircle from './components/ui/CursorCircle';
 import ScrollToTop from './components/ui/ScrollToTop';
 import Home from './pages/Home';
@@ -24,6 +25,7 @@ function App() {
         <Route path="/work/rec-o" element={<RecO />} />
         <Route path="/work/mochi-health-brand" element={<MochiHealth />} />
       </Routes>
+      <Analytics />
     </>
   );
 }
