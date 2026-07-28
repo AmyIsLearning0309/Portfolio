@@ -73,7 +73,7 @@ function Expandable({
   );
 }
 
-/** Side-by-side figures with wheel → horizontal scroll while hovered */
+/** Side-by-side figures — horizontal swipe OK; vertical wheel always scrolls the page */
 function HScroll({ children, label }) {
   const ref = useRef(null);
   const [progress, setProgress] = useState(0);
@@ -87,20 +87,12 @@ function HScroll({ children, label }) {
       setProgress(max > 0 ? Math.min(1, Math.max(0, el.scrollLeft / max)) : 0);
     };
 
+    // Overflow-x containers can swallow vertical wheel/trackpad gestures.
+    // Forward primarily-vertical input to the page so scroll never feels stuck.
     const onWheel = (e) => {
-      const max = el.scrollWidth - el.clientWidth;
-      if (max <= 1) return;
-      // Prefer native horizontal gestures; only remap vertical wheel
       if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-
-      const atStart = el.scrollLeft <= 0;
-      const atEnd = el.scrollLeft >= max - 1;
-      // At edges, release vertical scroll to the page
-      if ((atStart && e.deltaY < 0) || (atEnd && e.deltaY > 0)) return;
-
       e.preventDefault();
-      el.scrollLeft += e.deltaY;
-      updateProgress();
+      window.scrollBy(0, e.deltaY);
     };
 
     updateProgress();
