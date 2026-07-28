@@ -67,6 +67,11 @@ html.toc-is-hidden .reco-detail .pd-container {
   background: #111;
 }
 
+.ro-media__frame--zoom video {
+  transform: scale(1.05);
+  transform-origin: center center;
+}
+
 .ro-media__caption {
   margin-top: var(--space-3);
   font-size: var(--text-sm);
@@ -79,10 +84,56 @@ html.toc-is-hidden .reco-detail .pd-container {
   grid-template-columns: 1.35fr 1fr;
   gap: var(--space-4);
   margin: var(--space-8) 0;
+  align-items: stretch;
 }
 
 .ro-pair .ro-media {
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ro-pair .ro-media__frame {
+  position: relative;
+  flex: 0 0 auto;
+  width: 100%;
+  height: clamp(14rem, 20vw, 20.5rem);
+  overflow: hidden;
+}
+
+.ro-pair .ro-media__frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.ro-pair .ro-media__caption {
+  flex-shrink: 0;
+}
+
+/* Architecture details — stacked, identical frame size */
+.ro-pair--stack {
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+}
+
+.ro-pair--stack .ro-media__frame {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+.ro-pair--stack .ro-media__frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .ro-split {
@@ -138,5 +189,14 @@ html.toc-is-hidden .reco-detail .pd-container {
   .ro-pair,
   .ro-split {
     grid-template-columns: 1fr;
+  }
+
+  .ro-pair .ro-media__frame {
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  .ro-pair .ro-media__frame img {
+    position: absolute;
   }
 }

@@ -30,10 +30,14 @@ function CaseImage({ src, alt, caption, wide }) {
   );
 }
 
-function CaseVideo({ src, poster, caption, wide }) {
+function CaseVideo({ src, poster, caption, wide, zoom }) {
   return (
     <figure className={`ro-media${wide ? ' ro-media--wide' : ''}`}>
-      <div className="ro-media__frame ro-media__frame--video">
+      <div
+        className={`ro-media__frame ro-media__frame--video${
+          zoom ? ' ro-media__frame--zoom' : ''
+        }`}
+      >
         <video
           src={src}
           poster={poster}
@@ -141,6 +145,7 @@ export default function RecODetail() {
             poster="/rec-o/hero-ui.png"
             caption="REC-O product demo — software + wearable coaching system"
             wide
+            zoom
           />
 
           {/* ── Overview ── */}
@@ -263,7 +268,7 @@ export default function RecODetail() {
               caption="System architecture — capture, process, and coach loop"
               wide
             />
-            <div className="ro-pair">
+            <div className="ro-pair ro-pair--stack">
               <CaseImage
                 src="/rec-o/architecture-detail-1.jpg"
                 alt="Architecture detail — data processing pipeline"
