@@ -29,7 +29,7 @@ function isThumbnailFullyVisible(mediaEl, introEl) {
 /** Tight follow — smooth without feeling delayed */
 const FLOW_LERP = 0.22;
 const GIF_FADE_MS = 450;
-const GIF_HOVER_DELAY_MS = 1200;
+const GIF_HOVER_DELAY_MS = 1000;
 
 const SNAP_COUNT = projects.length;
 
@@ -343,7 +343,7 @@ export default function HorizontalProjects() {
                 <span className="hx__intro-name">Amy Ai.</span>
               </h1>
               <p className="hx__intro-tagline">
-                Product Designer/ Builder/ Product Manager
+                Product Design · Product Manager · Builder
               </p>
             </div>
 
