@@ -133,6 +133,7 @@ export default function NasaSuitDetail() {
         projectTitle={project.title}
         accent="#00D4FF"
         autoHideAfterId="ns-prototype"
+        variant="nasa"
       />
 
       <main className="project-detail nasa-suit-detail">

@@ -106,6 +106,38 @@
   color: #b04e5b;
 }
 
+/* NASA SUIT — matches deep-space page background */
+.navbar--nasa,
+.navbar--nasa.navbar--scrolled {
+  background: rgba(8, 12, 20, 0.92);
+  border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+.navbar--nasa .navbar__progress {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.navbar--nasa .navbar__progress-bar {
+  background: #00d4ff;
+}
+
+.navbar--nasa .navbar__brand {
+  color: #00d4ff;
+}
+
+.navbar--nasa .navbar__brand:hover {
+  color: #5ee3ff;
+}
+
+.navbar--nasa .navbar__link {
+  color: #a0aabf;
+}
+
+.navbar--nasa .navbar__link:hover,
+.navbar--nasa .navbar__link--active {
+  color: #e8edf5;
+}
+
 .navbar__brand {
   display: inline-flex;
   align-items: center;
@@ -222,7 +254,7 @@
   color: var(--color-ink-secondary);
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1023px), (max-device-width: 1023px) {
   .navbar__inner {
     padding-inline: var(--space-5);
   }

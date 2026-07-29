@@ -4,7 +4,7 @@
    ============================================================ */
 
 :root {
-  --toc-width: 280px;
+  --toc-width: 200px;
   --toc-slide-ease: cubic-bezier(0.45, 0.05, 0.2, 1);
   --toc-slide-duration: 780ms;
 }
@@ -15,12 +15,13 @@
   left: 0;
   width: var(--toc-width);
   height: calc(100vh - var(--navbar-height));
-  padding: var(--space-10) var(--space-6) var(--space-10) var(--space-8);
+  padding: var(--space-6) var(--space-3) var(--space-6) var(--space-3);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 0.35rem;
   border-right: none;
   background: var(--color-bg);
+  box-shadow: none;
   overflow-y: auto;
   z-index: 50;
 }
@@ -94,7 +95,39 @@
   text-underline-offset: 3px;
 }
 
-/* Open state: icon-only collapse control */
+/* Open state: icon sits in the title header row */
+.toc__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.3rem;
+  margin-bottom: var(--space-3);
+}
+
+.toc__header .toc__reveal {
+  position: static;
+  top: auto;
+  right: auto;
+  flex-shrink: 0;
+  margin-top: 0;
+  padding: 0;
+  line-height: 1;
+}
+
+.toc__project-title {
+  flex: 0 1 auto;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: var(--weight-semi);
+  color: var(--toc-accent, var(--color-ink));
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
 .toc__reveal--icon {
   display: inline-flex;
   align-items: center;
@@ -105,16 +138,16 @@
 .toc__reveal--icon:focus-visible {
   text-decoration: none;
   outline: 1px solid color-mix(in srgb, var(--color-ink-muted) 50%, transparent);
-  outline-offset: 3px;
+  outline-offset: 2px;
   border-radius: 2px;
 }
 
 .toc__reveal-chevron {
   display: inline-block;
-  font-size: 1.125rem;
+  font-size: 0.95rem;
   font-weight: var(--weight-regular);
   line-height: 1;
-  transform: scaleY(1.55);
+  transform: scaleY(1.35);
   transform-origin: center;
 }
 
@@ -124,77 +157,55 @@
   gap: 0.35em;
   right: auto;
   left: 100%;
-  padding-left: var(--space-4);
+  padding-left: var(--space-3);
 }
 
 .toc__reveal--collapsed .toc__reveal-chevron {
-  font-size: 0.95rem;
-}
-
-/* When TOC is hidden, center main content */
-html.toc-is-hidden .project-detail {
-  margin-left: 0;
-}
-
-.project-detail {
-  transition: margin-left var(--toc-slide-duration) var(--toc-slide-ease);
+  font-size: 0.85rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .toc-shell,
-  .project-detail {
+  .toc-shell {
     transition: none;
   }
 }
 
-/* Project title at top of sidebar */
-.toc__project-title {
-  font-family: var(--font-display);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semi);
-  color: var(--toc-accent, var(--color-ink));
-  letter-spacing: -0.01em;
-  line-height: var(--leading-snug);
-  margin-bottom: var(--space-6);
-  padding-bottom: 0;
-  white-space: nowrap;
-}
-
 /* "On this page" label */
 .toc__label {
-  font-size: var(--text-xs);
+  font-size: 0.65rem;
   font-weight: var(--weight-medium);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--color-ink-muted);
-  margin-bottom: var(--space-3);
+  margin: 0 0 0.35rem;
 }
 
 .toc__list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 0.1rem;
   flex: 1;
 }
 
 .toc__link {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
+  align-items: flex-start;
+  gap: 0.45rem;
   background: none;
   border: none;
-  padding: var(--space-1) 0;
+  padding: 0.15rem 0;
   cursor: pointer;
   font-family: var(--font-body);
-  font-size: var(--text-sm);
+  font-size: 0.75rem;
   font-weight: var(--weight-regular);
   color: var(--color-ink-muted);
   text-align: left;
-  line-height: var(--leading-snug);
+  line-height: 1.3;
   transition: color 200ms ease;
   width: 100%;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .toc__link:hover {
@@ -211,7 +222,8 @@ html.toc-is-hidden .project-detail {
   display: block;
   flex-shrink: 0;
   width: 2px;
-  height: 14px;
+  height: 11px;
+  margin-top: 0.2em;
   border-radius: 2px;
   background: var(--color-border-strong);
   transition: background 200ms ease, height 200ms ease;
@@ -219,16 +231,16 @@ html.toc-is-hidden .project-detail {
 
 .toc__link--active .toc__indicator {
   background: var(--toc-accent, var(--color-ink));
-  height: 20px;
+  height: 14px;
 }
 
 /* Back to top button — sits at the bottom of the sidebar */
 .toc__back-top {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 0.35rem;
   margin-top: auto;
-  padding-top: var(--space-6);
+  padding-top: var(--space-4);
   border-top: none;
   background: none;
   border-left: none;
@@ -236,7 +248,7 @@ html.toc-is-hidden .project-detail {
   border-bottom: none;
   cursor: pointer;
   font-family: var(--font-body);
-  font-size: var(--text-xs);
+  font-size: 0.7rem;
   font-weight: var(--weight-medium);
   color: var(--color-ink-muted);
   letter-spacing: 0.02em;
@@ -256,18 +268,57 @@ html.toc-is-hidden .project-detail {
   color: var(--color-ink);
 }
 
+/* NASA SUIT — match deep-space page background */
+.toc--nasa {
+  background: #080c14;
+}
+
+.toc--nasa .toc__label {
+  color: #7b8caa;
+}
+
+.toc--nasa .toc__link {
+  color: #7b8caa;
+}
+
+.toc--nasa .toc__link:hover {
+  color: #e8edf5;
+}
+
+.toc--nasa .toc__indicator {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.toc--nasa .toc__back-top {
+  color: #7b8caa;
+}
+
+.toc--nasa .toc__back-top:hover {
+  color: #e8edf5;
+}
+
+.toc--nasa .toc__reveal {
+  color: rgba(160, 170, 191, 0.55);
+}
+
+.toc--nasa .toc__reveal:hover,
+.toc--nasa .toc__reveal:focus-visible {
+  color: rgba(232, 237, 245, 0.85);
+}
+
+.toc-shell--nasa .toc__reveal--collapsed {
+  color: rgba(160, 170, 191, 0.7);
+}
+
+.toc-shell--nasa .toc__reveal--collapsed:hover,
+.toc-shell--nasa .toc__reveal--collapsed:focus-visible {
+  color: #e8edf5;
+}
+
 /* Hide on tablet and mobile — unchanged for auto-hide pages */
 @media (max-width: 1023px) {
   .toc,
   .toc-shell {
     display: none;
-  }
-
-  html.toc-is-hidden .project-detail {
-    margin-left: 0;
-  }
-
-  .project-detail {
-    transition: none;
   }
 }

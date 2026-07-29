@@ -1,4 +1,4 @@
-import { useEffect, useRef, useImperativeHandle, forwardRef, useState, memo } from 'react';
+import { useEffect, useRef, useImperativeHandle, forwardRef, useState, memo, Children, useCallback } from 'react';
 import Navbar from '../../components/layout/Navbar';
 import PlaceholderImage from '../../components/ui/PlaceholderImage';
 import Tag from '../../components/ui/Tag';
@@ -11,7 +11,7 @@ import '../../styles/siemens-detail.css';
 const TOC_SECTIONS = [
   { id: 'sd-overview', label: 'Overview' },
   { id: 'sd-scale', label: 'The Scale' },
-  { id: 'sd-pain-points', label: 'Pain Points' },
+  // { id: 'sd-pain-points', label: 'Pain Points' }, // Removed — images live in Scale slideshow
   // { id: 'sd-gap', label: 'The Gap' }, // Hidden for now
   // { id: 'sd-solution', label: 'The Solution' }, // Hidden for now
   // { id: 'sd-mapping', label: 'Pain Mapping' }, // Hidden for now
@@ -25,187 +25,122 @@ const TOC_SECTIONS = [
   { id: 'sd-reflection', label: 'Reflection' },
 ];
 
-/** Collapsed-by-default detail block — Expand / Show less */
-function Expandable({
-  children,
-  moreLabel = 'Expand to see the full process',
-  lessLabel = 'Show less',
-  onOpenChange,
-}) {
-  const [open, setOpen] = useState(false);
-  const panelRef = useRef(null);
-  const panelId = useRef(`sd-expand-${Math.random().toString(36).slice(2, 9)}`).current;
-
-  useEffect(() => {
-    if (!open || !panelRef.current) return undefined;
-    // Kick scroll-linked reveals now that the panel has layout
-    window.dispatchEvent(new Event('scroll'));
-    return undefined;
-  }, [open]);
-
-  return (
-    <div className={`sd-expand${open ? ' is-open' : ''}`}>
-      <div
-        id={panelId}
-        ref={panelRef}
-        className="sd-expand__panel"
-        hidden={!open}
-      >
-        {children}
-      </div>
-      <button
-        type="button"
-        className="sd-expand__toggle"
-        aria-expanded={open}
-        aria-controls={panelId}
-        onClick={() => {
-          const next = !open;
-          setOpen(next);
-          onOpenChange?.(next);
-        }}
-      >
-        <span className="sd-expand__toggle-label">
-          {open ? lessLabel : moreLabel}
-        </span>
-        <span className="sd-expand__chevron" aria-hidden="true" />
-      </button>
-    </div>
-  );
-}
-
-/** Side-by-side figures — horizontal swipe OK; vertical wheel always scrolls the page */
-const STACKED_MQ = '(max-width: 1023px)';
-
+/** Side-by-side figures — slideshow with arrow navigation */
 function HScroll({ children, label }) {
-  const ref = useRef(null);
-  const [progress, setProgress] = useState(0);
-  const [stacked, setStacked] = useState(() =>
-    typeof window !== 'undefined' ? window.matchMedia(STACKED_MQ).matches : false
+  const slides = Children.toArray(children).filter(Boolean);
+  const count = slides.length;
+  const [index, setIndex] = useState(0);
+
+  const go = useCallback(
+    (next) => {
+      if (count < 2) return;
+      setIndex(((next % count) + count) % count);
+    },
+    [count]
   );
 
-  useEffect(() => {
-    const mq = window.matchMedia(STACKED_MQ);
-    const onChange = () => setStacked(mq.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
-  }, []);
+  if (count === 0) return null;
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || stacked) return undefined;
-
-    const updateProgress = () => {
-      const max = el.scrollWidth - el.clientWidth;
-      setProgress(max > 0 ? Math.min(1, Math.max(0, el.scrollLeft / max)) : 0);
-    };
-
-    const onWheel = (e) => {
-      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-      e.preventDefault();
-      window.scrollBy(0, e.deltaY);
-    };
-
-    updateProgress();
-    el.addEventListener('scroll', updateProgress, { passive: true });
-    el.addEventListener('wheel', onWheel, { passive: false });
-    window.addEventListener('resize', updateProgress);
-
-    return () => {
-      el.removeEventListener('scroll', updateProgress);
-      el.removeEventListener('wheel', onWheel);
-      window.removeEventListener('resize', updateProgress);
-    };
-  }, [stacked]);
+  const progress = count > 1 ? (index + 1) / count : 1;
 
   return (
-    <div className={`sd-hscroll-wrap${stacked ? ' sd-hscroll-wrap--stacked' : ''}`}>
-      <div
-        ref={ref}
-        className="sd-hscroll"
-        tabIndex={stacked ? undefined : 0}
-        aria-label={label}
-      >
-        <div className="sd-hscroll__track">{children}</div>
+    <div
+      className="sd-slideshow"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label={label}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          go(index - 1);
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          go(index + 1);
+        }
+      }}
+    >
+      <div className="sd-slideshow__frame">
+        {count > 1 && (
+          <button
+            type="button"
+            className="sd-slideshow__arrow sd-slideshow__arrow--prev"
+            onClick={() => go(index - 1)}
+            aria-label="Previous slide"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M15 4 L7 12 L15 20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        )}
+
+        <div className="sd-slideshow__viewport">
+          <div
+            className="sd-slideshow__track"
+            style={{ transform: `translateX(-${index * 100}%)` }}
+          >
+            {slides.map((slide, i) => (
+              <div
+                key={slide.key ?? i}
+                className="sd-slideshow__slide"
+                aria-hidden={i !== index}
+              >
+                {slide}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {count > 1 && (
+          <button
+            type="button"
+            className="sd-slideshow__arrow sd-slideshow__arrow--next"
+            onClick={() => go(index + 1)}
+            aria-label="Next slide"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M9 4 L17 12 L9 20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        )}
       </div>
-      {!stacked && (
+
+      {count > 1 && (
         <div
-          className="sd-hscroll__progress"
+          className="sd-slideshow__progress"
           role="progressbar"
-          aria-label="Horizontal scroll progress"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={Math.round(progress * 100)}
+          aria-label="Slideshow progress"
+          aria-valuemin={1}
+          aria-valuemax={count}
+          aria-valuenow={index + 1}
         >
           <div
-            className="sd-hscroll__progress-bar"
-            style={{ transform: `scaleX(${Math.max(progress, 0.04)})` }}
+            className="sd-slideshow__progress-bar"
+            style={{ transform: `scaleX(${progress})` }}
           />
         </div>
       )}
+
+      <p className="sr-only" aria-live="polite">
+        Slide {index + 1} of {count}
+      </p>
     </div>
   );
 }
-
-/* ── Count-up number component ──
-   Imperative: parent calls countUpRef.current.start() to begin.
-   Counts 0 → target with ease-out cubic, then crossfades to rangeLabel.
-── */
-const CountUp = forwardRef(function CountUp(
-  { target, suffix = '', duration = 1800, rangeLabel = null },
-  ref
-) {
-  const numRef = useRef(null);
-  const rangeRef = useRef(null);
-  const startedRef = useRef(false);
-
-  useImperativeHandle(ref, () => ({
-    start() {
-      if (startedRef.current) return;
-      startedRef.current = true;
-      const numEl = numRef.current;
-      if (!numEl) return;
-      const begin = performance.now();
-      const tick = (now) => {
-        const progress = Math.min((now - begin) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        numEl.textContent = Math.round(eased * target) + suffix;
-        if (progress < 1) {
-          requestAnimationFrame(tick);
-        } else {
-          // Count done — crossfade to range label
-          if (rangeRef.current) {
-            rangeRef.current.style.opacity = '1';
-            numEl.style.opacity = '0';
-          }
-        }
-      };
-      requestAnimationFrame(tick);
-    },
-  }));
-
-  return (
-    <span style={{ position: 'relative', display: 'inline-block' }}>
-      <span ref={numRef} style={{ transition: 'opacity 0.4s ease' }}>
-        0{suffix}
-      </span>
-      {rangeLabel && (
-        <span
-          ref={rangeRef}
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            opacity: 0,
-            transition: 'opacity 0.4s ease',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {rangeLabel}
-        </span>
-      )}
-    </span>
-  );
-});
 
 /* ── Decimal count-up for the 7.5 rushed score ──
    memo() prevents ANY parent re-render from touching this component,
@@ -361,73 +296,8 @@ const DonutChart = memo(function DonutChart({ animated }) {
   );
 });
 
-/* ── Scroll-speed-linked flow animation hook ──
-   Maps scroll progress → step index 0–8.
-   At step 8, fires countUpRefs to start count-up animations.
-   `enabled` gates listening so collapsed expand panels don't
-   complete the sequence while display:none (zero height).
-── */
-function useScrollFlow(wrapRef, countUpRefs, enabled = true) {
-  const doneRef = useRef(false);
-  const countUpFiredRef = useRef(false);
-
-  useEffect(() => {
-    if (!enabled) return undefined;
-
-    const wrap = wrapRef.current;
-    if (!wrap) return undefined;
-
-    doneRef.current = false;
-    countUpFiredRef.current = false;
-    wrap.dataset.step = '-1';
-
-    const TOTAL_STEPS = 9;
-
-    const onScroll = () => {
-      if (doneRef.current) return;
-
-      const rect = wrap.getBoundingClientRect();
-      // Ignore while collapsed / not laid out
-      if (rect.height < 8) return;
-
-      const vh = window.innerHeight;
-
-      const progress = Math.max(
-        0,
-        Math.min(1, (vh - rect.top) / (rect.height + vh * 0.4))
-      );
-
-      const step = Math.floor(progress * TOTAL_STEPS);
-      wrap.dataset.step = step;
-
-      // Fire count-ups the moment step 8 is reached
-      if (step >= 8 && !countUpFiredRef.current) {
-        countUpFiredRef.current = true;
-        countUpRefs.forEach((r) => r.current?.start());
-      }
-
-      if (step >= TOTAL_STEPS - 1) {
-        doneRef.current = true;
-        wrap.dataset.step = TOTAL_STEPS - 1;
-        window.removeEventListener('scroll', onScroll, { passive: true });
-      }
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener('scroll', onScroll, { passive: true });
-  }, [wrapRef, countUpRefs, enabled]);
-}
-
 /* ── Main Component ── */
 export default function SiemensDetail() {
-  const flowRef = useRef(null);
-  const countUpTopRef = useRef(null);
-  const countUpBottomRef = useRef(null);
-  const flowCountUpRefs = useRef([countUpTopRef, countUpBottomRef]);
-  const [flowExpanded, setFlowExpanded] = useState(false);
-  useScrollFlow(flowRef, flowCountUpRefs.current, flowExpanded);
-
   // Landing: header + credits animate in; hero slides up on scroll
   const heroRef = useRef(null);
   const [introReady, setIntroReady] = useState(false);
@@ -562,8 +432,8 @@ export default function SiemensDetail() {
             className={`pd-hero-image pd-hero-image--inline sd-hero-slide${heroInView ? ' is-in' : ''}`}
           >
             <img
-              src="/siemens/notetaker-ui.png"
-              alt="Notetaker Assistant UI — AI-assisted research tooling for beta testing"
+              src="/siemens/siemens-task-issue.gif"
+              alt="Siemens Notetaker Assistant — task and issue capture in action"
               className="pd-hero-img"
             />
           </div>
@@ -579,143 +449,29 @@ export default function SiemensDetail() {
               <span className="sd-heading-dark">— at enterprise scale</span>
             </h2>
 
-            <HScroll label="Beta Testing Week context — scroll horizontally for timeline and users">
-              <figure className="sd-journey-figure sd-hscroll__item">
+            <HScroll label="Beta Testing Week context — timeline, users, and pain points">
+              <figure className="sd-journey-figure sd-slideshow__item">
                 <img
                   src="/siemens/beta-testing-week-overview.png"
                   alt="Beta testing week timeline — Week 1 user testing sessions through Week 2 thematic grouping, prioritization, and reporting"
                   loading="lazy"
                 />
               </figure>
-              <figure className="sd-journey-figure sd-hscroll__item">
+              <figure className="sd-journey-figure sd-slideshow__item">
                 <img
                   src="/siemens/users-overview.png"
                   alt="Two primary users of Beta Testing Week — Notetakers capturing issues during sessions, and Scrum UXers thematically grouping, prioritizing, and reporting"
                   loading="lazy"
                 />
               </figure>
-            </HScroll>
-
-            <p className="pd-section__body">
-              Each beta testing week spanned 10 product domains with 6–8 user testing sessions per domain. Every session required a moderator and a dedicated notetaker. Across both weeks the coordinated effort totaled between <strong>346–433 hours</strong> — a significant investment that depended entirely on the quality of what notetakers documented.
-            </p>
-
-            <Expandable onOpenChange={setFlowExpanded}>
-              {/* Animated process flow — scroll-speed linked */}
-              <div className="sd-card-wrap sd-flow-wrap" ref={flowRef} data-step="-1">
-
-                {/* Top hour callout — appears at step 8 */}
-                <div className="sd-hour-callout sd-step" data-show-at="8">
-                  Total of <strong><CountUp ref={countUpTopRef} target={433} suffix=" hrs" duration={1600} rangeLabel="346–433 hrs" /></strong>
-                </div>
-
-                {/* Row 1 */}
-                <div className="sd-process-week">
-                  <div className="sd-week-label">1st Week</div>
-                  <div className="sd-flow-row">
-                    {/* Box 1 — step 0 */}
-                    <div className="sd-flow-box sd-step" data-show-at="0">
-                      <div className="sd-flow-box__title">User Testing Sessions</div>
-                      <ul className="sd-flow-box__list">
-                        <li>10 Domains</li>
-                        <li>6–8 testing sessions for each Domain</li>
-                        <li>Each session requires a moderator and a notetaker</li>
-                      </ul>
-                    </div>
-                    <div className="sd-flow-arrow sd-step" data-show-at="0">→</div>
-                    {/* Box 2 (highlight) — step 1 */}
-                    <div className="sd-flow-box sd-flow-box--highlight sd-step sd-step--highlight" data-show-at="1">
-                      <div className="sd-flow-box__title">Issue Documentation</div>
-                      <ul className="sd-flow-box__list">
-                        <li>Note down specific description for each documented issue</li>
-                        <li>Record user's reaction in testing</li>
-                      </ul>
-                    </div>
-                    <div className="sd-flow-arrow sd-step" data-show-at="1">→</div>
-                    {/* Box 3 — step 2 */}
-                    <div className="sd-flow-box sd-step" data-show-at="2">
-                      <div className="sd-flow-box__title">Issue Severity Level</div>
-                      <ul className="sd-flow-box__list">
-                        <li>Assign severity levels to each of the issues</li>
-                        <li>Record Issues on shared document for issue overview</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right-side ↓ connector — step 3 */}
-                <div className="sd-row-connector sd-step" data-show-at="3" aria-hidden="true">
-                  <div className="sd-row-connector__inner">↓</div>
-                </div>
-
-                {/* Row 2 — reversed flow, reveals right-to-left (Transfer first = step 4) */}
-                <div className="sd-process-week" style={{ marginTop: 0 }}>
-                  <div className="sd-week-label sd-week-label--dashed">2nd Week</div>
-                  <div className="sd-flow-row">
-                    {/* Box 4 (Report to PM) — step 6, leftmost = last to appear */}
-                    <div className="sd-flow-box sd-step" data-show-at="6">
-                      <div className="sd-flow-box__title">Report to PM</div>
-                      <ul className="sd-flow-box__list">
-                        <li>Report all reoccurring themes of issue</li>
-                      </ul>
-                    </div>
-                    <div className="sd-flow-arrow sd-flow-arrow--left sd-step" data-show-at="6">→</div>
-                    {/* Box 5 (highlight) — step 5 */}
-                    <div className="sd-flow-box sd-flow-box--highlight sd-step sd-step--highlight" data-show-at="5">
-                      <div className="sd-flow-box__title">Thematically Grouping Domain Issues</div>
-                      <ul className="sd-flow-box__list">
-                        <li>Categorize similar issues under same themes</li>
-                        <li>Prioritize reoccurring issues</li>
-                        <li>Report thematically on to Horizon</li>
-                      </ul>
-                    </div>
-                    <div className="sd-flow-arrow sd-flow-arrow--left sd-step" data-show-at="5">→</div>
-                    {/* Box 6 (Transfer of Issues) — step 4, rightmost = first to appear */}
-                    <div className="sd-flow-box sd-step" data-show-at="4">
-                      <div className="sd-flow-box__title">Transfer of Issues</div>
-                      <ul className="sd-flow-box__list">
-                        <li>Identify issues that fall under other Domains</li>
-                        <li>Report to responsible Scrum UXers</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bottom hour callout — step 8 */}
-                <div className="sd-hour-callout sd-hour-callout--bottom sd-step" data-show-at="8">
-                  Total of <strong><CountUp ref={countUpBottomRef} target={216} suffix=" hrs" duration={1400} rangeLabel="180–216 hrs" /></strong>
-                </div>
-
-              </div>
-            </Expandable>
-          </section>
-
-          {/* ──────────────────────────────────────────
-              SECTION — Pain Points
-              Figma: Presentation → Slide 16:9 - 58 (2588:307) Notetakers
-                                    Slide 16:9 - 82 (2593:1092) Scrum UXers
-              ────────────────────────────────────────── */}
-          <section id="sd-pain-points" className="pd-section">
-            <p className="pd-section__label">Pain Points</p>
-            <h2 className="pd-section__heading">
-              <span className="sd-heading-dark">Notetakers and</span>{' '}
-              <span className="sd-heading-mint">Scrum UXers</span>{' '}
-              <span className="sd-heading-dark">— different roles, shared friction</span>
-            </h2>
-
-            <p className="pd-section__body">
-              Notetakers felt the squeeze in-session: <strong>19 of 23</strong> lacked time to capture notes, spent <strong>+26 minutes</strong> after each hour filling blanks, and logged anywhere from <strong>2–16</strong> issues per session. Scrum UXers absorbed the downstream cost — <strong>18 hours</strong> of thematic grouping, <strong>100+</strong> issues awaiting manual review, and <strong>40%</strong> of focus spent checking recordings when notes weren’t enough.
-            </p>
-
-            <HScroll label="Pain points — scroll horizontally for Notetakers and Scrum UXers">
-              <figure className="sd-journey-figure sd-hscroll__item">
+              <figure className="sd-journey-figure sd-slideshow__item">
                 <img
                   src="/siemens/pain-points-notetakers.png"
                   alt="Notetaker pain points — Time Pressure (19 of 23 lacked time to capture notes), The Workaround (+26 minutes after each hour-long session), and The Payoff Gap (2–16 issues captured per session)"
                   loading="lazy"
                 />
               </figure>
-              <figure className="sd-journey-figure sd-hscroll__item">
+              <figure className="sd-journey-figure sd-slideshow__item">
                 <img
                   src="/siemens/pain-points-overview.png"
                   alt="Scrum UXer pain points — Timeliness (18 hours for thematic grouping), Manual Effort (100+ issues awaiting review), and Focus (40% checking recordings because notes were insufficient)"
@@ -723,6 +479,7 @@ export default function SiemensDetail() {
                 />
               </figure>
             </HScroll>
+
           </section>
 
           {/* ──────────────────────────────────────────
@@ -899,7 +656,14 @@ export default function SiemensDetail() {
               SECTION 5 — Testing Results
               ────────────────────────────────────────── */}
           <section id="sd-results" className="pd-section">
-            <p className="pd-section__label">Validation</p>
+            <p className="pd-section__label">Results</p>
+            <figure className="sd-journey-figure">
+              <img
+                src="/siemens/notetaker-ui.png"
+                alt="Notetaker Assistant UI — AI-assisted research tooling for beta testing"
+                loading="lazy"
+              />
+            </figure>
             <h2 className="pd-section__heading">
               <span className="sd-heading-dark">Found</span>{' '}
               <span className="sd-heading-mint">10/14</span>{' '}
@@ -908,7 +672,6 @@ export default function SiemensDetail() {
             <p className="pd-section__body">
               The assistant was validated against a real testing session. Manual note-taking surfaced 2 effective documented usability issues. The Notetaker Assistant surfaced 8 additional validated issues the notetaker had missed. Results were reviewed and verified by the Scrum Master.
             </p>
-
             <figure className="sd-journey-figure sd-results-overview">
               <img
                 src="/siemens/results-overview.png"
@@ -1131,13 +894,13 @@ export default function SiemensDetail() {
               Every script follows the same skeleton: <strong>Session Metadata</strong> (filled before the session), <strong>Task Instructions</strong> as standardized prompts, and a <strong>Post-Test Survey</strong>. The Moderator version layers in <strong>Preparation</strong> and <strong>Introduction</strong> blocks. Identical structure across all 10 product domains is what lets the agents output comparable JSON every time.
             </p>
 
-            <HScroll label="Playbook figures — scroll horizontally">
-              <figure className="sd-journey-figure sd-hscroll__item">
+            <HScroll label="Playbook figures">
+              <figure className="sd-journey-figure sd-slideshow__item">
                 <img src="/impl-scripts-overview.png" alt="Enhanced Scrum UXer Playbook + Notetaker & Moderator scripts — uniform structure across every domain." />
                 <figcaption>Enhanced Scrum UXer Playbook + Notetaker &amp; Moderator scripts — uniform structure across every domain.</figcaption>
               </figure>
 
-              <figure className="sd-journey-figure sd-hscroll__item">
+              <figure className="sd-journey-figure sd-slideshow__item">
                 <img src="/impl-playbook-detail.png" alt="Inside the playbook: explicit prompts for the UX Notetakers Helper and JSON Search Agent." />
                 <figcaption>Inside the playbook: explicit prompts for the UX Notetakers Helper and JSON Search Agent — researchers follow numbered steps, not prose.</figcaption>
               </figure>

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Navbar from '../../components/layout/Navbar';
 import Tag from '../../components/ui/Tag';
 import TableOfContents from '../../components/ui/TableOfContents';
@@ -31,6 +31,35 @@ function CaseImage({ src, alt, caption, wide }) {
 }
 
 function CaseVideo({ src, poster, caption, wide, zoom }) {
+  const videoRef = useRef(null);
+  const [playing, setPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  const formatTime = (secs) => {
+    if (!Number.isFinite(secs) || secs < 0) return '0:00';
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m}:${String(s).padStart(2, '0')}`;
+  };
+
+  const togglePlay = () => {
+    const el = videoRef.current;
+    if (!el) return;
+    if (el.paused) el.play();
+    else el.pause();
+  };
+
+  const onSeek = (e) => {
+    const el = videoRef.current;
+    if (!el || !duration) return;
+    const next = Number(e.target.value) * duration;
+    el.currentTime = next;
+    setCurrentTime(next);
+  };
+
+  const progress = duration > 0 ? currentTime / duration : 0;
+
   return (
     <figure className={`ro-media${wide ? ' ro-media--wide' : ''}`}>
       <div
@@ -38,14 +67,57 @@ function CaseVideo({ src, poster, caption, wide, zoom }) {
           zoom ? ' ro-media__frame--zoom' : ''
         }`}
       >
-        <video
-          src={src}
-          poster={poster}
-          controls
-          playsInline
-          preload="metadata"
-          loop
-        />
+        {zoom ? (
+          <>
+            <div className="ro-media__zoom-clip">
+              <video
+                ref={videoRef}
+                src={src}
+                poster={poster}
+                playsInline
+                preload="metadata"
+                loop
+                onClick={togglePlay}
+                onPlay={() => setPlaying(true)}
+                onPause={() => setPlaying(false)}
+                onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
+                onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime || 0)}
+              />
+            </div>
+            <div className="ro-media__controls">
+              <button
+                type="button"
+                className="ro-media__controls-play"
+                onClick={togglePlay}
+                aria-label={playing ? 'Pause' : 'Play'}
+              >
+                {playing ? '❚❚' : '▶'}
+              </button>
+              <span className="ro-media__controls-time">
+                {formatTime(currentTime)} / {formatTime(duration)}
+              </span>
+              <input
+                className="ro-media__controls-seek"
+                type="range"
+                min="0"
+                max="1"
+                step="0.001"
+                value={progress || 0}
+                onChange={onSeek}
+                aria-label="Seek"
+              />
+            </div>
+          </>
+        ) : (
+          <video
+            src={src}
+            poster={poster}
+            controls
+            playsInline
+            preload="metadata"
+            loop
+          />
+        )}
       </div>
       {caption && <figcaption className="ro-media__caption">{caption}</figcaption>}
     </figure>
@@ -72,8 +144,7 @@ export default function RecODetail() {
 
   const project = projects.find((p) => p.slug === 'rec-o');
   const currentIndex = projects.findIndex((p) => p.slug === 'rec-o');
-  const prevProject =
-    currentIndex > 0 ? projects[currentIndex - 1] : projects[projects.length - 1];
+  const prevProject = projects.find((p) => p.slug === 'siemens') || (currentIndex > 0 ? projects[currentIndex - 1] : projects[projects.length - 1]);
   const nextProject =
     currentIndex < projects.length - 1 ? projects[currentIndex + 1] : projects[0];
 

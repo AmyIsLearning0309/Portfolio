@@ -22,6 +22,7 @@ export default function Navbar() {
   const isHome = location.pathname === '/';
   const isSiemens = location.pathname === '/work/siemens';
   const isRecO = location.pathname === '/work/rec-o';
+  const isNasa = location.pathname === '/work/nasa-suit';
 
   return (
     <nav
@@ -31,6 +32,7 @@ export default function Navbar() {
         isHome ? 'navbar--home' : '',
         isSiemens ? 'navbar--siemens' : '',
         isRecO ? 'navbar--reco' : '',
+        isNasa ? 'navbar--nasa' : '',
       ]
         .filter(Boolean)
         .join(' ')}

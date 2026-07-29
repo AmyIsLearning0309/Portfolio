@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { projects } from '../../data/projects.js';
 import '../../styles/horizontal-projects.css';
 
-const STACKED_MQ = '(max-width: 1023px)';
+/** Mobile + tablet, including iOS “Request Desktop Website” (uses device width). */
+const STACKED_MQ = '(max-width: 1023px), (max-device-width: 1023px)';
 
 /** True when the media box sits fully inside the clear stage (right of intro, inside viewport). */
 function isThumbnailFullyVisible(mediaEl, introEl) {
