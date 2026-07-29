@@ -1316,6 +1316,30 @@ html.toc-is-hidden .siemens-detail .pd-container {
   will-change: transform;
 }
 
+/* ── HScroll stacked mode (tablet + mobile) ── */
+@media (max-width: 1023px) {
+  .sd-hscroll-wrap--stacked .sd-hscroll {
+    overflow: visible;
+    scroll-snap-type: none;
+    cursor: default;
+  }
+
+  .sd-hscroll-wrap--stacked .sd-hscroll__track {
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    gap: var(--space-5);
+  }
+
+  .sd-hscroll-wrap--stacked .sd-hscroll__track > * {
+    flex: none;
+    width: 100%;
+    min-width: 0;
+    scroll-snap-align: none;
+  }
+}
+
 /* ── Implementation — bullets ── */
 .sd-impl-bullets {
   margin-top: var(--space-8);

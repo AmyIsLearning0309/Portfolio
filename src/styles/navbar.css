@@ -29,9 +29,6 @@
   background: #ffffff;
 }
 
-.home-page .navbar__mobile-menu {
-  background: #ffffff;
-}
 
 .navbar__inner {
   display: flex;
@@ -225,16 +222,20 @@
   color: var(--color-ink-secondary);
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
+  .navbar__inner {
+    padding-inline: var(--space-5);
+  }
+
   .navbar__links {
-    display: none;
+    gap: var(--space-5);
   }
 
-  .navbar__hamburger {
-    display: flex;
+  .navbar__logo {
+    width: 1.85rem;
   }
 
-  .navbar__mobile-menu {
-    display: flex;
+  .navbar__link {
+    font-size: var(--text-xs);
   }
 }

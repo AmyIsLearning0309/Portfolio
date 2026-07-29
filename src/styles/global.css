@@ -26,8 +26,8 @@
   --color-border-strong: rgba(20, 20, 20, 0.18);
 
   /* ── Typography — Instrument Sans site-wide ── */
-  --font-display: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;
-  --font-body: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Satoshi', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Satoshi', 'Helvetica Neue', Arial, sans-serif;
   --font-sans: var(--font-body);
 
   --text-xs: 0.75rem;

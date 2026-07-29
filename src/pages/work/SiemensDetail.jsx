@@ -74,21 +74,31 @@ function Expandable({
 }
 
 /** Side-by-side figures — horizontal swipe OK; vertical wheel always scrolls the page */
+const STACKED_MQ = '(max-width: 1023px)';
+
 function HScroll({ children, label }) {
   const ref = useRef(null);
   const [progress, setProgress] = useState(0);
+  const [stacked, setStacked] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia(STACKED_MQ).matches : false
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia(STACKED_MQ);
+    const onChange = () => setStacked(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return undefined;
+    if (!el || stacked) return undefined;
 
     const updateProgress = () => {
       const max = el.scrollWidth - el.clientWidth;
       setProgress(max > 0 ? Math.min(1, Math.max(0, el.scrollLeft / max)) : 0);
     };
 
-    // Overflow-x containers can swallow vertical wheel/trackpad gestures.
-    // Forward primarily-vertical input to the page so scroll never feels stuck.
     const onWheel = (e) => {
       if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
       e.preventDefault();
@@ -105,31 +115,33 @@ function HScroll({ children, label }) {
       el.removeEventListener('wheel', onWheel);
       window.removeEventListener('resize', updateProgress);
     };
-  }, []);
+  }, [stacked]);
 
   return (
-    <div className="sd-hscroll-wrap">
+    <div className={`sd-hscroll-wrap${stacked ? ' sd-hscroll-wrap--stacked' : ''}`}>
       <div
         ref={ref}
         className="sd-hscroll"
-        tabIndex={0}
+        tabIndex={stacked ? undefined : 0}
         aria-label={label}
       >
         <div className="sd-hscroll__track">{children}</div>
       </div>
-      <div
-        className="sd-hscroll__progress"
-        role="progressbar"
-        aria-label="Horizontal scroll progress"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.round(progress * 100)}
-      >
+      {!stacked && (
         <div
-          className="sd-hscroll__progress-bar"
-          style={{ transform: `scaleX(${Math.max(progress, 0.04)})` }}
-        />
-      </div>
+          className="sd-hscroll__progress"
+          role="progressbar"
+          aria-label="Horizontal scroll progress"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(progress * 100)}
+        >
+          <div
+            className="sd-hscroll__progress-bar"
+            style={{ transform: `scaleX(${Math.max(progress, 0.04)})` }}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -486,7 +498,7 @@ export default function SiemensDetail() {
   const project = projects.find((p) => p.slug === 'siemens');
   const currentIndex = projects.findIndex((p) => p.slug === 'siemens');
   const prevProject = currentIndex > 0 ? projects[currentIndex - 1] : projects[projects.length - 1];
-  const nextProject = currentIndex < projects.length - 1 ? projects[currentIndex + 1] : projects[0];
+  const nextProject = projects.find((p) => p.slug === 'rec-o') || projects[(currentIndex + 1) % projects.length];
 
   return (
     <>
