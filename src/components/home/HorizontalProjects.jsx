@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import { projects } from '../../data/projects.js';
 import '../../styles/horizontal-projects.css';
 
+/** Mobile + tablet, including iOS “Request Desktop Website” (uses device width). */
+const STACKED_MQ = '(max-width: 1023px), (max-device-width: 1023px)';
+
 /** True when the media box sits fully inside the clear stage (right of intro, inside viewport). */
 function isThumbnailFullyVisible(mediaEl, introEl) {
   if (!mediaEl) return false;
@@ -10,7 +13,8 @@ function isThumbnailFullyVisible(mediaEl, introEl) {
   if (rect.width < 2 || rect.height < 2) return false;
 
   const tol = 2;
-  const leftBound = introEl ? introEl.getBoundingClientRect().right : 0;
+  const isStacked = window.matchMedia(STACKED_MQ).matches;
+  const leftBound = isStacked || !introEl ? 0 : introEl.getBoundingClientRect().right;
   const rightBound = window.innerWidth;
   const topBound = 0;
   const bottomBound = window.innerHeight;
@@ -26,9 +30,9 @@ function isThumbnailFullyVisible(mediaEl, introEl) {
 /** Tight follow — smooth without feeling delayed */
 const FLOW_LERP = 0.22;
 const GIF_FADE_MS = 450;
-const GIF_HOVER_DELAY_MS = 1200;
+const GIF_HOVER_DELAY_MS = 1000;
 
-const SNAP_COUNT = projects.length; // rest (first project visible) + each following project
+const SNAP_COUNT = projects.length;
 
 /**
  * Vertical scroll drives a horizontal track.
@@ -47,6 +51,9 @@ export default function HorizontalProjects() {
   const targetShiftRef = useRef(0);
   const currentShiftRef = useRef(0);
   const [tunnelHeight, setTunnelHeight] = useState(`${SNAP_COUNT * 100}svh`);
+  const [isStacked, setIsStacked] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia(STACKED_MQ).matches : false
+  );
   const [gifState, setGifState] = useState(null); // { id, key, visible }
   const hoveredIdRef = useRef(null);
   const gifPlayIdRef = useRef(null);
@@ -150,18 +157,36 @@ export default function HorizontalProjects() {
     if (gifPlayIdRef.current === project.id) hideGif(project.id);
   };
 
-  // Enable native vertical scroll-snap while this section is mounted
+  // Track viewport breakpoint
   useEffect(() => {
-    document.documentElement.classList.add('hx-scroll-snap');
+    const mq = window.matchMedia(STACKED_MQ);
+    const onChange = () => setIsStacked(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  // When entering stacked mode, clear desktop transforms
+  useEffect(() => {
+    if (isStacked) {
+      document.documentElement.classList.remove('hx-scroll-snap');
+      if (trackRef.current) trackRef.current.style.transform = '';
+      if (introRef.current) introRef.current.style.transform = '';
+      currentShiftRef.current = 0;
+      targetShiftRef.current = 0;
+    } else {
+      document.documentElement.classList.add('hx-scroll-snap');
+    }
     return () => {
       document.documentElement.classList.remove('hx-scroll-snap');
       clearGifFadeTimer();
       clearGifHoverTimer();
     };
-  }, []);
+  }, [isStacked]);
 
-  // Measure max travel + per-card center shifts (at rest transform)
+  // Measure max travel + per-card center shifts (desktop only)
   useEffect(() => {
+    if (isStacked) return undefined;
+
     const measure = () => {
       const track = trackRef.current;
       const intro = introRef.current;
@@ -202,10 +227,12 @@ export default function HorizontalProjects() {
       window.clearTimeout(t);
       window.removeEventListener('resize', measure);
     };
-  }, []);
+  }, [isStacked]);
 
-  // Scroll progress → interpolate across snap shifts; tight lerp for polish
+  // Scroll progress → interpolate across snap shifts (desktop only)
   useEffect(() => {
+    if (isStacked) return undefined;
+
     let raf = 0;
 
     const syncGifVisibility = () => {
@@ -273,22 +300,24 @@ export default function HorizontalProjects() {
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [tunnelHeight]);
+  }, [tunnelHeight, isStacked]);
 
   return (
     <section
-      className="hx"
+      className={`hx${isStacked ? ' hx--stacked' : ''}`}
       id="selected-works"
       ref={tunnelRef}
-      style={{ height: tunnelHeight }}
+      style={isStacked ? undefined : { height: tunnelHeight }}
       aria-label="Introduction and selected works"
     >
-      {/* Native snap stops — rest + one viewport per following project */}
-      <div className="hx__snap-rail" aria-hidden="true">
-        {Array.from({ length: SNAP_COUNT }, (_, i) => (
-          <div key={i} className="hx__snap-stop" />
-        ))}
-      </div>
+      {/* Native snap stops — desktop only */}
+      {!isStacked && (
+        <div className="hx__snap-rail" aria-hidden="true">
+          {Array.from({ length: SNAP_COUNT }, (_, i) => (
+            <div key={i} className="hx__snap-stop" />
+          ))}
+        </div>
+      )}
 
       <div className="hx__stage">
         <div className="hx__track" ref={trackRef}>
@@ -315,16 +344,14 @@ export default function HorizontalProjects() {
                 <span className="hx__intro-name">Amy Ai.</span>
               </h1>
               <p className="hx__intro-tagline">
-                Forward deployed product designer,
-                <br />
-                building and shipping AI-native tools.
+                Product Design · Product Manager · Builder
               </p>
             </div>
 
             <div className="hx__intro-foot">
               <p className="hx__intro-subtitle">
                 <span className="hx__intro-role">
-                  Product designer{' '}
+                  Current{' '}
                   <a
                     href="https://joinmochi.com/"
                     target="_blank"

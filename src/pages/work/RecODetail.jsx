@@ -30,14 +30,10 @@ function CaseImage({ src, alt, caption, wide }) {
   );
 }
 
-function CaseVideo({ src, poster, caption, wide, zoom }) {
+function CaseVideo({ src, poster, caption, wide }) {
   return (
     <figure className={`ro-media${wide ? ' ro-media--wide' : ''}`}>
-      <div
-        className={`ro-media__frame ro-media__frame--video${
-          zoom ? ' ro-media__frame--zoom' : ''
-        }`}
-      >
+      <div className="ro-media__frame ro-media__frame--video">
         <video
           src={src}
           poster={poster}
@@ -72,8 +68,7 @@ export default function RecODetail() {
 
   const project = projects.find((p) => p.slug === 'rec-o');
   const currentIndex = projects.findIndex((p) => p.slug === 'rec-o');
-  const prevProject =
-    currentIndex > 0 ? projects[currentIndex - 1] : projects[projects.length - 1];
+  const prevProject = projects.find((p) => p.slug === 'siemens') || (currentIndex > 0 ? projects[currentIndex - 1] : projects[projects.length - 1]);
   const nextProject =
     currentIndex < projects.length - 1 ? projects[currentIndex + 1] : projects[0];
 
@@ -145,7 +140,6 @@ export default function RecODetail() {
             poster="/rec-o/hero-ui.png"
             caption="REC-O product demo — software + wearable coaching system"
             wide
-            zoom
           />
 
           {/* ── Overview ── */}

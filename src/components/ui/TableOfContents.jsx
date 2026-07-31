@@ -17,6 +17,7 @@ export default function TableOfContents({
   projectTitle,
   accent,
   autoHideAfterId,
+  variant,
 }) {
   const hideAfterId = autoHideAfterId ?? sections[1]?.id ?? null;
 
@@ -109,6 +110,8 @@ export default function TableOfContents({
   };
 
   const accentStyle = accent ? { '--toc-accent': accent } : undefined;
+  const variantClass = variant ? ` toc--${variant}` : '';
+  const shellVariantClass = variant ? ` toc-shell--${variant}` : '';
 
   const panel = (
     <>
@@ -151,7 +154,11 @@ export default function TableOfContents({
   /* Single-section pages: static TOC without auto-hide */
   if (!hideAfterId) {
     return (
-      <aside className="toc" aria-label="Page navigation" style={accentStyle}>
+      <aside
+        className={`toc${variantClass}`}
+        aria-label="Page navigation"
+        style={accentStyle}
+      >
         {panel}
       </aside>
     );
@@ -159,39 +166,27 @@ export default function TableOfContents({
 
   return (
     <aside
-      className={`toc-shell${isCollapsed ? ' toc-shell--collapsed' : ''}`}
+      className={`toc-shell${shellVariantClass}${isCollapsed ? ' toc-shell--collapsed' : ''}`}
       aria-label="Page navigation"
       style={accentStyle}
     >
       <div
-        className="toc toc--in-shell"
+        className={`toc toc--in-shell${variantClass}`}
         id="toc-panel"
         aria-hidden={isCollapsed}
       >
         {panel}
       </div>
 
-      {dismissed && (
+      {dismissed && isCollapsed && (
         <button
           type="button"
-          className={`toc__reveal${isCollapsed ? ' toc__reveal--collapsed' : ' toc__reveal--icon'}`}
-          aria-expanded={!isCollapsed}
+          className="toc__reveal toc__reveal--collapsed"
+          aria-expanded={false}
           aria-controls="toc-panel"
-          aria-label={isCollapsed ? undefined : 'Hide content'}
           onClick={handleRevealToggle}
         >
-          {isCollapsed ? (
-            <>
-              Show Content
-              <span className="toc__reveal-chevron" aria-hidden="true">
-                &gt;
-              </span>
-            </>
-          ) : (
-            <span className="toc__reveal-chevron" aria-hidden="true">
-              &lt;
-            </span>
-          )}
+          Show Content
         </button>
       )}
     </aside>

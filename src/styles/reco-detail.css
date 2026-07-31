@@ -9,12 +9,8 @@
 
 /* Match Siemens content column width + side padding */
 .reco-detail .pd-container {
-  max-width: 1020px;
-  padding-inline: var(--space-8);
-}
-
-html.toc-is-hidden .reco-detail .pd-container {
-  max-width: 1100px;
+  max-width: 1440px;
+  padding-inline: var(--space-5);
 }
 
 .ro-title-link {
@@ -47,7 +43,7 @@ html.toc-is-hidden .reco-detail .pd-container {
 }
 
 .ro-media--wide {
-  margin-inline: calc(var(--space-8) * -0.5);
+  margin-inline: 0;
 }
 
 .ro-media__frame {
@@ -65,11 +61,6 @@ html.toc-is-hidden .reco-detail .pd-container {
 
 .ro-media__frame--video {
   background: #111;
-}
-
-.ro-media__frame--zoom video {
-  transform: scale(1.05);
-  transform-origin: center center;
 }
 
 .ro-media__caption {

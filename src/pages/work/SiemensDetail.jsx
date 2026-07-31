@@ -1,4 +1,4 @@
-import { useEffect, useRef, useImperativeHandle, forwardRef, useState, memo } from 'react';
+import { useEffect, useRef, useImperativeHandle, forwardRef, useState, memo, Children, useCallback } from 'react';
 import Navbar from '../../components/layout/Navbar';
 import PlaceholderImage from '../../components/ui/PlaceholderImage';
 import Tag from '../../components/ui/Tag';
@@ -10,10 +10,11 @@ import '../../styles/siemens-detail.css';
 
 const TOC_SECTIONS = [
   { id: 'sd-overview', label: 'Overview' },
-  { id: 'sd-scale', label: 'The Scale' },
-  { id: 'sd-pain-points', label: 'Pain Points' },
+  { id: 'sd-scale', label: 'Context' },
+  // { id: 'sd-pain-points', label: 'Pain Points' }, // Removed — images live in Scale slideshow
   // { id: 'sd-gap', label: 'The Gap' }, // Hidden for now
-  // { id: 'sd-solution', label: 'The Solution' }, // Hidden for now
+  { id: 'sd-opportunity', label: 'Opportunity' },
+  { id: 'sd-solution', label: 'Solution' },
   // { id: 'sd-mapping', label: 'Pain Mapping' }, // Hidden for now
   { id: 'sd-results', label: 'Results' },
   { id: 'sd-findings', label: 'Findings' },
@@ -25,175 +26,835 @@ const TOC_SECTIONS = [
   { id: 'sd-reflection', label: 'Reflection' },
 ];
 
-/** Collapsed-by-default detail block — Expand / Show less */
-function Expandable({
-  children,
-  moreLabel = 'Expand to see the full process',
-  lessLabel = 'Show less',
-  onOpenChange,
-}) {
-  const [open, setOpen] = useState(false);
-  const panelRef = useRef(null);
-  const panelId = useRef(`sd-expand-${Math.random().toString(36).slice(2, 9)}`).current;
+/** Side-by-side figures — slideshow with arrow navigation */
+function HScroll({ children, label }) {
+  const slides = Children.toArray(children).filter(Boolean);
+  const count = slides.length;
+  const [index, setIndex] = useState(0);
 
-  useEffect(() => {
-    if (!open || !panelRef.current) return undefined;
-    // Kick scroll-linked reveals now that the panel has layout
-    window.dispatchEvent(new Event('scroll'));
-    return undefined;
-  }, [open]);
+  const go = useCallback(
+    (next) => {
+      if (count < 2) return;
+      setIndex(((next % count) + count) % count);
+    },
+    [count]
+  );
+
+  if (count === 0) return null;
+
+  const progress = count > 1 ? (index + 1) / count : 1;
 
   return (
-    <div className={`sd-expand${open ? ' is-open' : ''}`}>
-      <div
-        id={panelId}
-        ref={panelRef}
-        className="sd-expand__panel"
-        hidden={!open}
-      >
-        {children}
+    <div
+      className="sd-slideshow"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label={label}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          go(index - 1);
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          go(index + 1);
+        }
+      }}
+    >
+      <div className="sd-slideshow__frame">
+        {count > 1 && (
+          <button
+            type="button"
+            className="sd-slideshow__arrow sd-slideshow__arrow--prev"
+            onClick={() => go(index - 1)}
+            aria-label="Previous slide"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M15 4 L7 12 L15 20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        )}
+
+        <div className="sd-slideshow__viewport">
+          <div
+            className="sd-slideshow__track"
+            style={{ transform: `translateX(-${index * 100}%)` }}
+          >
+            {slides.map((slide, i) => (
+              <div
+                key={slide.key ?? i}
+                className="sd-slideshow__slide"
+                aria-hidden={i !== index}
+              >
+                {slide}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {count > 1 && (
+          <button
+            type="button"
+            className="sd-slideshow__arrow sd-slideshow__arrow--next"
+            onClick={() => go(index + 1)}
+            aria-label="Next slide"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M9 4 L17 12 L9 20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        )}
       </div>
-      <button
-        type="button"
-        className="sd-expand__toggle"
-        aria-expanded={open}
-        aria-controls={panelId}
-        onClick={() => {
-          const next = !open;
-          setOpen(next);
-          onOpenChange?.(next);
-        }}
-      >
-        <span className="sd-expand__toggle-label">
-          {open ? lessLabel : moreLabel}
-        </span>
-        <span className="sd-expand__chevron" aria-hidden="true" />
-      </button>
+
+      {count > 1 && (
+        <div className="sd-slideshow__progress" aria-hidden="true">
+          <div
+            className="sd-slideshow__progress-bar"
+            style={{ transform: `scaleX(${progress})` }}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
-/** Side-by-side figures — horizontal swipe OK; vertical wheel always scrolls the page */
-function HScroll({ children, label }) {
-  const ref = useRef(null);
+const SOLUTION_HOWTO_VIDEOS = [
+  {
+    src: '/siemens/nt-howto1.mp4',
+    label: 'Notetaker Assistant how-to — attach script and stand by',
+    caption: "Import Notetaker's note",
+  },
+  {
+    src: '/siemens/nt-howto2.mp4',
+    label: 'Notetaker Assistant how-to — continue the two-agent workflow',
+    caption: 'Review newly found issues',
+  },
+  {
+    src: '/siemens/nt-howto3.mp4',
+    label: 'Notetaker Assistant how-to — review findings and evidence',
+    caption: 'Review quotes',
+  },
+  {
+    src: '/siemens/nt-howto4.mp4',
+    label: 'Notetaker Assistant how-to — extract quotes and wrap up',
+    caption: 'Convert to Json',
+  },
+];
+
+const HOWTO_PROGRESS_STEPS = 4;
+const HOWTO_PANEL_COUNT = SOLUTION_HOWTO_VIDEOS.length;
+
+/** Vertical scroll drives a horizontal slide between howto videos */
+function SolutionHowToHScroll() {
+  const pinRef = useRef(null);
+  const trackRef = useRef(null);
+  const videoRefs = useRef([]);
+  const activeRef = useRef(0);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return undefined;
+    const pin = pinRef.current;
+    const track = trackRef.current;
+    if (!pin || !track) return undefined;
 
-    const updateProgress = () => {
-      const max = el.scrollWidth - el.clientWidth;
-      setProgress(max > 0 ? Math.min(1, Math.max(0, el.scrollLeft / max)) : 0);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const stackedMq = window.matchMedia('(max-width: 1023px)');
+    if (reduceMotion) return undefined;
+
+    const pauseAll = () => {
+      videoRefs.current.forEach((video) => {
+        if (!video) return;
+        video.pause();
+      });
     };
 
-    // Overflow-x containers can swallow vertical wheel/trackpad gestures.
-    // Forward primarily-vertical input to the page so scroll never feels stuck.
+    const syncVideos = (index, sectionVisible) => {
+      const next = Math.min(HOWTO_PANEL_COUNT - 1, Math.max(0, index));
+      activeRef.current = next;
+
+      if (!sectionVisible) {
+        pauseAll();
+        return;
+      }
+
+      videoRefs.current.forEach((video, i) => {
+        if (!video) return;
+        if (i === next) {
+          if (video.paused) {
+            const play = video.play();
+            if (play?.catch) play.catch(() => {});
+          }
+        } else if (!video.paused) {
+          video.pause();
+        }
+      });
+    };
+
+    const shiftFromProgress = (p) => {
+      const n = HOWTO_PANEL_COUNT;
+      if (n <= 1) return 0;
+      const scaled = Math.max(0, Math.min(1, p)) * (n - 1);
+      const i = Math.min(n - 2, Math.floor(scaled));
+      const t = scaled - i;
+      const a = (i / n) * 100;
+      const b = ((i + 1) / n) * 100;
+      return a + (b - a) * t;
+    };
+
+    const setSnapEnabled = (on) => {
+      document.documentElement.classList.toggle('sd-howto-scroll-snap', on && !stackedMq.matches);
+    };
+
+    const readProgress = () => {
+      const rect = pin.getBoundingClientRect();
+      const scrollable = pin.offsetHeight - window.innerHeight;
+      if (scrollable <= 0) return 0;
+      return Math.min(1, Math.max(0, -rect.top / scrollable));
+    };
+
+    const stickyVisible = () => {
+      const sticky = pin.querySelector('.sd-howto-hscroll__sticky');
+      const el = sticky || pin;
+      const r = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // Play only when the frame is substantially on screen
+      return r.top < vh * 0.85 && r.bottom > vh * 0.15;
+    };
+
+    const update = () => {
+      if (stackedMq.matches) {
+        setSnapEnabled(false);
+        track.style.transform = 'translate3d(0,0,0)';
+        setProgress(0);
+        // Mobile: play whichever video is in view via IO below
+        return;
+      }
+
+      const rect = pin.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const scrollable = pin.offsetHeight - vh;
+      const inSection = rect.top <= vh * 0.55 && rect.bottom >= vh * 0.45;
+      const visible = stickyVisible();
+
+      if (scrollable <= 0) {
+        syncVideos(0, visible);
+        return;
+      }
+      const p = Math.min(1, Math.max(0, -rect.top / scrollable));
+      // Free scroll at the first/last stops so users can leave the section
+      const edgePad = 0.5 / Math.max(1, HOWTO_PANEL_COUNT);
+      const atFirst = p <= edgePad;
+      const atLast = p >= 1 - edgePad;
+      setSnapEnabled(inSection && !atFirst && !atLast);
+
+      track.style.transform = `translate3d(-${shiftFromProgress(p)}%, 0, 0)`;
+      syncVideos(Math.round(p * (HOWTO_PANEL_COUNT - 1)), visible);
+      setProgress(p);
+    };
+
+    // Release snap immediately on upward intent at the first thumbnail
     const onWheel = (e) => {
-      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-      e.preventDefault();
-      window.scrollBy(0, e.deltaY);
+      if (stackedMq.matches) return;
+      const p = readProgress();
+      if (e.deltaY < 0 && p <= 0.5 / Math.max(1, HOWTO_PANEL_COUNT)) {
+        setSnapEnabled(false);
+      } else if (e.deltaY > 0 && p >= 1 - 0.5 / Math.max(1, HOWTO_PANEL_COUNT)) {
+        setSnapEnabled(false);
+      }
     };
 
-    updateProgress();
-    el.addEventListener('scroll', updateProgress, { passive: true });
-    el.addEventListener('wheel', onWheel, { passive: false });
-    window.addEventListener('resize', updateProgress);
+    // Stacked / mobile: each clip plays only while intersecting the viewport
+    const observers = videoRefs.current.map((video) => {
+      if (!video) return null;
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          if (!stackedMq.matches) return;
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.45) {
+            const play = video.play();
+            if (play?.catch) play.catch(() => {});
+          } else {
+            video.pause();
+          }
+        },
+        { threshold: [0, 0.45, 0.7] }
+      );
+      io.observe(video);
+      return io;
+    });
 
+    // Start paused; only play once in view
+    pauseAll();
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    window.addEventListener('wheel', onWheel, { passive: true });
+    stackedMq.addEventListener?.('change', update);
     return () => {
-      el.removeEventListener('scroll', updateProgress);
-      el.removeEventListener('wheel', onWheel);
-      window.removeEventListener('resize', updateProgress);
+      setSnapEnabled(false);
+      pauseAll();
+      observers.forEach((io) => io?.disconnect());
+      window.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+      window.removeEventListener('wheel', onWheel);
+      stackedMq.removeEventListener?.('change', update);
     };
   }, []);
 
+  const activePanel = Math.round(progress * Math.max(1, HOWTO_PANEL_COUNT - 1));
+  const activeStep = Math.min(HOWTO_PROGRESS_STEPS, activePanel + 1);
+  const fillPct =
+    HOWTO_PROGRESS_STEPS <= 1
+      ? 100
+      : ((activeStep - 1) / (HOWTO_PROGRESS_STEPS - 1)) * 100;
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const pin = pinRef.current;
+    if (!pin) return undefined;
+    const sticky = pin.querySelector('.sd-howto-hscroll__sticky');
+    const target = sticky || pin;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      setInView(true);
+      return undefined;
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.28) {
+          setInView(true);
+        }
+      },
+      { threshold: [0, 0.28, 0.5] }
+    );
+    io.observe(target);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <div className="sd-hscroll-wrap">
-      <div
-        ref={ref}
-        className="sd-hscroll"
-        tabIndex={0}
-        aria-label={label}
-      >
-        <div className="sd-hscroll__track">{children}</div>
+    <div
+      ref={pinRef}
+      className={`sd-howto-hscroll${inView ? ' sd-howto-hscroll--inview' : ''}`}
+      aria-label="Two agents, one workflow — how-to walkthrough"
+      style={{ height: `${HOWTO_PANEL_COUNT * 100}svh` }}
+    >
+      {/* Native y-snap stops — one centered panel per stop (homepage pattern) */}
+      <div className="sd-howto-hscroll__snap-rail" aria-hidden="true">
+        {SOLUTION_HOWTO_VIDEOS.map((clip) => (
+          <div key={clip.src} className="sd-howto-hscroll__snap-stop" />
+        ))}
       </div>
-      <div
-        className="sd-hscroll__progress"
-        role="progressbar"
-        aria-label="Horizontal scroll progress"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.round(progress * 100)}
-      >
+
+      <div className="sd-howto-hscroll__sticky">
+        <div className="sd-howto-hscroll__viewport">
+          <div
+            ref={trackRef}
+            className="sd-howto-hscroll__track"
+            style={{
+              width: `${HOWTO_PANEL_COUNT * 100}%`,
+            }}
+          >
+            {SOLUTION_HOWTO_VIDEOS.map((clip, i) => (
+              <figure
+                key={clip.src}
+                className="sd-journey-figure sd-howto-hscroll__panel"
+                style={{
+                  flex: `0 0 ${100 / HOWTO_PANEL_COUNT}%`,
+                  width: `${100 / HOWTO_PANEL_COUNT}%`,
+                }}
+              >
+                <video
+                  ref={(el) => {
+                    videoRefs.current[i] = el;
+                  }}
+                  src={clip.src}
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  aria-label={clip.label}
+                />
+              </figure>
+            ))}
+          </div>
+        </div>
+
         <div
-          className="sd-hscroll__progress-bar"
-          style={{ transform: `scaleX(${Math.max(progress, 0.04)})` }}
-        />
+          className="sd-howto-progress"
+          role="progressbar"
+          aria-valuemin={1}
+          aria-valuemax={HOWTO_PROGRESS_STEPS}
+          aria-valuenow={activeStep}
+          aria-label={`Step ${String(activeStep).padStart(2, '0')}: ${SOLUTION_HOWTO_VIDEOS[activePanel]?.caption ?? ''}`}
+        >
+          <div className="sd-howto-progress__caption" aria-live="polite">
+            <span className="sd-howto-progress__num" aria-hidden="true">
+              <span className="sd-howto-progress__num-tens">0</span>
+              <span className="sd-howto-progress__num-ones">
+                <span
+                  className="sd-howto-progress__num-reel"
+                  style={{
+                    '--sd-howto-reel-i': activeStep - 1,
+                  }}
+                >
+                  {Array.from({ length: HOWTO_PROGRESS_STEPS }, (_, i) => (
+                    <span key={i + 1} className="sd-howto-progress__num-digit">
+                      {i + 1}
+                    </span>
+                  ))}
+                </span>
+              </span>
+            </span>
+            <span className="sd-howto-progress__sr">
+              {String(activeStep).padStart(2, '0')}
+            </span>
+            <span key={`t-${activeStep}`} className="sd-howto-progress__title">
+              {SOLUTION_HOWTO_VIDEOS[activePanel]?.caption}
+            </span>
+          </div>
+
+          <div className="sd-howto-progress__bar">
+            <div className="sd-howto-progress__track" aria-hidden="true">
+              <div
+                className="sd-howto-progress__fill"
+                style={{ width: `${fillPct}%` }}
+              />
+            </div>
+            <ol className="sd-howto-progress__steps">
+              {Array.from({ length: HOWTO_PROGRESS_STEPS }, (_, i) => {
+                const step = i + 1;
+                const done = step < activeStep;
+                const current = step === activeStep;
+                return (
+                  <li
+                    key={step}
+                    className={[
+                      'sd-howto-progress__step',
+                      done ? 'is-done' : '',
+                      current ? 'is-current' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                  >
+                    <span className="sd-howto-progress__dot" />
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-/* ── Count-up number component ──
-   Imperative: parent calls countUpRef.current.start() to begin.
-   Counts 0 → target with ease-out cubic, then crossfades to rangeLabel.
-── */
-const CountUp = forwardRef(function CountUp(
-  { target, suffix = '', duration = 1800, rangeLabel = null },
-  ref
-) {
-  const numRef = useRef(null);
-  const rangeRef = useRef(null);
-  const startedRef = useRef(false);
+const WAFFLE_TOTAL = 100;
+const WAFFLE_PURPLE = 82;
+const WAFFLE_COLS = 20;
 
-  useImperativeHandle(ref, () => ({
-    start() {
-      if (startedRef.current) return;
-      startedRef.current = true;
-      const numEl = numRef.current;
-      if (!numEl) return;
-      const begin = performance.now();
-      const tick = (now) => {
-        const progress = Math.min((now - begin) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        numEl.textContent = Math.round(eased * target) + suffix;
-        if (progress < 1) {
-          requestAnimationFrame(tick);
-        } else {
-          // Count done — crossfade to range label
-          if (rangeRef.current) {
-            rangeRef.current.style.opacity = '1';
-            numEl.style.opacity = '0';
+function PainWaffle({ onComplete }) {
+  const wrapRef = useRef(null);
+  const [lit, setLit] = useState(0);
+  const startedRef = useRef(false);
+  const completedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return undefined;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting || startedRef.current) return;
+        startedRef.current = true;
+        io.disconnect();
+
+        let i = 0;
+        const step = () => {
+          i += 1;
+          setLit(i);
+          if (i < WAFFLE_PURPLE) {
+            window.setTimeout(step, 38);
+          } else if (!completedRef.current) {
+            completedRef.current = true;
+            window.setTimeout(() => onCompleteRef.current?.(), 280);
           }
-        }
-      };
-      requestAnimationFrame(tick);
-    },
-  }));
+        };
+        window.setTimeout(step, 220);
+      },
+      { threshold: 0.4 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <span style={{ position: 'relative', display: 'inline-block' }}>
-      <span ref={numRef} style={{ transition: 'opacity 0.4s ease' }}>
-        0{suffix}
-      </span>
-      {rangeLabel && (
-        <span
-          ref={rangeRef}
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            opacity: 0,
-            transition: 'opacity 0.4s ease',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {rangeLabel}
-        </span>
-      )}
-    </span>
+    <div
+      ref={wrapRef}
+      className={`sd-pain-waffle${lit > 0 ? ' sd-pain-waffle--active' : ''}`}
+    >
+      <div className="sd-pain-waffle__copy">
+        <p className="sd-pain-waffle__stat" aria-live="polite">
+          {lit}
+          <span className="sd-pain-waffle__stat-unit">%</span>
+        </p>
+        <p className="sd-pain-waffle__desc">
+          reported they didn’t have enough time to capture notes during the
+          session
+        </p>
+      </div>
+
+      <div className="sd-pain-waffle__grid" aria-hidden="true">
+        {Array.from({ length: WAFFLE_TOTAL }, (_, i) => {
+          const isPurple = i < lit;
+          return (
+            <span
+              key={i}
+              className={`sd-pain-waffle__dot${isPurple ? ' sd-pain-waffle__dot--purple' : ''}`}
+              style={{ '--i': i % WAFFLE_COLS, '--r': Math.floor(i / WAFFLE_COLS) }}
+            />
+          );
+        })}
+      </div>
+    </div>
   );
-});
+}
+
+/** Animated stock-style sparkline — 8 discrete points, no labels/numbers */
+const PAIN_SPARK_VALUES = [48, 72, 28, 64, 18, 81, 35, 55];
+
+function PainSparkline({ ready = false, onComplete }) {
+  const wrapRef = useRef(null);
+  const pathRef = useRef(null);
+  const [drawn, setDrawn] = useState(false);
+  const [copyReady, setCopyReady] = useState(false);
+  const [litDots, setLitDots] = useState(0);
+  const [low, setLow] = useState(16);
+  const [high, setHigh] = useState(2);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+  const completedRef = useRef(false);
+
+  const width = 960;
+  const height = 240;
+  const padX = 22;
+  const padY = 22;
+  const n = PAIN_SPARK_VALUES.length;
+  const min = Math.min(...PAIN_SPARK_VALUES);
+  const max = Math.max(...PAIN_SPARK_VALUES);
+  const span = max - min || 1;
+
+  const points = PAIN_SPARK_VALUES.map((v, i) => {
+    const x = padX + (i / (n - 1)) * (width - padX * 2);
+    const y = height - padY - ((v - min) / span) * (height - padY * 2);
+    return { x, y };
+  });
+
+  const linePath = points
+    .map((p, i) => {
+      if (i === 0) return `M ${p.x} ${p.y}`;
+      const prev = points[i - 1];
+      const c1x = prev.x + (p.x - prev.x) / 2;
+      return `C ${c1x} ${prev.y}, ${c1x} ${p.y}, ${p.x} ${p.y}`;
+    })
+    .join(' ');
+
+  const finish = useCallback(() => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    onCompleteRef.current?.();
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return undefined;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      setDrawn(true);
+      setLitDots(n);
+      setCopyReady(true);
+      setLow(2);
+      setHigh(16);
+      finish();
+      return undefined;
+    }
+    const id = window.requestAnimationFrame(() => setDrawn(true));
+    return () => window.cancelAnimationFrame(id);
+  }, [ready, n, finish]);
+
+  useEffect(() => {
+    const path = pathRef.current;
+    if (!path || !drawn) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    path.style.strokeDasharray = '1';
+    path.style.strokeDashoffset = '1';
+    path.getBoundingClientRect();
+    path.style.strokeDashoffset = '0';
+
+    let i = 0;
+    const timers = [];
+    const startDots = window.setTimeout(() => {
+      const step = () => {
+        i += 1;
+        setLitDots(i);
+        if (i < n) timers.push(window.setTimeout(step, 140));
+      };
+      step();
+    }, 900);
+    timers.push(startDots);
+
+    const showCopy = window.setTimeout(() => setCopyReady(true), 1800);
+    timers.push(showCopy);
+
+    return () => timers.forEach((t) => window.clearTimeout(t));
+  }, [drawn, n]);
+
+  useEffect(() => {
+    if (!copyReady) return undefined;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      setLow(2);
+      setHigh(16);
+      finish();
+      return undefined;
+    }
+
+    const duration = 1400;
+    const begin = performance.now();
+    let raf = 0;
+    const tick = (now) => {
+      const progress = Math.min((now - begin) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setLow(Math.round(16 - eased * 14));
+      setHigh(Math.round(2 + eased * 14));
+      if (progress < 1) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        setLow(2);
+        setHigh(16);
+        window.setTimeout(finish, 200);
+      }
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [copyReady, finish]);
+
+  return (
+    <div
+      ref={wrapRef}
+      className={`sd-pain-spark${ready ? ' sd-pain-spark--visible' : ''}${drawn ? ' sd-pain-spark--drawn' : ''}`}
+    >
+      <div
+        className={`sd-pain-spark__chart${ready ? ' sd-pain-spark__chart--visible' : ''}`}
+      >
+        <svg
+          className="sd-pain-spark__svg"
+          viewBox={`0 0 ${width} ${height}`}
+          preserveAspectRatio="xMinYMid meet"
+          role="presentation"
+          aria-hidden="true"
+        >
+          <path
+            ref={pathRef}
+            className="sd-pain-spark__line"
+            d={linePath}
+            fill="none"
+            stroke="#31CDC7"
+            strokeWidth="3.9"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            pathLength="1"
+            style={{ strokeDasharray: 1, strokeDashoffset: 1 }}
+          />
+
+          {points.map((p, i) => {
+            const isEnd = i === n - 1;
+            const isLit = i < litDots || isEnd;
+            return (
+              <g
+                key={i}
+                className={`sd-pain-spark__point${isLit ? ' sd-pain-spark__point--lit' : ''}${isEnd ? ' sd-pain-spark__point--end' : ''}`}
+                style={{ '--i': i }}
+              >
+                <circle
+                  className={`sd-pain-spark__dot${isLit ? ' sd-pain-spark__dot--purple' : ''}${isEnd ? ' sd-pain-spark__dot--end' : ''}`}
+                  cx={p.x}
+                  cy={p.y}
+                  r={isEnd ? 18 : 16}
+                />
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+      <div
+        className={`sd-pain-spark__copy${copyReady ? ' sd-pain-spark__copy--visible' : ''}`}
+      >
+        <p className="sd-pain-spark__stat" aria-live="polite">
+          {low}-{high}
+        </p>
+        <p className="sd-pain-spark__desc">
+          reported they didn’t have enough time to capture notes during the
+          session
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function NotetakerPainVisuals({ onSparkComplete }) {
+  const [waffleDone, setWaffleDone] = useState(false);
+  return (
+    <>
+      <PainWaffle onComplete={() => setWaffleDone(true)} />
+      <PainSparkline ready={waffleDone} onComplete={onSparkComplete} />
+    </>
+  );
+}
+
+const SCRUM_PAIN_STATS = [
+  {
+    label: 'Timeliness',
+    value: 18,
+    unit: 'hours',
+    desc: 'on average to conduct a thematically grouping for each Scrum UXers.',
+  },
+  {
+    label: 'Manual Effort',
+    value: 100,
+    suffix: '+',
+    desc: 'reported issues awaiting to be manually reviewed and sorted by one Scrum UXer for each Domain.',
+  },
+  {
+    label: 'Focus',
+    value: 40,
+    suffix: '%',
+    desc: 'Checking back to original testing recording because the note is not sufficient to support.',
+  },
+];
+
+function ScrumPainStatNumber({ active, value, suffix = '', unit = '', duration = 1100 }) {
+  const [display, setDisplay] = useState(0);
+  const doneRef = useRef(false);
+
+  useEffect(() => {
+    if (!active || doneRef.current) return undefined;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      setDisplay(value);
+      doneRef.current = true;
+      return undefined;
+    }
+
+    const begin = performance.now();
+    let raf = 0;
+    const tick = (now) => {
+      const progress = Math.min((now - begin) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplay(Math.round(eased * value));
+      if (progress < 1) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        setDisplay(value);
+        doneRef.current = true;
+      }
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [active, value, duration]);
+
+  return (
+    <p className="sd-scrum-pain__stat">
+      <span className="sd-scrum-pain__value">
+        {display}
+        {suffix}
+      </span>
+      {unit ? <span className="sd-scrum-pain__unit">{unit}</span> : null}
+    </p>
+  );
+}
+
+function ScrumPainStats({ ready = false }) {
+  const wrapRef = useRef(null);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    if (!ready || started) return undefined;
+    const el = wrapRef.current;
+    if (!el) return undefined;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setStarted(true);
+        io.disconnect();
+      },
+      {
+        // Only fire when the block crosses the vertical center band of the screen
+        rootMargin: '-40% 0px -40% 0px',
+        threshold: 0,
+      }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ready, started]);
+
+  return (
+    <div
+      ref={wrapRef}
+      className={`sd-scrum-pain${started ? ' sd-scrum-pain--started' : ''}`}
+    >
+      {SCRUM_PAIN_STATS.map((stat) => (
+        <div
+          key={stat.label}
+          className={`sd-scrum-pain__col${started ? ' sd-scrum-pain__col--visible' : ''}`}
+        >
+          <p className="sd-scrum-pain__label">{stat.label}</p>
+          <ScrumPainStatNumber
+            active={started}
+            value={stat.value}
+            suffix={stat.suffix}
+            unit={stat.unit}
+          />
+          <p className="sd-scrum-pain__desc">{stat.desc}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PainPointBlock() {
+  const [sparkDone, setSparkDone] = useState(false);
+  return (
+    <div className="sd-pain-subsection">
+      <p className="pd-section__label">Pain Point</p>
+      <h2 className="pd-section__heading">
+        <span className="sd-heading-dark">Notetaker&apos;s Painpoint</span>
+      </h2>
+      <NotetakerPainVisuals onSparkComplete={() => setSparkDone(true)} />
+      <h2 className="pd-section__heading">
+        <span className="sd-heading-dark">Scrum UXer&apos;s Painpoint</span>
+      </h2>
+      <ScrumPainStats ready={sparkDone} />
+    </div>
+  );
+}
 
 /* ── Decimal count-up for the 7.5 rushed score ──
    memo() prevents ANY parent re-render from touching this component,
@@ -349,73 +1010,8 @@ const DonutChart = memo(function DonutChart({ animated }) {
   );
 });
 
-/* ── Scroll-speed-linked flow animation hook ──
-   Maps scroll progress → step index 0–8.
-   At step 8, fires countUpRefs to start count-up animations.
-   `enabled` gates listening so collapsed expand panels don't
-   complete the sequence while display:none (zero height).
-── */
-function useScrollFlow(wrapRef, countUpRefs, enabled = true) {
-  const doneRef = useRef(false);
-  const countUpFiredRef = useRef(false);
-
-  useEffect(() => {
-    if (!enabled) return undefined;
-
-    const wrap = wrapRef.current;
-    if (!wrap) return undefined;
-
-    doneRef.current = false;
-    countUpFiredRef.current = false;
-    wrap.dataset.step = '-1';
-
-    const TOTAL_STEPS = 9;
-
-    const onScroll = () => {
-      if (doneRef.current) return;
-
-      const rect = wrap.getBoundingClientRect();
-      // Ignore while collapsed / not laid out
-      if (rect.height < 8) return;
-
-      const vh = window.innerHeight;
-
-      const progress = Math.max(
-        0,
-        Math.min(1, (vh - rect.top) / (rect.height + vh * 0.4))
-      );
-
-      const step = Math.floor(progress * TOTAL_STEPS);
-      wrap.dataset.step = step;
-
-      // Fire count-ups the moment step 8 is reached
-      if (step >= 8 && !countUpFiredRef.current) {
-        countUpFiredRef.current = true;
-        countUpRefs.forEach((r) => r.current?.start());
-      }
-
-      if (step >= TOTAL_STEPS - 1) {
-        doneRef.current = true;
-        wrap.dataset.step = TOTAL_STEPS - 1;
-        window.removeEventListener('scroll', onScroll, { passive: true });
-      }
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener('scroll', onScroll, { passive: true });
-  }, [wrapRef, countUpRefs, enabled]);
-}
-
 /* ── Main Component ── */
 export default function SiemensDetail() {
-  const flowRef = useRef(null);
-  const countUpTopRef = useRef(null);
-  const countUpBottomRef = useRef(null);
-  const flowCountUpRefs = useRef([countUpTopRef, countUpBottomRef]);
-  const [flowExpanded, setFlowExpanded] = useState(false);
-  useScrollFlow(flowRef, flowCountUpRefs.current, flowExpanded);
-
   // Landing: header + credits animate in; hero slides up on scroll
   const heroRef = useRef(null);
   const [introReady, setIntroReady] = useState(false);
@@ -486,7 +1082,7 @@ export default function SiemensDetail() {
   const project = projects.find((p) => p.slug === 'siemens');
   const currentIndex = projects.findIndex((p) => p.slug === 'siemens');
   const prevProject = currentIndex > 0 ? projects[currentIndex - 1] : projects[projects.length - 1];
-  const nextProject = currentIndex < projects.length - 1 ? projects[currentIndex + 1] : projects[0];
+  const nextProject = projects.find((p) => p.slug === 'rec-o') || projects[(currentIndex + 1) % projects.length];
 
   return (
     <>
@@ -564,146 +1160,32 @@ export default function SiemensDetail() {
             <h2 className="pd-section__heading">
               <span className="sd-heading-dark">Beta Testing</span>{' '}
               <span className="sd-heading-mint">Week</span>{' '}
-              <span className="sd-heading-dark">— at enterprise scale</span>
+              <span className="sd-heading-dark">at a glance</span>
             </h2>
 
-            <HScroll label="Beta Testing Week context — scroll horizontally for timeline and users">
-              <figure className="sd-journey-figure sd-hscroll__item">
+            <HScroll label="Beta Testing Week context — timeline, users, and pain points">
+              <figure className="sd-journey-figure sd-slideshow__item">
                 <img
                   src="/siemens/beta-testing-week-overview.png"
                   alt="Beta testing week timeline — Week 1 user testing sessions through Week 2 thematic grouping, prioritization, and reporting"
                   loading="lazy"
                 />
               </figure>
-              <figure className="sd-journey-figure sd-hscroll__item">
+              <figure className="sd-journey-figure sd-slideshow__item">
                 <img
                   src="/siemens/users-overview.png"
                   alt="Two primary users of Beta Testing Week — Notetakers capturing issues during sessions, and Scrum UXers thematically grouping, prioritizing, and reporting"
                   loading="lazy"
                 />
               </figure>
-            </HScroll>
-
-            <p className="pd-section__body">
-              Each beta testing week spanned 10 product domains with 6–8 user testing sessions per domain. Every session required a moderator and a dedicated notetaker. Across both weeks the coordinated effort totaled between <strong>346–433 hours</strong> — a significant investment that depended entirely on the quality of what notetakers documented.
-            </p>
-
-            <Expandable onOpenChange={setFlowExpanded}>
-              {/* Animated process flow — scroll-speed linked */}
-              <div className="sd-card-wrap sd-flow-wrap" ref={flowRef} data-step="-1">
-
-                {/* Top hour callout — appears at step 8 */}
-                <div className="sd-hour-callout sd-step" data-show-at="8">
-                  Total of <strong><CountUp ref={countUpTopRef} target={433} suffix=" hrs" duration={1600} rangeLabel="346–433 hrs" /></strong>
-                </div>
-
-                {/* Row 1 */}
-                <div className="sd-process-week">
-                  <div className="sd-week-label">1st Week</div>
-                  <div className="sd-flow-row">
-                    {/* Box 1 — step 0 */}
-                    <div className="sd-flow-box sd-step" data-show-at="0">
-                      <div className="sd-flow-box__title">User Testing Sessions</div>
-                      <ul className="sd-flow-box__list">
-                        <li>10 Domains</li>
-                        <li>6–8 testing sessions for each Domain</li>
-                        <li>Each session requires a moderator and a notetaker</li>
-                      </ul>
-                    </div>
-                    <div className="sd-flow-arrow sd-step" data-show-at="0">→</div>
-                    {/* Box 2 (highlight) — step 1 */}
-                    <div className="sd-flow-box sd-flow-box--highlight sd-step sd-step--highlight" data-show-at="1">
-                      <div className="sd-flow-box__title">Issue Documentation</div>
-                      <ul className="sd-flow-box__list">
-                        <li>Note down specific description for each documented issue</li>
-                        <li>Record user's reaction in testing</li>
-                      </ul>
-                    </div>
-                    <div className="sd-flow-arrow sd-step" data-show-at="1">→</div>
-                    {/* Box 3 — step 2 */}
-                    <div className="sd-flow-box sd-step" data-show-at="2">
-                      <div className="sd-flow-box__title">Issue Severity Level</div>
-                      <ul className="sd-flow-box__list">
-                        <li>Assign severity levels to each of the issues</li>
-                        <li>Record Issues on shared document for issue overview</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right-side ↓ connector — step 3 */}
-                <div className="sd-row-connector sd-step" data-show-at="3" aria-hidden="true">
-                  <div className="sd-row-connector__inner">↓</div>
-                </div>
-
-                {/* Row 2 — reversed flow, reveals right-to-left (Transfer first = step 4) */}
-                <div className="sd-process-week" style={{ marginTop: 0 }}>
-                  <div className="sd-week-label sd-week-label--dashed">2nd Week</div>
-                  <div className="sd-flow-row">
-                    {/* Box 4 (Report to PM) — step 6, leftmost = last to appear */}
-                    <div className="sd-flow-box sd-step" data-show-at="6">
-                      <div className="sd-flow-box__title">Report to PM</div>
-                      <ul className="sd-flow-box__list">
-                        <li>Report all reoccurring themes of issue</li>
-                      </ul>
-                    </div>
-                    <div className="sd-flow-arrow sd-flow-arrow--left sd-step" data-show-at="6">→</div>
-                    {/* Box 5 (highlight) — step 5 */}
-                    <div className="sd-flow-box sd-flow-box--highlight sd-step sd-step--highlight" data-show-at="5">
-                      <div className="sd-flow-box__title">Thematically Grouping Domain Issues</div>
-                      <ul className="sd-flow-box__list">
-                        <li>Categorize similar issues under same themes</li>
-                        <li>Prioritize reoccurring issues</li>
-                        <li>Report thematically on to Horizon</li>
-                      </ul>
-                    </div>
-                    <div className="sd-flow-arrow sd-flow-arrow--left sd-step" data-show-at="5">→</div>
-                    {/* Box 6 (Transfer of Issues) — step 4, rightmost = first to appear */}
-                    <div className="sd-flow-box sd-step" data-show-at="4">
-                      <div className="sd-flow-box__title">Transfer of Issues</div>
-                      <ul className="sd-flow-box__list">
-                        <li>Identify issues that fall under other Domains</li>
-                        <li>Report to responsible Scrum UXers</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bottom hour callout — step 8 */}
-                <div className="sd-hour-callout sd-hour-callout--bottom sd-step" data-show-at="8">
-                  Total of <strong><CountUp ref={countUpBottomRef} target={216} suffix=" hrs" duration={1400} rangeLabel="180–216 hrs" /></strong>
-                </div>
-
-              </div>
-            </Expandable>
-          </section>
-
-          {/* ──────────────────────────────────────────
-              SECTION — Pain Points
-              Figma: Presentation → Slide 16:9 - 58 (2588:307) Notetakers
-                                    Slide 16:9 - 82 (2593:1092) Scrum UXers
-              ────────────────────────────────────────── */}
-          <section id="sd-pain-points" className="pd-section">
-            <p className="pd-section__label">Pain Points</p>
-            <h2 className="pd-section__heading">
-              <span className="sd-heading-dark">Notetakers and</span>{' '}
-              <span className="sd-heading-mint">Scrum UXers</span>{' '}
-              <span className="sd-heading-dark">— different roles, shared friction</span>
-            </h2>
-
-            <p className="pd-section__body">
-              Notetakers felt the squeeze in-session: <strong>19 of 23</strong> lacked time to capture notes, spent <strong>+26 minutes</strong> after each hour filling blanks, and logged anywhere from <strong>2–16</strong> issues per session. Scrum UXers absorbed the downstream cost — <strong>18 hours</strong> of thematic grouping, <strong>100+</strong> issues awaiting manual review, and <strong>40%</strong> of focus spent checking recordings when notes weren’t enough.
-            </p>
-
-            <HScroll label="Pain points — scroll horizontally for Notetakers and Scrum UXers">
-              <figure className="sd-journey-figure sd-hscroll__item">
+              <figure className="sd-journey-figure sd-slideshow__item">
                 <img
                   src="/siemens/pain-points-notetakers.png"
                   alt="Notetaker pain points — Time Pressure (19 of 23 lacked time to capture notes), The Workaround (+26 minutes after each hour-long session), and The Payoff Gap (2–16 issues captured per session)"
                   loading="lazy"
                 />
               </figure>
-              <figure className="sd-journey-figure sd-hscroll__item">
+              <figure className="sd-journey-figure sd-slideshow__item">
                 <img
                   src="/siemens/pain-points-overview.png"
                   alt="Scrum UXer pain points — Timeliness (18 hours for thematic grouping), Manual Effort (100+ issues awaiting review), and Focus (40% checking recordings because notes were insufficient)"
@@ -711,6 +1193,26 @@ export default function SiemensDetail() {
                 />
               </figure>
             </HScroll>
+
+            <PainPointBlock />
+
+          </section>
+
+          {/* ──────────────────────────────────────────
+              SECTION — Opportunity
+              ────────────────────────────────────────── */}
+          <section id="sd-opportunity" className="pd-section">
+            <p className="pd-section__label">Opportunity</p>
+            <h2 className="pd-section__heading">
+              <span className="sd-heading-dark">Scope</span>
+            </h2>
+            <figure className="sd-journey-figure">
+              <img
+                src="/siemens/Howmightwe.png"
+                alt="How might we — opportunity framing for the Notetaker and Scrum UXer workflow"
+                loading="lazy"
+              />
+            </figure>
           </section>
 
           {/* ──────────────────────────────────────────
@@ -793,7 +1295,7 @@ export default function SiemensDetail() {
               Hidden for now — not helpful in current narrative
               ────────────────────────────────────────── */}
           {false && (
-          <section id="sd-solution" className="pd-section">
+          <section id="sd-solution-legacy" className="pd-section">
             <p className="pd-section__label">Solution Design</p>
             <h2 className="pd-section__heading">
               <span className="sd-heading-dark">Notetaker</span>{' '}
@@ -884,10 +1386,21 @@ export default function SiemensDetail() {
           )}
 
           {/* ──────────────────────────────────────────
+              SECTION — Solution
+              ────────────────────────────────────────── */}
+          <section id="sd-solution" className="pd-section">
+            <p className="pd-section__label">Solution</p>
+            <h2 className="pd-section__heading">
+              <span className="sd-heading-dark">Two Agents one workflow</span>
+            </h2>
+            <SolutionHowToHScroll />
+          </section>
+
+          {/* ──────────────────────────────────────────
               SECTION 5 — Testing Results
               ────────────────────────────────────────── */}
           <section id="sd-results" className="pd-section">
-            <p className="pd-section__label">Validation</p>
+            <p className="pd-section__label">Results</p>
             <h2 className="pd-section__heading">
               <span className="sd-heading-dark">Found</span>{' '}
               <span className="sd-heading-mint">10/14</span>{' '}
@@ -896,8 +1409,7 @@ export default function SiemensDetail() {
             <p className="pd-section__body">
               The assistant was validated against a real testing session. Manual note-taking surfaced 2 effective documented usability issues. The Notetaker Assistant surfaced 8 additional validated issues the notetaker had missed. Results were reviewed and verified by the Scrum Master.
             </p>
-
-            <figure className="sd-journey-figure sd-results-overview">
+            <figure className="sd-journey-figure sd-journey-figure--bare sd-results-overview">
               <img
                 src="/siemens/results-overview.png"
                 alt="Copilot Generated Issues chart with Human Input, Expert Accepted, and Missed series across 8 participants, alongside the validated issues table — Notetaker Assistant found 8 extra effective usability issues"
@@ -1119,13 +1631,13 @@ export default function SiemensDetail() {
               Every script follows the same skeleton: <strong>Session Metadata</strong> (filled before the session), <strong>Task Instructions</strong> as standardized prompts, and a <strong>Post-Test Survey</strong>. The Moderator version layers in <strong>Preparation</strong> and <strong>Introduction</strong> blocks. Identical structure across all 10 product domains is what lets the agents output comparable JSON every time.
             </p>
 
-            <HScroll label="Playbook figures — scroll horizontally">
-              <figure className="sd-journey-figure sd-hscroll__item">
+            <HScroll label="Playbook figures">
+              <figure className="sd-journey-figure sd-slideshow__item">
                 <img src="/impl-scripts-overview.png" alt="Enhanced Scrum UXer Playbook + Notetaker & Moderator scripts — uniform structure across every domain." />
                 <figcaption>Enhanced Scrum UXer Playbook + Notetaker &amp; Moderator scripts — uniform structure across every domain.</figcaption>
               </figure>
 
-              <figure className="sd-journey-figure sd-hscroll__item">
+              <figure className="sd-journey-figure sd-slideshow__item">
                 <img src="/impl-playbook-detail.png" alt="Inside the playbook: explicit prompts for the UX Notetakers Helper and JSON Search Agent." />
                 <figcaption>Inside the playbook: explicit prompts for the UX Notetakers Helper and JSON Search Agent — researchers follow numbered steps, not prose.</figcaption>
               </figure>

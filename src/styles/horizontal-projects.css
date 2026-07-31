@@ -203,7 +203,7 @@ html.hx-scroll-snap {
   grid-column: 2;
   display: block;
   font-size: var(--hx-name-size);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-regular);
   letter-spacing: -0.04em;
   line-height: 1;
   color: var(--color-ink);
@@ -327,7 +327,7 @@ html.hx-scroll-snap {
 
 .hx__card-title {
   font-size: clamp(1.35rem, 2.4vw, 2rem);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-regular);
   letter-spacing: -0.035em;
   line-height: var(--leading-snug);
   color: var(--color-ink);
@@ -416,7 +416,10 @@ html.hx-scroll-snap {
   border-radius: 9999px !important;
 }
 
-@media (max-width: 767px) {
+/* ── Tablet + mobile: vertical stack, normal page scroll ──
+   Also match max-device-width so iOS “Request Desktop Website”
+   still stacks (that mode fakes a ~1024px CSS viewport). */
+@media (max-width: 1023px), (max-device-width: 1023px) {
   html.hx-scroll-snap {
     scroll-snap-type: none;
   }
@@ -425,69 +428,136 @@ html.hx-scroll-snap {
     display: none;
   }
 
-  .hx {
+  .hx,
+  .hx.hx--stacked {
     height: auto !important;
   }
 
-  .hx__contacts {
-    margin-top: var(--space-10);
-    padding: 0;
-  }
-
-  .hx__stage {
+  .hx .hx__stage,
+  .hx--stacked .hx__stage {
     position: relative;
+    top: auto;
     height: auto;
-    padding: calc(var(--navbar-height)) 0 var(--space-16);
-    overflow-x: auto;
-    overflow-y: visible;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
+    overflow: visible;
+    display: block;
+    padding: calc(var(--navbar-height) + var(--space-6)) var(--space-5) var(--space-12);
+  }
+
+  .hx .hx__track,
+  .hx--stacked .hx__track {
+    display: flex;
     flex-direction: column;
-  }
-
-  .hx__track {
-    transform: none !important;
-    height: auto;
     align-items: stretch;
-    padding: var(--space-6) var(--container-pad) var(--space-10);
+    gap: clamp(2rem, 5vw, 3rem);
+    height: auto;
+    width: 100%;
+    max-width: 40rem;
+    margin-inline: auto;
+    padding: 0;
+    transform: none !important;
+    will-change: auto;
+    --hx-card-width: 100%;
+    --hx-card-scale: 1;
+    --hx-card-media-h-actual: none;
   }
 
-  .hx__intro {
-    width: max-content;
-    max-width: min(92vw, 520px);
-    min-height: 60svh;
-    scroll-snap-align: start;
+  .hx .hx__intro,
+  .hx--stacked .hx__intro {
+    position: relative;
+    flex: none;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    padding: 0 0 var(--space-2);
     transform: none !important;
     background: transparent;
     will-change: auto;
   }
 
-  .hx__intro-inner {
+  .hx .hx__intro-inner,
+  .hx--stacked .hx__intro-inner {
     width: 100%;
     max-width: 100%;
     margin-top: 0;
   }
 
-  .hx__intro-heading,
-  .hx__intro-tagline,
-  .hx__intro-subtitle {
+  .hx .hx__intro-foot,
+  .hx--stacked .hx__intro-foot {
+    margin-top: var(--space-6);
+    padding-bottom: 0;
+  }
+
+  .hx .hx__contacts,
+  .hx--stacked .hx__contacts {
+    margin-top: 0;
+  }
+
+  .hx .hx__intro-heading,
+  .hx--stacked .hx__intro-heading {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .hx .hx__intro-tagline,
+  .hx .hx__intro-subtitle,
+  .hx--stacked .hx__intro-tagline,
+  .hx--stacked .hx__intro-subtitle {
     width: 100%;
     min-width: 0;
   }
 
-  .hx__intro-name {
-    font-size: clamp(2.25rem, 11vw, 3.25rem);
+  .hx .hx__intro-name,
+  .hx--stacked .hx__intro-name {
+    font-size: clamp(2.25rem, 8vw, 3.25rem);
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .hx .hx__intro-role,
+  .hx .hx__intro-link,
+  .hx--stacked .hx__intro-role,
+  .hx--stacked .hx__intro-link {
     white-space: normal;
   }
 
-  .hx__card {
-    --hx-card-avail-h: none;
-    width: calc(100vw - var(--container-pad) - 48px);
+  .hx .hx__card,
+  .hx--stacked .hx__card {
+    flex: none;
+    width: 100%;
+    max-width: none;
     max-height: none;
-    scroll-snap-align: start;
+    align-self: stretch;
   }
 
-  .hx__card-media {
+  .hx .hx__card-media,
+  .hx--stacked .hx__card-media {
     max-height: none;
+  }
+
+  .hx .hx__card:hover .hx__card-img,
+  .hx--stacked .hx__card:hover .hx__card-img {
+    transform: none;
+  }
+
+  .hx .hx__card-title,
+  .hx--stacked .hx__card-title {
+    font-size: clamp(0.85rem, 3vw, 1.05rem);
+  }
+
+  .hx .hx__card-pill,
+  .hx--stacked .hx__card-pill {
+    padding: 0.15rem 0.45rem;
+    font-size: 0.6rem;
+  }
+
+  .hx .hx__card-year,
+  .hx--stacked .hx__card-year {
+    font-size: 0.65rem;
+  }
+
+  .hx .hx__card-meta,
+  .hx--stacked .hx__card-meta {
+    gap: 0.35rem;
   }
 }
