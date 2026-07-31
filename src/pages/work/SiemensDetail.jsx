@@ -10,10 +10,11 @@ import '../../styles/siemens-detail.css';
 
 const TOC_SECTIONS = [
   { id: 'sd-overview', label: 'Overview' },
-  { id: 'sd-scale', label: 'The Scale' },
+  { id: 'sd-scale', label: 'Context' },
   // { id: 'sd-pain-points', label: 'Pain Points' }, // Removed — images live in Scale slideshow
   // { id: 'sd-gap', label: 'The Gap' }, // Hidden for now
-  // { id: 'sd-solution', label: 'The Solution' }, // Hidden for now
+  { id: 'sd-opportunity', label: 'Opportunity' },
+  { id: 'sd-solution', label: 'Solution' },
   // { id: 'sd-mapping', label: 'Pain Mapping' }, // Hidden for now
   { id: 'sd-results', label: 'Results' },
   { id: 'sd-findings', label: 'Findings' },
@@ -120,24 +121,737 @@ function HScroll({ children, label }) {
       </div>
 
       {count > 1 && (
-        <div
-          className="sd-slideshow__progress"
-          role="progressbar"
-          aria-label="Slideshow progress"
-          aria-valuemin={1}
-          aria-valuemax={count}
-          aria-valuenow={index + 1}
-        >
+        <div className="sd-slideshow__progress" aria-hidden="true">
           <div
             className="sd-slideshow__progress-bar"
             style={{ transform: `scaleX(${progress})` }}
           />
         </div>
       )}
+    </div>
+  );
+}
 
-      <p className="sr-only" aria-live="polite">
-        Slide {index + 1} of {count}
-      </p>
+const SOLUTION_HOWTO_VIDEOS = [
+  {
+    src: '/siemens/nt-howto1.mp4',
+    label: 'Notetaker Assistant how-to — attach script and stand by',
+    caption: "Import Notetaker's note",
+  },
+  {
+    src: '/siemens/nt-howto2.mp4',
+    label: 'Notetaker Assistant how-to — continue the two-agent workflow',
+    caption: 'Review newly found issues',
+  },
+  {
+    src: '/siemens/nt-howto3.mp4',
+    label: 'Notetaker Assistant how-to — review findings and evidence',
+    caption: 'Review quotes',
+  },
+  {
+    src: '/siemens/nt-howto4.mp4',
+    label: 'Notetaker Assistant how-to — extract quotes and wrap up',
+    caption: 'Convert to Json',
+  },
+];
+
+const HOWTO_PROGRESS_STEPS = 4;
+const HOWTO_PANEL_COUNT = SOLUTION_HOWTO_VIDEOS.length;
+
+/** Vertical scroll drives a horizontal slide between howto videos */
+function SolutionHowToHScroll() {
+  const pinRef = useRef(null);
+  const trackRef = useRef(null);
+  const videoRefs = useRef([]);
+  const activeRef = useRef(0);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const pin = pinRef.current;
+    const track = trackRef.current;
+    if (!pin || !track) return undefined;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const stackedMq = window.matchMedia('(max-width: 1023px)');
+    if (reduceMotion) return undefined;
+
+    const pauseAll = () => {
+      videoRefs.current.forEach((video) => {
+        if (!video) return;
+        video.pause();
+      });
+    };
+
+    const syncVideos = (index, sectionVisible) => {
+      const next = Math.min(HOWTO_PANEL_COUNT - 1, Math.max(0, index));
+      activeRef.current = next;
+
+      if (!sectionVisible) {
+        pauseAll();
+        return;
+      }
+
+      videoRefs.current.forEach((video, i) => {
+        if (!video) return;
+        if (i === next) {
+          if (video.paused) {
+            const play = video.play();
+            if (play?.catch) play.catch(() => {});
+          }
+        } else if (!video.paused) {
+          video.pause();
+        }
+      });
+    };
+
+    const shiftFromProgress = (p) => {
+      const n = HOWTO_PANEL_COUNT;
+      if (n <= 1) return 0;
+      const scaled = Math.max(0, Math.min(1, p)) * (n - 1);
+      const i = Math.min(n - 2, Math.floor(scaled));
+      const t = scaled - i;
+      const a = (i / n) * 100;
+      const b = ((i + 1) / n) * 100;
+      return a + (b - a) * t;
+    };
+
+    const setSnapEnabled = (on) => {
+      document.documentElement.classList.toggle('sd-howto-scroll-snap', on && !stackedMq.matches);
+    };
+
+    const readProgress = () => {
+      const rect = pin.getBoundingClientRect();
+      const scrollable = pin.offsetHeight - window.innerHeight;
+      if (scrollable <= 0) return 0;
+      return Math.min(1, Math.max(0, -rect.top / scrollable));
+    };
+
+    const stickyVisible = () => {
+      const sticky = pin.querySelector('.sd-howto-hscroll__sticky');
+      const el = sticky || pin;
+      const r = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // Play only when the frame is substantially on screen
+      return r.top < vh * 0.85 && r.bottom > vh * 0.15;
+    };
+
+    const update = () => {
+      if (stackedMq.matches) {
+        setSnapEnabled(false);
+        track.style.transform = 'translate3d(0,0,0)';
+        setProgress(0);
+        // Mobile: play whichever video is in view via IO below
+        return;
+      }
+
+      const rect = pin.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const scrollable = pin.offsetHeight - vh;
+      const inSection = rect.top <= vh * 0.55 && rect.bottom >= vh * 0.45;
+      const visible = stickyVisible();
+
+      if (scrollable <= 0) {
+        syncVideos(0, visible);
+        return;
+      }
+      const p = Math.min(1, Math.max(0, -rect.top / scrollable));
+      // Free scroll at the first/last stops so users can leave the section
+      const edgePad = 0.5 / Math.max(1, HOWTO_PANEL_COUNT);
+      const atFirst = p <= edgePad;
+      const atLast = p >= 1 - edgePad;
+      setSnapEnabled(inSection && !atFirst && !atLast);
+
+      track.style.transform = `translate3d(-${shiftFromProgress(p)}%, 0, 0)`;
+      syncVideos(Math.round(p * (HOWTO_PANEL_COUNT - 1)), visible);
+      setProgress(p);
+    };
+
+    // Release snap immediately on upward intent at the first thumbnail
+    const onWheel = (e) => {
+      if (stackedMq.matches) return;
+      const p = readProgress();
+      if (e.deltaY < 0 && p <= 0.5 / Math.max(1, HOWTO_PANEL_COUNT)) {
+        setSnapEnabled(false);
+      } else if (e.deltaY > 0 && p >= 1 - 0.5 / Math.max(1, HOWTO_PANEL_COUNT)) {
+        setSnapEnabled(false);
+      }
+    };
+
+    // Stacked / mobile: each clip plays only while intersecting the viewport
+    const observers = videoRefs.current.map((video) => {
+      if (!video) return null;
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          if (!stackedMq.matches) return;
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.45) {
+            const play = video.play();
+            if (play?.catch) play.catch(() => {});
+          } else {
+            video.pause();
+          }
+        },
+        { threshold: [0, 0.45, 0.7] }
+      );
+      io.observe(video);
+      return io;
+    });
+
+    // Start paused; only play once in view
+    pauseAll();
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    window.addEventListener('wheel', onWheel, { passive: true });
+    stackedMq.addEventListener?.('change', update);
+    return () => {
+      setSnapEnabled(false);
+      pauseAll();
+      observers.forEach((io) => io?.disconnect());
+      window.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+      window.removeEventListener('wheel', onWheel);
+      stackedMq.removeEventListener?.('change', update);
+    };
+  }, []);
+
+  const activePanel = Math.round(progress * Math.max(1, HOWTO_PANEL_COUNT - 1));
+  const activeStep = Math.min(HOWTO_PROGRESS_STEPS, activePanel + 1);
+  const fillPct =
+    HOWTO_PROGRESS_STEPS <= 1
+      ? 100
+      : ((activeStep - 1) / (HOWTO_PROGRESS_STEPS - 1)) * 100;
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const pin = pinRef.current;
+    if (!pin) return undefined;
+    const sticky = pin.querySelector('.sd-howto-hscroll__sticky');
+    const target = sticky || pin;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      setInView(true);
+      return undefined;
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.28) {
+          setInView(true);
+        }
+      },
+      { threshold: [0, 0.28, 0.5] }
+    );
+    io.observe(target);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={pinRef}
+      className={`sd-howto-hscroll${inView ? ' sd-howto-hscroll--inview' : ''}`}
+      aria-label="Two agents, one workflow — how-to walkthrough"
+      style={{ height: `${HOWTO_PANEL_COUNT * 100}svh` }}
+    >
+      {/* Native y-snap stops — one centered panel per stop (homepage pattern) */}
+      <div className="sd-howto-hscroll__snap-rail" aria-hidden="true">
+        {SOLUTION_HOWTO_VIDEOS.map((clip) => (
+          <div key={clip.src} className="sd-howto-hscroll__snap-stop" />
+        ))}
+      </div>
+
+      <div className="sd-howto-hscroll__sticky">
+        <div className="sd-howto-hscroll__viewport">
+          <div
+            ref={trackRef}
+            className="sd-howto-hscroll__track"
+            style={{
+              width: `${HOWTO_PANEL_COUNT * 100}%`,
+            }}
+          >
+            {SOLUTION_HOWTO_VIDEOS.map((clip, i) => (
+              <figure
+                key={clip.src}
+                className="sd-journey-figure sd-howto-hscroll__panel"
+                style={{
+                  flex: `0 0 ${100 / HOWTO_PANEL_COUNT}%`,
+                  width: `${100 / HOWTO_PANEL_COUNT}%`,
+                }}
+              >
+                <video
+                  ref={(el) => {
+                    videoRefs.current[i] = el;
+                  }}
+                  src={clip.src}
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  aria-label={clip.label}
+                />
+              </figure>
+            ))}
+          </div>
+        </div>
+
+        <div
+          className="sd-howto-progress"
+          role="progressbar"
+          aria-valuemin={1}
+          aria-valuemax={HOWTO_PROGRESS_STEPS}
+          aria-valuenow={activeStep}
+          aria-label={`Step ${String(activeStep).padStart(2, '0')}: ${SOLUTION_HOWTO_VIDEOS[activePanel]?.caption ?? ''}`}
+        >
+          <div className="sd-howto-progress__caption" aria-live="polite">
+            <span className="sd-howto-progress__num" aria-hidden="true">
+              <span className="sd-howto-progress__num-tens">0</span>
+              <span className="sd-howto-progress__num-ones">
+                <span
+                  className="sd-howto-progress__num-reel"
+                  style={{
+                    '--sd-howto-reel-i': activeStep - 1,
+                  }}
+                >
+                  {Array.from({ length: HOWTO_PROGRESS_STEPS }, (_, i) => (
+                    <span key={i + 1} className="sd-howto-progress__num-digit">
+                      {i + 1}
+                    </span>
+                  ))}
+                </span>
+              </span>
+            </span>
+            <span className="sd-howto-progress__sr">
+              {String(activeStep).padStart(2, '0')}
+            </span>
+            <span key={`t-${activeStep}`} className="sd-howto-progress__title">
+              {SOLUTION_HOWTO_VIDEOS[activePanel]?.caption}
+            </span>
+          </div>
+
+          <div className="sd-howto-progress__bar">
+            <div className="sd-howto-progress__track" aria-hidden="true">
+              <div
+                className="sd-howto-progress__fill"
+                style={{ width: `${fillPct}%` }}
+              />
+            </div>
+            <ol className="sd-howto-progress__steps">
+              {Array.from({ length: HOWTO_PROGRESS_STEPS }, (_, i) => {
+                const step = i + 1;
+                const done = step < activeStep;
+                const current = step === activeStep;
+                return (
+                  <li
+                    key={step}
+                    className={[
+                      'sd-howto-progress__step',
+                      done ? 'is-done' : '',
+                      current ? 'is-current' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                  >
+                    <span className="sd-howto-progress__dot" />
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const WAFFLE_TOTAL = 100;
+const WAFFLE_PURPLE = 82;
+const WAFFLE_COLS = 20;
+
+function PainWaffle({ onComplete }) {
+  const wrapRef = useRef(null);
+  const [lit, setLit] = useState(0);
+  const startedRef = useRef(false);
+  const completedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return undefined;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting || startedRef.current) return;
+        startedRef.current = true;
+        io.disconnect();
+
+        let i = 0;
+        const step = () => {
+          i += 1;
+          setLit(i);
+          if (i < WAFFLE_PURPLE) {
+            window.setTimeout(step, 38);
+          } else if (!completedRef.current) {
+            completedRef.current = true;
+            window.setTimeout(() => onCompleteRef.current?.(), 280);
+          }
+        };
+        window.setTimeout(step, 220);
+      },
+      { threshold: 0.4 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={wrapRef}
+      className={`sd-pain-waffle${lit > 0 ? ' sd-pain-waffle--active' : ''}`}
+    >
+      <div className="sd-pain-waffle__copy">
+        <p className="sd-pain-waffle__stat" aria-live="polite">
+          {lit}
+          <span className="sd-pain-waffle__stat-unit">%</span>
+        </p>
+        <p className="sd-pain-waffle__desc">
+          reported they didn’t have enough time to capture notes during the
+          session
+        </p>
+      </div>
+
+      <div className="sd-pain-waffle__grid" aria-hidden="true">
+        {Array.from({ length: WAFFLE_TOTAL }, (_, i) => {
+          const isPurple = i < lit;
+          return (
+            <span
+              key={i}
+              className={`sd-pain-waffle__dot${isPurple ? ' sd-pain-waffle__dot--purple' : ''}`}
+              style={{ '--i': i % WAFFLE_COLS, '--r': Math.floor(i / WAFFLE_COLS) }}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/** Animated stock-style sparkline — 8 discrete points, no labels/numbers */
+const PAIN_SPARK_VALUES = [48, 72, 28, 64, 18, 81, 35, 55];
+
+function PainSparkline({ ready = false, onComplete }) {
+  const wrapRef = useRef(null);
+  const pathRef = useRef(null);
+  const [drawn, setDrawn] = useState(false);
+  const [copyReady, setCopyReady] = useState(false);
+  const [litDots, setLitDots] = useState(0);
+  const [low, setLow] = useState(16);
+  const [high, setHigh] = useState(2);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+  const completedRef = useRef(false);
+
+  const width = 960;
+  const height = 240;
+  const padX = 22;
+  const padY = 22;
+  const n = PAIN_SPARK_VALUES.length;
+  const min = Math.min(...PAIN_SPARK_VALUES);
+  const max = Math.max(...PAIN_SPARK_VALUES);
+  const span = max - min || 1;
+
+  const points = PAIN_SPARK_VALUES.map((v, i) => {
+    const x = padX + (i / (n - 1)) * (width - padX * 2);
+    const y = height - padY - ((v - min) / span) * (height - padY * 2);
+    return { x, y };
+  });
+
+  const linePath = points
+    .map((p, i) => {
+      if (i === 0) return `M ${p.x} ${p.y}`;
+      const prev = points[i - 1];
+      const c1x = prev.x + (p.x - prev.x) / 2;
+      return `C ${c1x} ${prev.y}, ${c1x} ${p.y}, ${p.x} ${p.y}`;
+    })
+    .join(' ');
+
+  const finish = useCallback(() => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    onCompleteRef.current?.();
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return undefined;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      setDrawn(true);
+      setLitDots(n);
+      setCopyReady(true);
+      setLow(2);
+      setHigh(16);
+      finish();
+      return undefined;
+    }
+    const id = window.requestAnimationFrame(() => setDrawn(true));
+    return () => window.cancelAnimationFrame(id);
+  }, [ready, n, finish]);
+
+  useEffect(() => {
+    const path = pathRef.current;
+    if (!path || !drawn) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    path.style.strokeDasharray = '1';
+    path.style.strokeDashoffset = '1';
+    path.getBoundingClientRect();
+    path.style.strokeDashoffset = '0';
+
+    let i = 0;
+    const timers = [];
+    const startDots = window.setTimeout(() => {
+      const step = () => {
+        i += 1;
+        setLitDots(i);
+        if (i < n) timers.push(window.setTimeout(step, 140));
+      };
+      step();
+    }, 900);
+    timers.push(startDots);
+
+    const showCopy = window.setTimeout(() => setCopyReady(true), 1800);
+    timers.push(showCopy);
+
+    return () => timers.forEach((t) => window.clearTimeout(t));
+  }, [drawn, n]);
+
+  useEffect(() => {
+    if (!copyReady) return undefined;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      setLow(2);
+      setHigh(16);
+      finish();
+      return undefined;
+    }
+
+    const duration = 1400;
+    const begin = performance.now();
+    let raf = 0;
+    const tick = (now) => {
+      const progress = Math.min((now - begin) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setLow(Math.round(16 - eased * 14));
+      setHigh(Math.round(2 + eased * 14));
+      if (progress < 1) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        setLow(2);
+        setHigh(16);
+        window.setTimeout(finish, 200);
+      }
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [copyReady, finish]);
+
+  return (
+    <div
+      ref={wrapRef}
+      className={`sd-pain-spark${ready ? ' sd-pain-spark--visible' : ''}${drawn ? ' sd-pain-spark--drawn' : ''}`}
+    >
+      <div
+        className={`sd-pain-spark__chart${ready ? ' sd-pain-spark__chart--visible' : ''}`}
+      >
+        <svg
+          className="sd-pain-spark__svg"
+          viewBox={`0 0 ${width} ${height}`}
+          preserveAspectRatio="xMinYMid meet"
+          role="presentation"
+          aria-hidden="true"
+        >
+          <path
+            ref={pathRef}
+            className="sd-pain-spark__line"
+            d={linePath}
+            fill="none"
+            stroke="#31CDC7"
+            strokeWidth="3.9"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            pathLength="1"
+            style={{ strokeDasharray: 1, strokeDashoffset: 1 }}
+          />
+
+          {points.map((p, i) => {
+            const isEnd = i === n - 1;
+            const isLit = i < litDots || isEnd;
+            return (
+              <g
+                key={i}
+                className={`sd-pain-spark__point${isLit ? ' sd-pain-spark__point--lit' : ''}${isEnd ? ' sd-pain-spark__point--end' : ''}`}
+                style={{ '--i': i }}
+              >
+                <circle
+                  className={`sd-pain-spark__dot${isLit ? ' sd-pain-spark__dot--purple' : ''}${isEnd ? ' sd-pain-spark__dot--end' : ''}`}
+                  cx={p.x}
+                  cy={p.y}
+                  r={isEnd ? 18 : 16}
+                />
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+      <div
+        className={`sd-pain-spark__copy${copyReady ? ' sd-pain-spark__copy--visible' : ''}`}
+      >
+        <p className="sd-pain-spark__stat" aria-live="polite">
+          {low}-{high}
+        </p>
+        <p className="sd-pain-spark__desc">
+          reported they didn’t have enough time to capture notes during the
+          session
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function NotetakerPainVisuals({ onSparkComplete }) {
+  const [waffleDone, setWaffleDone] = useState(false);
+  return (
+    <>
+      <PainWaffle onComplete={() => setWaffleDone(true)} />
+      <PainSparkline ready={waffleDone} onComplete={onSparkComplete} />
+    </>
+  );
+}
+
+const SCRUM_PAIN_STATS = [
+  {
+    label: 'Timeliness',
+    value: 18,
+    unit: 'hours',
+    desc: 'on average to conduct a thematically grouping for each Scrum UXers.',
+  },
+  {
+    label: 'Manual Effort',
+    value: 100,
+    suffix: '+',
+    desc: 'reported issues awaiting to be manually reviewed and sorted by one Scrum UXer for each Domain.',
+  },
+  {
+    label: 'Focus',
+    value: 40,
+    suffix: '%',
+    desc: 'Checking back to original testing recording because the note is not sufficient to support.',
+  },
+];
+
+function ScrumPainStatNumber({ active, value, suffix = '', unit = '', duration = 1100 }) {
+  const [display, setDisplay] = useState(0);
+  const doneRef = useRef(false);
+
+  useEffect(() => {
+    if (!active || doneRef.current) return undefined;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      setDisplay(value);
+      doneRef.current = true;
+      return undefined;
+    }
+
+    const begin = performance.now();
+    let raf = 0;
+    const tick = (now) => {
+      const progress = Math.min((now - begin) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplay(Math.round(eased * value));
+      if (progress < 1) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        setDisplay(value);
+        doneRef.current = true;
+      }
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [active, value, duration]);
+
+  return (
+    <p className="sd-scrum-pain__stat">
+      <span className="sd-scrum-pain__value">
+        {display}
+        {suffix}
+      </span>
+      {unit ? <span className="sd-scrum-pain__unit">{unit}</span> : null}
+    </p>
+  );
+}
+
+function ScrumPainStats({ ready = false }) {
+  const wrapRef = useRef(null);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    if (!ready || started) return undefined;
+    const el = wrapRef.current;
+    if (!el) return undefined;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setStarted(true);
+        io.disconnect();
+      },
+      {
+        // Only fire when the block crosses the vertical center band of the screen
+        rootMargin: '-40% 0px -40% 0px',
+        threshold: 0,
+      }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ready, started]);
+
+  return (
+    <div
+      ref={wrapRef}
+      className={`sd-scrum-pain${started ? ' sd-scrum-pain--started' : ''}`}
+    >
+      {SCRUM_PAIN_STATS.map((stat) => (
+        <div
+          key={stat.label}
+          className={`sd-scrum-pain__col${started ? ' sd-scrum-pain__col--visible' : ''}`}
+        >
+          <p className="sd-scrum-pain__label">{stat.label}</p>
+          <ScrumPainStatNumber
+            active={started}
+            value={stat.value}
+            suffix={stat.suffix}
+            unit={stat.unit}
+          />
+          <p className="sd-scrum-pain__desc">{stat.desc}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PainPointBlock() {
+  const [sparkDone, setSparkDone] = useState(false);
+  return (
+    <div className="sd-pain-subsection">
+      <p className="pd-section__label">Pain Point</p>
+      <h2 className="pd-section__heading">
+        <span className="sd-heading-dark">Notetaker&apos;s Painpoint</span>
+      </h2>
+      <NotetakerPainVisuals onSparkComplete={() => setSparkDone(true)} />
+      <h2 className="pd-section__heading">
+        <span className="sd-heading-dark">Scrum UXer&apos;s Painpoint</span>
+      </h2>
+      <ScrumPainStats ready={sparkDone} />
     </div>
   );
 }
@@ -432,8 +1146,8 @@ export default function SiemensDetail() {
             className={`pd-hero-image pd-hero-image--inline sd-hero-slide${heroInView ? ' is-in' : ''}`}
           >
             <img
-              src="/siemens/siemens-task-issue.gif"
-              alt="Siemens Notetaker Assistant — task and issue capture in action"
+              src="/siemens/notetaker-ui.png"
+              alt="Notetaker Assistant UI — AI-assisted research tooling for beta testing"
               className="pd-hero-img"
             />
           </div>
@@ -446,7 +1160,7 @@ export default function SiemensDetail() {
             <h2 className="pd-section__heading">
               <span className="sd-heading-dark">Beta Testing</span>{' '}
               <span className="sd-heading-mint">Week</span>{' '}
-              <span className="sd-heading-dark">— at enterprise scale</span>
+              <span className="sd-heading-dark">at a glance</span>
             </h2>
 
             <HScroll label="Beta Testing Week context — timeline, users, and pain points">
@@ -480,6 +1194,25 @@ export default function SiemensDetail() {
               </figure>
             </HScroll>
 
+            <PainPointBlock />
+
+          </section>
+
+          {/* ──────────────────────────────────────────
+              SECTION — Opportunity
+              ────────────────────────────────────────── */}
+          <section id="sd-opportunity" className="pd-section">
+            <p className="pd-section__label">Opportunity</p>
+            <h2 className="pd-section__heading">
+              <span className="sd-heading-dark">Scope</span>
+            </h2>
+            <figure className="sd-journey-figure">
+              <img
+                src="/siemens/Howmightwe.png"
+                alt="How might we — opportunity framing for the Notetaker and Scrum UXer workflow"
+                loading="lazy"
+              />
+            </figure>
           </section>
 
           {/* ──────────────────────────────────────────
@@ -562,7 +1295,7 @@ export default function SiemensDetail() {
               Hidden for now — not helpful in current narrative
               ────────────────────────────────────────── */}
           {false && (
-          <section id="sd-solution" className="pd-section">
+          <section id="sd-solution-legacy" className="pd-section">
             <p className="pd-section__label">Solution Design</p>
             <h2 className="pd-section__heading">
               <span className="sd-heading-dark">Notetaker</span>{' '}
@@ -653,17 +1386,21 @@ export default function SiemensDetail() {
           )}
 
           {/* ──────────────────────────────────────────
+              SECTION — Solution
+              ────────────────────────────────────────── */}
+          <section id="sd-solution" className="pd-section">
+            <p className="pd-section__label">Solution</p>
+            <h2 className="pd-section__heading">
+              <span className="sd-heading-dark">Two Agents one workflow</span>
+            </h2>
+            <SolutionHowToHScroll />
+          </section>
+
+          {/* ──────────────────────────────────────────
               SECTION 5 — Testing Results
               ────────────────────────────────────────── */}
           <section id="sd-results" className="pd-section">
             <p className="pd-section__label">Results</p>
-            <figure className="sd-journey-figure">
-              <img
-                src="/siemens/notetaker-ui.png"
-                alt="Notetaker Assistant UI — AI-assisted research tooling for beta testing"
-                loading="lazy"
-              />
-            </figure>
             <h2 className="pd-section__heading">
               <span className="sd-heading-dark">Found</span>{' '}
               <span className="sd-heading-mint">10/14</span>{' '}
@@ -672,7 +1409,7 @@ export default function SiemensDetail() {
             <p className="pd-section__body">
               The assistant was validated against a real testing session. Manual note-taking surfaced 2 effective documented usability issues. The Notetaker Assistant surfaced 8 additional validated issues the notetaker had missed. Results were reviewed and verified by the Scrum Master.
             </p>
-            <figure className="sd-journey-figure sd-results-overview">
+            <figure className="sd-journey-figure sd-journey-figure--bare sd-results-overview">
               <img
                 src="/siemens/results-overview.png"
                 alt="Copilot Generated Issues chart with Human Input, Expert Accepted, and Missed series across 8 participants, alongside the validated issues table — Notetaker Assistant found 8 extra effective usability issues"
