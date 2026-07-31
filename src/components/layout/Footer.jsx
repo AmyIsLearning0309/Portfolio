@@ -12,7 +12,7 @@ export default function Footer() {
               <Logo className="footer__logo" title="Amy Ai" />
               <p className="footer__brand-name">Amy Ai</p>
             </div>
-            <p className="footer__brand-tagline">UX Designer · Providence, RI</p>
+            <p className="footer__brand-tagline">Product Designer · San Francisco, CA</p>
           </div>
           <nav className="footer__nav" aria-label="Footer navigation">
             <Link to="/#selected-works" className="footer__nav-link">Work</Link>

@@ -492,7 +492,8 @@ export default function HorizontalProjects() {
 
                 <div className="hx__card-head">
                   <h3 className="hx__card-title">{project.title}</h3>
-                  <div className="hx__card-meta">
+                  {/* data-nosnippet keeps Google from stitching tags/years into search snippets */}
+                  <div className="hx__card-meta" data-nosnippet="">
                     {project.pills?.length > 0 && (
                       <div className="hx__card-pills" aria-hidden="true">
                         {project.pills.map((pill) => (

@@ -72,10 +72,12 @@
 
 .ro-pair {
   display: grid;
-  grid-template-columns: 1.35fr 1fr;
+  /* Columns proportional to each image's aspect ratio (2:3 vs 0.814)
+     so both render at identical heights without cropping */
+  grid-template-columns: 0.667fr 0.814fr;
   gap: var(--space-4);
   margin: var(--space-8) 0;
-  align-items: stretch;
+  align-items: start;
 }
 
 .ro-pair .ro-media {
@@ -89,17 +91,13 @@
   position: relative;
   flex: 0 0 auto;
   width: 100%;
-  height: clamp(14rem, 20vw, 20.5rem);
   overflow: hidden;
 }
 
 .ro-pair .ro-media__frame img {
-  position: absolute;
-  inset: 0;
+  display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+  height: auto;
 }
 
 .ro-pair .ro-media__caption {

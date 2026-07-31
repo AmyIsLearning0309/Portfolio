@@ -6,7 +6,7 @@ export default function Hero() {
       <div className="hero__wash" aria-hidden="true" />
       <div className="hero__frame">
         <p className="eyebrow hero__eyebrow">
-          Providence, RI · UX Design System Intern @ Siemens
+          San Francisco, CA · UX Design System Intern @ Siemens
         </p>
 
         <h1 className="hero__heading">
