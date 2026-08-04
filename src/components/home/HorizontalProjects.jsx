@@ -425,7 +425,7 @@ export default function HorizontalProjects() {
           {projects.map((project) => {
             const isGifMounted = gifState?.id === project.id;
             const isGifVisible = isGifMounted && gifState.visible;
-            const isPreviewOnly = Boolean(project.externalUrl);
+            const isPreviewOnly = Boolean(project.externalUrl) || Boolean(project.previewOnly);
             const CardTag = isPreviewOnly ? 'div' : Link;
             const cardProps = isPreviewOnly
               ? {
@@ -459,7 +459,7 @@ export default function HorizontalProjects() {
                   onMouseLeave={() => handleCardLeave(project)}
                   onFocus={() => handleCardEnter(project)}
                   onBlur={() => handleCardLeave(project)}
-                  {...(isPreviewOnly
+                  {...(project.externalUrl
                     ? { 'data-cursor-label': project.externalUrl.replace(/^https?:\/\//, '').replace(/\/$/, '') }
                     : {})}
                 >

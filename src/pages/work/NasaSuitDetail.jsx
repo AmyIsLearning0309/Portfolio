@@ -121,7 +121,8 @@ export default function NasaSuitDetail() {
   const project = projects.find((p) => p.slug === 'nasa-suit');
   const currentIndex = projects.findIndex((p) => p.slug === 'nasa-suit');
   const prevProject =
-    currentIndex > 0 ? projects[currentIndex - 1] : projects[projects.length - 1];
+    projects.find((p) => p.slug === 'rec-o') ||
+    (currentIndex > 0 ? projects[currentIndex - 1] : projects[projects.length - 1]);
   const nextProject =
     currentIndex < projects.length - 1 ? projects[currentIndex + 1] : projects[0];
 

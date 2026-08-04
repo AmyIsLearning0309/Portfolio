@@ -5,6 +5,23 @@
 .reco-detail {
   --ro-accent: #c45c6a;
   --ro-muted: rgba(20, 20, 20, 0.55);
+  background: #ffffff;
+}
+
+/* Full-page white canvas while on Rec-O */
+body:has(.reco-detail) {
+  background-color: #ffffff;
+  background-image: none;
+}
+
+body:has(.reco-detail) .navbar,
+body:has(.reco-detail) .navbar--scrolled {
+  background: #ffffff;
+}
+
+body:has(.reco-detail) .toc,
+body:has(.reco-detail) .toc-shell .toc {
+  background: #ffffff;
 }
 
 /* Match Siemens content column width + side padding */
@@ -61,6 +78,48 @@
 
 .ro-media__frame--video {
   background: #111;
+}
+
+/* Phone loop clip — after general video rules so size caps win */
+.ro-gif-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-5);
+  margin: var(--space-6) 0 var(--space-8);
+}
+
+.ro-gif-row .ro-media--gif-left {
+  margin: 0;
+  flex: 0 1 auto;
+}
+
+.ro-media--gif-left {
+  margin: var(--space-6) 0 var(--space-8);
+  width: min(450px, 56vw);
+  max-width: 100%;
+  margin-right: auto;
+}
+
+.ro-gif-row .ro-media--gif-left {
+  width: min(450px, calc((100% - 2 * var(--space-5)) / 3));
+  max-width: 450px;
+}
+
+.ro-media__frame--gif {
+  background: transparent;
+  line-height: 0;
+  width: 100%;
+}
+
+.ro-media--gif-left .ro-media__frame--gif video {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(85vh, 820px);
+  object-fit: contain;
+  object-position: top center;
+  pointer-events: none;
 }
 
 .ro-media__caption {

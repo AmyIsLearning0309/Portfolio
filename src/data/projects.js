@@ -104,6 +104,41 @@ export const projects = [
     ],
   },
   {
+    id: 'memento',
+    slug: 'memento',
+    title: 'Memento',
+    subtitle: 'A desktop companion that turns conversations into printed keepsakes',
+    category: 'UX',
+    categoryKey: 'ux',
+    year: '2026',
+    role: 'Product Designer · Interaction Designer',
+    company: 'Personal project',
+    duration: 'Ongoing',
+    tags: ['Hardware', 'Interaction Design', 'Physical Computing', 'Typography'],
+    summary:
+      'Memento is a wooden desktop printer that gives meaningful conversations a physical form — dialing through words, then outputting a thermal receipt you can keep, archive, and share.',
+    challenge:
+      'Digital chats disappear into infinite scroll. Moments worth remembering rarely leave a trace beyond a screenshot buried in a camera roll.',
+    approach:
+      'Designed a tactile object with a navigation dial, advance/delete controls, and thermal output so selecting and printing a memory feels deliberate — closer to a keepsake than a notification.',
+    outcomes: [
+      'Defined form language: warm wood enclosure with a matte control deck',
+      'Designed dial-driven interaction for browsing and confirming printable moments',
+      'Produced receipt layouts with archive metadata, keyword, quote, and QR',
+    ],
+    placeholderColor: '#F2EBE3',
+    placeholderAccent: '#5C4033',
+    heroImage: '/memento/memento-thumbnail.jpg',
+    previewOnly: true,
+    pills: ['Hardware', 'Interaction Design'],
+    images: [
+      { label: 'Product Overview', aspect: '16/9' },
+      { label: 'Control Deck', aspect: '4/3' },
+      { label: 'Receipt Output', aspect: '16/9' },
+      { label: 'Interaction Flow', aspect: '3/2' },
+    ],
+  },
+  {
     id: 'nasa-suit',
     slug: 'nasa-suit',
     title: 'NASA SUIT',

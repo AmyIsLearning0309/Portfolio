@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Navbar from '../../components/layout/Navbar';
 import Tag from '../../components/ui/Tag';
 import TableOfContents from '../../components/ui/TableOfContents';
@@ -30,23 +30,46 @@ function CaseImage({ src, alt, caption, wide }) {
   );
 }
 
-function CaseVideo({ src, poster, caption, wide }) {
+/** Muted autoplaying loop — behaves like a GIF */
+function LoopClip({ src, label }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    el.muted = true;
+    const tryPlay = () => {
+      const p = el.play();
+      if (p?.catch) p.catch(() => {});
+    };
+    tryPlay();
+    el.addEventListener('canplay', tryPlay);
+    return () => el.removeEventListener('canplay', tryPlay);
+  }, [src]);
+
   return (
-    <figure className={`ro-media${wide ? ' ro-media--wide' : ''}`}>
-      <div className="ro-media__frame ro-media__frame--video">
+    <figure className="ro-media ro-media--gif-left">
+      <div className="ro-media__frame ro-media__frame--gif">
         <video
+          ref={ref}
           src={src}
-          poster={poster}
-          controls
-          playsInline
-          preload="metadata"
+          autoPlay
+          muted
           loop
+          playsInline
+          preload="auto"
+          aria-label={label}
         />
       </div>
-      {caption && <figcaption className="ro-media__caption">{caption}</figcaption>}
     </figure>
   );
 }
+
+const REC_FEATURE_CLIPS = [
+  { src: '/rec-o/f-insight.mp4', label: 'Rec Insights tab looping preview' },
+  { src: '/rec-o/f-highlight.mp4', label: 'Rec Highlight tab looping preview' },
+  { src: '/rec-o/f-transcript.mp4', label: 'Rec Transcript tab looping preview' },
+];
 
 export default function RecODetail() {
   useEffect(() => {
@@ -70,7 +93,8 @@ export default function RecODetail() {
   const currentIndex = projects.findIndex((p) => p.slug === 'rec-o');
   const prevProject = projects.find((p) => p.slug === 'siemens') || (currentIndex > 0 ? projects[currentIndex - 1] : projects[projects.length - 1]);
   const nextProject =
-    currentIndex < projects.length - 1 ? projects[currentIndex + 1] : projects[0];
+    projects.find((p) => p.slug === 'nasa-suit') ||
+    (currentIndex < projects.length - 1 ? projects[currentIndex + 1] : projects[0]);
 
   return (
     <>
@@ -78,7 +102,7 @@ export default function RecODetail() {
       <TableOfContents
         sections={TOC_SECTIONS}
         projectTitle={project.title}
-        accent="#C45C6A"
+        accent="#111111"
         autoHideAfterId="ro-rec"
       />
 
@@ -105,18 +129,9 @@ export default function RecODetail() {
               An LLM-backed coaching system that helps young professionals improve
               communication skills at high-stakes moments.
             </p>
-            <p className="ro-live-cue">
-              <a href={LIVE_URL} target="_blank" rel="noopener noreferrer">
-                Click to view the functional website →
-              </a>
-            </p>
           </header>
 
           <div className="pd-credits">
-            <div className="pd-credits__item">
-              <span className="pd-credits__label">Company</span>
-              <span className="pd-credits__value">Rhode Island School of Design</span>
-            </div>
             <div className="pd-credits__item">
               <span className="pd-credits__label">Role</span>
               <span className="pd-credits__value">
@@ -135,64 +150,11 @@ export default function RecODetail() {
             </div>
           </div>
 
-          <CaseVideo
-            src="/rec-o/hero-demo.mp4"
-            poster="/rec-o/hero-ui.png"
-            caption="REC-O product demo — software + wearable coaching system"
+          <CaseImage
+            src="/rec-o/reco-hero.png"
+            alt="REC-O wearable pin and coaching app on concrete"
             wide
           />
-
-          {/* ── Overview ── */}
-          <section className="pd-section ro-reveal">
-            <p className="pd-section__label">Overview</p>
-            <h2 className="pd-section__heading">A coach that grows with you</h2>
-            <p className="pd-section__body">
-              <strong>Rec-O</strong> is a communication-coaching system designed to help
-              young professionals speak with clarity and confidence in professional
-              settings. The system combines a digital application powered by an LLM
-              backend (<em>Rec</em>) with a wearable voice-recording accessory (<em>O</em>).
-            </p>
-            <p className="pd-section__body">
-              Together, they create a personalized communication coach that grows with
-              the user by tracking progress, offering insights, and delivering actionable
-              feedback to strengthen communication skills over time.
-            </p>
-
-            <div className="ro-pair">
-              <CaseImage
-                src="/rec-o/overview-product.jpg"
-                alt="REC-O hardware pin and phone app on concrete blocks"
-                caption="Hardware pin (O) alongside the Rec coaching interface"
-              />
-              <CaseImage
-                src="/rec-o/overview-device.png"
-                alt="Close-up of the REC-O wearable recording pin"
-                caption="O — wearable voice-recording pin"
-              />
-            </div>
-
-            <div className="ro-split">
-              <div className="ro-split__card">
-                <h3 className="ro-split__title">Rec (Software)</h3>
-                <p>
-                  Supports young professionals before and after networking moments. It
-                  helps users prepare introductions, explore conversation strategies,
-                  reflect on interactions, and identify specific areas for improvement.
-                  It also keeps a record of past conversations and personalized growth
-                  insights.
-                </p>
-              </div>
-              <div className="ro-split__card">
-                <h3 className="ro-split__title">O (Hardware)</h3>
-                <p>
-                  A wearable voice-recording pin worn during networking events. Acting as
-                  the user’s closest listener, O captures real-time speech data and sends
-                  it to Rec for transcription and detailed analysis — an unobtrusive way
-                  to understand communication patterns and accelerate growth.
-                </p>
-              </div>
-            </div>
-          </section>
 
           {/* ── REC Software ── */}
           <section id="ro-rec" className="pd-section ro-reveal">
@@ -205,12 +167,11 @@ export default function RecODetail() {
               areas for improvement. It also keeps a record of past conversations and
               personalized growth insights.
             </p>
-            <CaseVideo
-              src="/rec-o/rec-software.mp4"
-              poster="/rec-o/hero-ui.png"
-              caption="Rec software walkthrough — preparation, reflection, and growth insights"
-              wide
-            />
+            <div className="ro-gif-row">
+              {REC_FEATURE_CLIPS.map((clip) => (
+                <LoopClip key={clip.src} src={clip.src} label={clip.label} />
+              ))}
+            </div>
           </section>
 
           {/* ── O Hardware ── */}
@@ -240,11 +201,6 @@ export default function RecODetail() {
               After recording, O automatically sends recording details to REC for session
               analysis. The user can reflect on their session for future improvements.
             </p>
-            <CaseVideo
-              src="/rec-o/performance-analysis.mp4"
-              caption="Session analysis flow — from recording to actionable feedback"
-              wide
-            />
           </section>
 
           {/* ── Architecture ── */}
@@ -256,12 +212,6 @@ export default function RecODetail() {
               information — from capture on O through transcription, LLM analysis, and
               feedback surfaced in Rec.
             </p>
-            <CaseImage
-              src="/rec-o/architecture.png"
-              alt="REC-O system architecture diagram"
-              caption="System architecture — capture, process, and coach loop"
-              wide
-            />
             <div className="ro-pair ro-pair--stack">
               <CaseImage
                 src="/rec-o/architecture-detail-1.jpg"
@@ -303,12 +253,6 @@ export default function RecODetail() {
               src="/rec-o/prototypes-1.png"
               alt="Hardware prototype iterations — size and layout studies"
               caption="Prototype iterations — size, shape, and component layout"
-              wide
-            />
-            <CaseImage
-              src="/rec-o/prototypes-2.png"
-              alt="Final hardware prototype assemblies"
-              caption="Refined assemblies — packing the recording stack tightly"
               wide
             />
           </section>

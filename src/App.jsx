@@ -9,6 +9,7 @@ import Siemens from './pages/work/Siemens';
 import NasaSuit from './pages/work/NasaSuit';
 import RecO from './pages/work/RecO';
 import MochiHealth from './pages/work/MochiHealth';
+import Memento from './pages/work/Memento';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/work/nasa-suit" element={<NasaSuit />} />
         <Route path="/work/rec-o" element={<RecO />} />
         <Route path="/work/mochi-health-brand" element={<MochiHealth />} />
+        <Route path="/work/memento" element={<Memento />} />
       </Routes>
       <Analytics />
     </>

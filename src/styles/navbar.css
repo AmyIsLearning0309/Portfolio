@@ -84,26 +84,26 @@
   color: #2bb8b2;
 }
 
-/* REC-O — matches TOC accent */
+/* REC-O — black chrome on white canvas */
 .navbar--reco .navbar__progress-bar {
-  background: #c45c6a;
+  background: #111111;
 }
 
 .navbar--reco .navbar__brand {
-  color: #c45c6a;
+  color: #111111;
 }
 
 .navbar--reco .navbar__brand:hover {
-  color: #b04e5b;
+  color: #000000;
 }
 
 .navbar--reco .navbar__link {
-  color: #c45c6a;
+  color: #111111;
 }
 
 .navbar--reco .navbar__link:hover,
 .navbar--reco .navbar__link--active {
-  color: #b04e5b;
+  color: #000000;
 }
 
 /* NASA SUIT — matches deep-space page background */
