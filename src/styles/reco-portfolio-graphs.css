@@ -1,0 +1,351 @@
+.reco-graphs {
+  --reco-ink: #141414;
+  --reco-muted: #817d76;
+  --reco-line: rgba(20, 20, 20, 0.16);
+  --reco-surface: #ffffff;
+  --reco-field: #ffffff;
+  display: grid;
+  gap: clamp(6rem, 12vw, 11rem);
+}
+
+.reco-graph {
+  color: var(--reco-ink);
+  font-family: "Satoshi", "Helvetica Neue", sans-serif;
+}
+
+.reco-graph__header {
+  max-width: 56rem;
+  margin-bottom: clamp(2rem, 5vw, 4rem);
+}
+
+.reco-graph__eyebrow {
+  margin: 0 0 1rem;
+  color: var(--reco-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.reco-graph__title {
+  margin: 0;
+  color: var(--reco-ink);
+  font-size: clamp(2rem, 4.1vw, 3.65rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1.04;
+}
+
+.reco-graph__caption {
+  max-width: 42rem;
+  margin: 1rem 0 0;
+  color: var(--reco-muted);
+  font-size: clamp(0.95rem, 1.45vw, 1.14rem);
+  line-height: 1.55;
+}
+
+.reco-graph__canvas {
+  width: 100%;
+  overflow: hidden;
+  border-radius: clamp(1rem, 2.4vw, 2rem);
+  background: var(--reco-field);
+}
+
+.reco-graph__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+.reco-graph__guide,
+.reco-graph__line {
+  fill: none;
+  stroke: var(--reco-line);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.reco-graph__line {
+  stroke: var(--reco-ink);
+  stroke-width: 1.5;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+}
+
+.reco-graph__line--system,
+.reco-graph__line--flow {
+  stroke-width: 1.65;
+}
+
+.reco-graph__line--loop,
+.reco-graph__line--archive {
+  stroke: var(--reco-muted);
+  stroke-width: 1.2;
+  stroke-dasharray: 0.012 0.02;
+}
+
+.reco-graph__arrow {
+  fill: var(--reco-ink);
+}
+
+.reco-graph__dot,
+.reco-graph__surface,
+.reco-graph__hub,
+.reco-graph__hub-label,
+.reco-graph__node-label,
+.reco-graph__node-sub,
+.reco-graph__phase,
+.reco-graph__orbit-labels,
+.reco-graph__wave,
+.reco-graph__sound-bars,
+.reco-graph__structure-icon,
+.reco-graph__note-icon {
+  opacity: 0;
+}
+
+.reco-graph__dot {
+  fill: var(--reco-ink);
+  stroke: var(--reco-field);
+  stroke-width: 3;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0);
+}
+
+.reco-graph__surface {
+  fill: var(--reco-surface);
+  stroke: var(--reco-line);
+  stroke-width: 1.25;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.94);
+}
+
+.reco-graph__hub {
+  fill: var(--reco-ink);
+  stroke: var(--reco-ink);
+  stroke-width: 1.25;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.94);
+}
+
+.reco-graph__hub-label {
+  fill: #ffffff;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.reco-graph__node-label {
+  fill: var(--reco-ink);
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.reco-graph__number,
+.reco-graph__phase {
+  fill: var(--reco-muted);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.reco-graph__node-sub {
+  fill: var(--reco-muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.reco-graph__node-sub--inverse {
+  fill: rgba(255, 255, 255, 0.62);
+}
+
+.reco-graph__orbit-labels {
+  fill: var(--reco-muted);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.reco-graph__wave {
+  fill: none;
+  stroke: var(--reco-ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.reco-graph__sound-bar {
+  fill: var(--reco-ink);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.reco-graph__structure-icon path {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.72);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.reco-graph__structure-icon circle {
+  fill: #ffffff;
+}
+
+.reco-graph__note-icon path {
+  fill: none;
+  stroke: var(--reco-ink);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.reco-graph.is-visible .reco-graph__line {
+  animation: reco-line-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(0.1s + var(--i, 0) * 0.11s);
+}
+
+.reco-graph.is-visible .reco-graph__dot {
+  animation: reco-dot-in 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: calc(0.28s + var(--i, 0) * 0.11s);
+}
+
+.reco-graph.is-visible .reco-graph__surface,
+.reco-graph.is-visible .reco-graph__hub {
+  animation: reco-surface-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(0.18s + var(--i, 0) * 0.11s);
+}
+
+.reco-graph.is-visible .reco-graph__node-label,
+.reco-graph.is-visible .reco-graph__hub-label,
+.reco-graph.is-visible .reco-graph__node-sub,
+.reco-graph.is-visible .reco-graph__phase,
+.reco-graph.is-visible .reco-graph__orbit-labels,
+.reco-graph.is-visible .reco-graph__wave,
+.reco-graph.is-visible .reco-graph__sound-bars,
+.reco-graph.is-visible .reco-graph__structure-icon,
+.reco-graph.is-visible .reco-graph__note-icon {
+  animation: reco-label-in 0.46s ease forwards;
+  animation-delay: calc(0.36s + var(--i, 0) * 0.11s);
+}
+
+.reco-graph.is-visible .reco-graph__sound-bar {
+  animation: reco-sound-level 1.4s ease-in-out infinite alternate;
+  animation-delay: calc(0.7s + var(--bar-i, 0) * -0.07s);
+}
+
+@keyframes reco-line-in {
+  from {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  to {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes reco-dot-in {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes reco-surface-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes reco-label-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes reco-sound-level {
+  from {
+    transform: scaleY(0.68);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@media (max-width: 720px) {
+  .reco-graphs {
+    gap: 5rem;
+  }
+
+  .reco-graph__header {
+    margin-bottom: 1.5rem;
+  }
+
+  .reco-graph__canvas {
+    margin-inline: calc(var(--mobile-bleed, 0px) * -1);
+    width: calc(100% + var(--mobile-bleed, 0px) * 2);
+  }
+
+  .reco-graph__node-label,
+  .reco-graph__hub-label {
+    font-size: 16px;
+  }
+
+  .reco-graph__node-sub,
+  .reco-graph__phase,
+  .reco-graph__orbit-labels {
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reco-graph__line,
+  .reco-graph__dot,
+  .reco-graph__surface,
+  .reco-graph__hub,
+  .reco-graph__hub-label,
+  .reco-graph__node-label,
+  .reco-graph__node-sub,
+  .reco-graph__phase,
+  .reco-graph__orbit-labels,
+  .reco-graph__wave,
+  .reco-graph__sound-bars,
+  .reco-graph__structure-icon,
+  .reco-graph__note-icon {
+    animation: none !important;
+    opacity: 1;
+    stroke-dashoffset: 0;
+    transform: none;
+  }
+
+  .reco-graph__sound-bar {
+    animation: none !important;
+    transform: none;
+  }
+}

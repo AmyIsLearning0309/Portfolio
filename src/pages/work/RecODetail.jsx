@@ -3,6 +3,7 @@ import Navbar from '../../components/layout/Navbar';
 import Tag from '../../components/ui/Tag';
 import TableOfContents from '../../components/ui/TableOfContents';
 import NextProjectBanner from '../../components/ui/NextProjectBanner';
+import RecoPortfolioGraphs from '../../components/work/RecoPortfolioGraphs';
 import { projects } from '../../data/projects';
 import '../../styles/project-detail.css';
 import '../../styles/reco-detail.css';
@@ -13,6 +14,7 @@ const TOC_SECTIONS = [
   { id: 'ro-overview', label: 'Overview' },
   { id: 'ro-method', label: 'Approach' },
   { id: 'ro-rec', label: 'REC (Software)' },
+  { id: 'ro-how-it-works', label: 'How it Works' },
   { id: 'ro-hardware', label: 'O (Hardware)' },
   { id: 'ro-performance', label: 'Performance Analysis' },
   { id: 'ro-architecture', label: 'System Architecture' },
@@ -306,6 +308,13 @@ export default function RecODetail() {
                 <LoopClip key={clip.src} src={clip.src} label={clip.label} />
               ))}
             </div>
+          </section>
+
+          {/* ── How It Works ── */}
+          <section id="ro-how-it-works" className="pd-section ro-reveal">
+            <p className="pd-section__label">Architecture</p>
+            <h2 className="pd-section__heading">How it Works</h2>
+            <RecoPortfolioGraphs />
           </section>
 
           {/* ── O Hardware ── */}
