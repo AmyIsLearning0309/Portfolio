@@ -430,7 +430,7 @@ body:has(.siemens-detail) .toc-shell .toc {
 }
 
 .sd-pain-spark__line {
-  transition: stroke-dashoffset 1.7s cubic-bezier(0.33, 0.1, 0.25, 1);
+  transition: stroke-dashoffset 1.1s cubic-bezier(0.33, 0.1, 0.25, 1);
 }
 
 .sd-pain-spark__point {
@@ -450,7 +450,7 @@ body:has(.siemens-detail) .toc-shell .toc {
 
 .sd-pain-spark__dot--end {
   opacity: 0;
-  transition: opacity 320ms ease 1.55s, fill 280ms ease;
+  transition: opacity 280ms ease 1s, fill 220ms ease;
 }
 
 .sd-pain-spark--drawn .sd-pain-spark__dot--end {

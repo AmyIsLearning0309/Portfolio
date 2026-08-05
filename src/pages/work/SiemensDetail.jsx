@@ -13,7 +13,7 @@ const TOC_SECTIONS = [
   { id: 'sd-scale', label: 'Context' },
   // { id: 'sd-pain-points', label: 'Pain Points' }, // Removed — images live in Scale slideshow
   // { id: 'sd-gap', label: 'The Gap' }, // Hidden for now
-  { id: 'sd-opportunity', label: 'Opportunity' },
+  // { id: 'sd-opportunity', label: 'Opportunity' }, // Hidden for now
   { id: 'sd-solution', label: 'Solution' },
   // { id: 'sd-mapping', label: 'Pain Mapping' }, // Hidden for now
   { id: 'sd-results', label: 'Results' },
@@ -611,13 +611,13 @@ function PainSparkline({ ready = false, onComplete }) {
       const step = () => {
         i += 1;
         setLitDots(i);
-        if (i < n) timers.push(window.setTimeout(step, 140));
+        if (i < n) timers.push(window.setTimeout(step, 90));
       };
       step();
-    }, 900);
+    }, 550);
     timers.push(startDots);
 
-    const showCopy = window.setTimeout(() => setCopyReady(true), 1800);
+    const showCopy = window.setTimeout(() => setCopyReady(true), 1150);
     timers.push(showCopy);
 
     return () => timers.forEach((t) => window.clearTimeout(t));
@@ -634,7 +634,7 @@ function PainSparkline({ ready = false, onComplete }) {
       return undefined;
     }
 
-    const duration = 1400;
+    const duration = 900;
     const begin = performance.now();
     let raf = 0;
     const tick = (now) => {
@@ -647,7 +647,7 @@ function PainSparkline({ ready = false, onComplete }) {
       } else {
         setLow(2);
         setHigh(16);
-        window.setTimeout(finish, 200);
+        window.setTimeout(finish, 150);
       }
     };
     raf = requestAnimationFrame(tick);
@@ -806,8 +806,8 @@ function ScrumPainStats({ ready = false }) {
         io.disconnect();
       },
       {
-        // Only fire when the block crosses the vertical center band of the screen
-        rootMargin: '-40% 0px -40% 0px',
+        // Fire a bit earlier than center — as the block enters the upper mid viewport
+        rootMargin: '-22% 0px -40% 0px',
         threshold: 0,
       }
     );
@@ -1178,20 +1178,6 @@ export default function SiemensDetail() {
                   loading="lazy"
                 />
               </figure>
-              <figure className="sd-journey-figure sd-slideshow__item">
-                <img
-                  src="/siemens/pain-points-notetakers.png"
-                  alt="Notetaker pain points — Time Pressure (19 of 23 lacked time to capture notes), The Workaround (+26 minutes after each hour-long session), and The Payoff Gap (2–16 issues captured per session)"
-                  loading="lazy"
-                />
-              </figure>
-              <figure className="sd-journey-figure sd-slideshow__item">
-                <img
-                  src="/siemens/pain-points-overview.png"
-                  alt="Scrum UXer pain points — Timeliness (18 hours for thematic grouping), Manual Effort (100+ issues awaiting review), and Focus (40% checking recordings because notes were insufficient)"
-                  loading="lazy"
-                />
-              </figure>
             </HScroll>
 
             <PainPointBlock />
@@ -1200,7 +1186,9 @@ export default function SiemensDetail() {
 
           {/* ──────────────────────────────────────────
               SECTION — Opportunity
+              Hidden for now
               ────────────────────────────────────────── */}
+          {false && (
           <section id="sd-opportunity" className="pd-section">
             <p className="pd-section__label">Opportunity</p>
             <h2 className="pd-section__heading">
@@ -1214,6 +1202,7 @@ export default function SiemensDetail() {
               />
             </figure>
           </section>
+          )}
 
           {/* ──────────────────────────────────────────
               SECTION 2 — The Gap
