@@ -11,6 +11,7 @@ const LIVE_URL = 'https://rec-o-production.up.railway.app/';
 
 const TOC_SECTIONS = [
   { id: 'ro-overview', label: 'Overview' },
+  { id: 'ro-method', label: 'Approach' },
   { id: 'ro-rec', label: 'REC (Software)' },
   { id: 'ro-hardware', label: 'O (Hardware)' },
   { id: 'ro-performance', label: 'Performance Analysis' },
@@ -18,6 +19,130 @@ const TOC_SECTIONS = [
   { id: 'ro-form', label: 'Form Inspiration' },
   { id: 'ro-prototypes', label: 'Iterations' },
 ];
+
+const METHOD_STEPS = ['Observe', 'Diagnose', 'Design', 'Build', 'Reflect'];
+
+function MethodLoop() {
+  const wrapRef = useRef(null);
+  const n = METHOD_STEPS.length;
+  const size = 520;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = 168;
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return undefined;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('ro-method-loop--ready');
+          io.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const nodes = METHOD_STEPS.map((label, i) => {
+    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+    return {
+      label,
+      index: i,
+      x: cx + r * Math.cos(angle),
+      y: cy + r * Math.sin(angle),
+      angle,
+    };
+  });
+
+  // Arc from node i → i+1, slightly inset so arrowheads clear the dots
+  const arcs = nodes.map((from, i) => {
+    const to = nodes[(i + 1) % n];
+    const a1 = from.angle + 0.28;
+    const a2 = to.angle - 0.28;
+    const x1 = cx + r * Math.cos(a1);
+    const y1 = cy + r * Math.sin(a1);
+    const x2 = cx + r * Math.cos(a2);
+    const y2 = cy + r * Math.sin(a2);
+    const large = 0;
+    return {
+      i,
+      d: `M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}`,
+    };
+  });
+
+  return (
+    <div
+      ref={wrapRef}
+      className="ro-method-loop"
+      role="img"
+      aria-label={`Method loop: ${METHOD_STEPS.join(', then ')}, then back to Observe.`}
+    >
+      <svg className="ro-method-loop__svg" viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
+        <defs>
+          <marker
+            id="roMethodArrow"
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerWidth="7"
+            markerHeight="7"
+            orient="auto-start-reverse"
+          >
+            <path d="M 1 1 L 9 5 L 1 9 Z" fill="#141414" />
+          </marker>
+        </defs>
+
+        {/* faint full ring */}
+        <circle className="ro-method-loop__ring" cx={cx} cy={cy} r={r} />
+
+        {arcs.map((arc) => (
+          <path
+            key={arc.i}
+            className="ro-method-loop__arc"
+            d={arc.d}
+            pathLength="1"
+            style={{ '--i': arc.i }}
+            markerEnd="url(#roMethodArrow)"
+          />
+        ))}
+
+        {nodes.map((node) => (
+          <g key={node.label} className="ro-method-loop__node" style={{ '--i': node.index }}>
+            <circle className="ro-method-loop__dot" cx={node.x} cy={node.y} r="7" />
+          </g>
+        ))}
+
+        <text className="ro-method-loop__center" x={cx} y={cy + 5} textAnchor="middle">
+          iterate
+        </text>
+      </svg>
+
+      <ol className="ro-method-loop__labels">
+        {nodes.map((node) => {
+          const lx = cx + (r + 52) * Math.cos(node.angle);
+          const ly = cy + (r + 52) * Math.sin(node.angle);
+          return (
+            <li
+              key={node.label}
+              className="ro-method-loop__label"
+              style={{
+                left: `${(lx / size) * 100}%`,
+                top: `${(ly / size) * 100}%`,
+                '--i': node.index,
+              }}
+            >
+              <span className="ro-method-loop__num">{String(node.index + 1).padStart(2, '0')}</span>
+              <span className="ro-method-loop__name">{node.label}</span>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
 
 function CaseImage({ src, alt, caption, wide }) {
   return (
@@ -31,7 +156,7 @@ function CaseImage({ src, alt, caption, wide }) {
 }
 
 /** Muted autoplaying loop — behaves like a GIF */
-function LoopClip({ src, label }) {
+function LoopClip({ src, label, wide = false }) {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -48,8 +173,10 @@ function LoopClip({ src, label }) {
   }, [src]);
 
   return (
-    <figure className="ro-media ro-media--gif-left">
-      <div className="ro-media__frame ro-media__frame--gif">
+    <figure
+      className={`ro-media${wide ? ' ro-media--wide' : ' ro-media--gif-left'}`}
+    >
+      <div className={`ro-media__frame${wide ? '' : ' ro-media__frame--gif'}`}>
         <video
           ref={ref}
           src={src}
@@ -150,11 +277,18 @@ export default function RecODetail() {
             </div>
           </div>
 
-          <CaseImage
-            src="/rec-o/reco-hero.png"
-            alt="REC-O wearable pin and coaching app on concrete"
+          <LoopClip
+            src="/rec-o/rec-o-hero.mp4"
+            label="REC-O wearable pin and coaching app"
             wide
           />
+
+          {/* ── Approach / Method ── */}
+          <section id="ro-method" className="pd-section ro-reveal">
+            <p className="pd-section__label">Approach</p>
+            <h2 className="pd-section__heading">Method</h2>
+            <MethodLoop />
+          </section>
 
           {/* ── REC Software ── */}
           <section id="ro-rec" className="pd-section ro-reveal">
