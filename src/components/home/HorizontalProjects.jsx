@@ -29,6 +29,10 @@ function isThumbnailFullyVisible(mediaEl, introEl) {
 
 /** Tight follow — smooth without feeling delayed */
 const FLOW_LERP = 0.22;
+/** Horizontal swipe must accumulate this much delta before advancing one project */
+const H_STEP_THRESHOLD = 48;
+/** Ignore further horizontal input while a step settles onto the next snap */
+const H_STEP_COOLDOWN_MS = 520;
 const GIF_FADE_MS = 450;
 const GIF_HOVER_DELAY_MS = 1000;
 
@@ -301,6 +305,79 @@ export default function HorizontalProjects() {
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [tunnelHeight, isStacked]);
+
+  /* Trackpad left/right (and Shift+wheel) → one project per gesture */
+  useEffect(() => {
+    if (isStacked) return undefined;
+
+    let accum = 0;
+    let cooldownUntil = 0;
+
+    const snapIndexFromProgress = (progress) => {
+      const n = snapShiftsRef.current.length;
+      if (n <= 1) return 0;
+      return Math.round(Math.max(0, Math.min(1, progress)) * (n - 1));
+    };
+
+    const readProgress = () => {
+      const tunnel = tunnelRef.current;
+      if (!tunnel) return 0;
+      const rect = tunnel.getBoundingClientRect();
+      const range = tunnel.offsetHeight - window.innerHeight;
+      if (range <= 0) return 0;
+      return Math.max(0, Math.min(1, -rect.top / range));
+    };
+
+    const scrollToSnapIndex = (index) => {
+      const tunnel = tunnelRef.current;
+      if (!tunnel) return;
+      const n = snapShiftsRef.current.length;
+      if (n <= 1) return;
+      const clamped = Math.max(0, Math.min(n - 1, index));
+      const range = Math.max(1, tunnel.offsetHeight - window.innerHeight);
+      const progress = clamped / (n - 1);
+      const top =
+        window.scrollY + tunnel.getBoundingClientRect().top + progress * range;
+      window.scrollTo({ top, behavior: 'auto' });
+    };
+
+    const onWheel = (e) => {
+      const tunnel = tunnelRef.current;
+      if (!tunnel) return;
+
+      const rect = tunnel.getBoundingClientRect();
+      const inSection = rect.top <= 1 && rect.bottom >= window.innerHeight - 1;
+      if (!inSection) return;
+
+      const absX = Math.abs(e.deltaX);
+      const absY = Math.abs(e.deltaY);
+      const shiftHorizontal = e.shiftKey && absY > 0;
+      const trackpadHorizontal = absX > absY && absX > 0.5;
+      if (!shiftHorizontal && !trackpadHorizontal) return;
+
+      e.preventDefault();
+
+      const now = performance.now();
+      if (now < cooldownUntil) {
+        accum = 0;
+        return;
+      }
+
+      const raw = shiftHorizontal ? e.deltaY : e.deltaX;
+      accum += raw;
+      if (Math.abs(accum) < H_STEP_THRESHOLD) return;
+
+      const direction = Math.sign(accum);
+      accum = 0;
+      cooldownUntil = now + H_STEP_COOLDOWN_MS;
+
+      const current = snapIndexFromProgress(readProgress());
+      scrollToSnapIndex(current + direction);
+    };
+
+    window.addEventListener('wheel', onWheel, { passive: false });
+    return () => window.removeEventListener('wheel', onWheel);
+  }, [isStacked]);
 
   return (
     <section
