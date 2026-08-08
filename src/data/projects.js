@@ -1,5 +1,39 @@
 export const projects = [
   {
+    id: 'rec-o',
+    slug: 'rec-o',
+    title: 'REC-O',
+    subtitle: 'LLM-Backed Communication Coaching System',
+    category: 'UX',
+    categoryKey: 'ux',
+    year: '2026',
+    role: 'Journey Owner · UX Researcher · UI Designer · Developer',
+    company: 'Rhode Island School of Design',
+    duration: 'Academic project',
+    tags: ['Interaction Design', 'Accessibility', 'Hardware', 'LLM'],
+    summary:
+      'A communication-coaching system that pairs an LLM-backed app (Rec) with a wearable voice-recording pin (O) to help young professionals speak with clarity and confidence in high-stakes moments.',
+    challenge:
+      'Young professionals often lack structured feedback on how they communicate in networking and high-stakes conversations. Coaching is expensive, episodic, and rarely available in the moments that matter most.',
+    approach:
+      'Designed and built Rec-O as a dual-system product: Rec prepares and reflects with users before and after conversations, while O captures speech unobtrusively during events for transcription and LLM analysis. Explored form factors that read as accessories, and iterated hardware layouts for a compact recording stack.',
+    outcomes: [
+      'Shipped a functional LLM-backed coaching website with session analysis',
+      'Designed and prototyped wearable audio-recording hardware (O)',
+      'Mapped end-to-end system architecture from capture → analysis → feedback',
+    ],
+    placeholderColor: '#F3E5F5',
+    placeholderAccent: '#7B1FA2',
+    heroImage: '/rec-o/reco-thumbnail.png',
+    pills: ['Interaction Design', '0-1 shipped'],
+    images: [
+      { label: 'System Overview', aspect: '16/9' },
+      { label: 'Feedback Interface', aspect: '4/3' },
+      { label: 'Session Dashboard', aspect: '16/9' },
+      { label: 'Hardware Prototypes', aspect: '3/2' },
+    ],
+  },
+  {
     id: 'siemens',
     slug: 'siemens',
     title: 'Siemens × M365 Copilot',
@@ -27,7 +61,7 @@ export const projects = [
     placeholderAccent: '#00BFA5',
     heroImage: '/siemens/homepage-thumbnail.png',
     hoverImage: '/siemens/siemens-task-issue.gif',
-    pills: ['AI-native tool', 'User Experience Research'],
+    pills: ['AI-native tool', 'User Experience Research', 'B2B'],
     images: [
       { label: 'Beta Testing Process', aspect: '16/9' },
       { label: 'Notetaker Assistant Flow', aspect: '16/9' },
@@ -61,46 +95,12 @@ export const projects = [
     placeholderAccent: '#E88A9A',
     heroImage: '/mochi/mochi-thumbnail.png',
     externalUrl: 'https://joinmochi.com/',
-    pills: ['Brand Identity', 'Visual Design'],
+    pills: ['Brand Identity', 'Web Design'],
     images: [
       { label: 'Brand Overview', aspect: '16/9' },
       { label: 'Visual System', aspect: '16/9' },
       { label: 'Product Touchpoints', aspect: '16/9' },
       { label: 'Campaign Applications', aspect: '16/9' },
-    ],
-  },
-  {
-    id: 'rec-o',
-    slug: 'rec-o',
-    title: 'REC-O',
-    subtitle: 'LLM-Backed Communication Coaching System',
-    category: 'UX',
-    categoryKey: 'ux',
-    year: '2026',
-    role: 'Journey Owner · UX Researcher · UI Designer · Developer',
-    company: 'Rhode Island School of Design',
-    duration: 'Academic project',
-    tags: ['Interaction Design', 'Accessibility', 'Hardware', 'LLM'],
-    summary:
-      'A communication-coaching system that pairs an LLM-backed app (Rec) with a wearable voice-recording pin (O) to help young professionals speak with clarity and confidence in high-stakes moments.',
-    challenge:
-      'Young professionals often lack structured feedback on how they communicate in networking and high-stakes conversations. Coaching is expensive, episodic, and rarely available in the moments that matter most.',
-    approach:
-      'Designed and built Rec-O as a dual-system product: Rec prepares and reflects with users before and after conversations, while O captures speech unobtrusively during events for transcription and LLM analysis. Explored form factors that read as accessories, and iterated hardware layouts for a compact recording stack.',
-    outcomes: [
-      'Shipped a functional LLM-backed coaching website with session analysis',
-      'Designed and prototyped wearable audio-recording hardware (O)',
-      'Mapped end-to-end system architecture from capture → analysis → feedback',
-    ],
-    placeholderColor: '#F3E5F5',
-    placeholderAccent: '#7B1FA2',
-    heroImage: '/rec-o/reco-thumbnail.png',
-    pills: ['Interaction Design', 'Accessibility'],
-    images: [
-      { label: 'System Overview', aspect: '16/9' },
-      { label: 'Feedback Interface', aspect: '4/3' },
-      { label: 'Session Dashboard', aspect: '16/9' },
-      { label: 'Hardware Prototypes', aspect: '3/2' },
     ],
   },
   {

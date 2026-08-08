@@ -1,11 +1,72 @@
 .reco-graphs {
-  --reco-ink: #141414;
-  --reco-muted: #817d76;
-  --reco-line: rgba(20, 20, 20, 0.16);
+  --reco-ink: #2f1f18;
+  --reco-muted: #6b5348;
+  --reco-line: rgba(47, 31, 24, 0.22);
   --reco-surface: #ffffff;
   --reco-field: #ffffff;
   display: grid;
   gap: clamp(6rem, 12vw, 11rem);
+}
+
+.reco-graph-stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.reco-graph-stack .ro-media {
+  margin: 0;
+  width: 100%;
+}
+
+.reco-graph-stack .ro-media__frame {
+  width: 100%;
+  background: #ffffff;
+}
+
+.reco-graph-stack .ro-media__frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Feature flow still — simple fade in */
+.reco-feature-flow .ro-media__frame {
+  overflow: hidden;
+  position: relative;
+}
+
+.reco-feature-flow .ro-media__frame::after {
+  content: none;
+}
+
+.reco-feature-flow img {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+}
+
+.reco-feature-flow.is-visible img {
+  animation: reco-feature-fade-in 0.9s ease forwards;
+}
+
+/* Insight → follow-up still — simple fade in */
+.reco-feature-flow--bridge img {
+  opacity: 0;
+}
+
+.reco-feature-flow--bridge.is-visible img {
+  animation: reco-feature-fade-in 0.9s ease forwards;
+}
+
+@keyframes reco-feature-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .reco-graph {
@@ -22,7 +83,7 @@
   margin: 0 0 1rem;
   color: var(--reco-muted);
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: var(--weight-regular);
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -30,10 +91,11 @@
 .reco-graph__title {
   margin: 0;
   color: var(--reco-ink);
-  font-size: clamp(2rem, 4.1vw, 3.65rem);
-  font-weight: 500;
-  letter-spacing: -0.045em;
-  line-height: 1.04;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-regular);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
 }
 
 .reco-graph__caption {
@@ -137,7 +199,7 @@
   fill: #ffffff;
   font-family: inherit;
   font-size: 18px;
-  font-weight: 500;
+  font-weight: var(--weight-regular);
   letter-spacing: -0.02em;
 }
 
@@ -145,7 +207,7 @@
   fill: var(--reco-ink);
   font-family: inherit;
   font-size: 18px;
-  font-weight: 500;
+  font-weight: var(--weight-regular);
   letter-spacing: -0.02em;
 }
 
@@ -154,7 +216,7 @@
   fill: var(--reco-muted);
   font-family: inherit;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: var(--weight-regular);
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -174,7 +236,7 @@
   fill: var(--reco-muted);
   font-family: inherit;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: var(--weight-regular);
   letter-spacing: 0.03em;
 }
 
@@ -300,27 +362,40 @@
 
 @media (max-width: 720px) {
   .reco-graphs {
-    gap: 5rem;
+    gap: 3.5rem;
+  }
+
+  .reco-graph-stack {
+    gap: 1.25rem;
   }
 
   .reco-graph__header {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .reco-graph__title {
+    font-size: clamp(1.35rem, 6vw, 1.85rem);
   }
 
   .reco-graph__canvas {
-    margin-inline: calc(var(--mobile-bleed, 0px) * -1);
-    width: calc(100% + var(--mobile-bleed, 0px) * 2);
+    margin-inline: 0;
+    width: 100%;
+    border-radius: 1rem;
+  }
+
+  .reco-graph__svg {
+    aspect-ratio: 16 / 10;
   }
 
   .reco-graph__node-label,
   .reco-graph__hub-label {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .reco-graph__node-sub,
   .reco-graph__phase,
   .reco-graph__orbit-labels {
-    font-size: 10px;
+    font-size: 9px;
   }
 }
 
@@ -347,5 +422,20 @@
   .reco-graph__sound-bar {
     animation: none !important;
     transform: none;
+  }
+
+  .reco-feature-flow img,
+  .reco-feature-flow .ro-media__frame::after {
+    animation: none !important;
+  }
+
+  .reco-feature-flow img {
+    clip-path: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .reco-feature-flow .ro-media__frame::after {
+    content: none;
   }
 }

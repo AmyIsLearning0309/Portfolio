@@ -1,9 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Navbar from '../../components/layout/Navbar';
 import Tag from '../../components/ui/Tag';
 import TableOfContents from '../../components/ui/TableOfContents';
 import NextProjectBanner from '../../components/ui/NextProjectBanner';
-import RecoPortfolioGraphs from '../../components/work/RecoPortfolioGraphs';
+import {
+  RecoHowItWorksGraph,
+  RecoFollowUpGraph,
+} from '../../components/work/RecoPortfolioGraphs';
 import { projects } from '../../data/projects';
 import '../../styles/project-detail.css';
 import '../../styles/reco-detail.css';
@@ -14,12 +17,10 @@ const TOC_SECTIONS = [
   { id: 'ro-overview', label: 'Overview' },
   { id: 'ro-method', label: 'Approach' },
   { id: 'ro-rec', label: 'REC (Software)' },
-  { id: 'ro-how-it-works', label: 'How it Works' },
   { id: 'ro-hardware', label: 'O (Hardware)' },
-  { id: 'ro-performance', label: 'Performance Analysis' },
+  { id: 'ro-how-it-works', label: 'How it Works' },
   { id: 'ro-architecture', label: 'System Architecture' },
-  { id: 'ro-form', label: 'Form Inspiration' },
-  { id: 'ro-prototypes', label: 'Iterations' },
+  { id: 'ro-form-collapse', label: 'Form & Iterations' },
 ];
 
 const METHOD_STEPS = ['Observe', 'Diagnose', 'Design', 'Build', 'Reflect'];
@@ -93,7 +94,7 @@ function MethodLoop() {
             markerHeight="7"
             orient="auto-start-reverse"
           >
-            <path d="M 1 1 L 9 5 L 1 9 Z" fill="#141414" />
+            <path d="M 1 1 L 9 5 L 1 9 Z" fill="#554c4c" />
           </marker>
         </defs>
 
@@ -146,10 +147,12 @@ function MethodLoop() {
   );
 }
 
-function CaseImage({ src, alt, caption, wide }) {
+function CaseImage({ src, alt, caption, wide, frame = 'default' }) {
   return (
     <figure className={`ro-media${wide ? ' ro-media--wide' : ''}`}>
-      <div className="ro-media__frame">
+      <div
+        className={`ro-media__frame${frame === 'white' ? ' ro-media__frame--white' : ''}`}
+      >
         <img src={src} alt={alt} loading="lazy" />
       </div>
       {caption && <figcaption className="ro-media__caption">{caption}</figcaption>}
@@ -157,8 +160,69 @@ function CaseImage({ src, alt, caption, wide }) {
   );
 }
 
+/** Scroll reveal still — left→right wipe when the figure enters view */
+function FeatureFlowImage({ src, alt, variant = 'flow' }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        el.classList.add('is-visible');
+        io.disconnect();
+      },
+      { threshold: 0.28, rootMargin: '0px 0px -8% 0px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <figure
+      ref={ref}
+      className={`ro-media reco-feature-flow reco-feature-flow--${variant}`}
+    >
+      <div className="ro-media__frame ro-media__frame--white">
+        <img src={src} alt={alt} loading="lazy" />
+      </div>
+    </figure>
+  );
+}
+
+/** Animated expand/collapse for Form Inspiration + Iterations */
+function FormIterationsDisclosure({ children }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div
+      id="ro-form-collapse"
+      className={`pd-section ro-disclosure${open ? ' is-open' : ''}`}
+    >
+      <button
+        type="button"
+        className="ro-disclosure__summary"
+        aria-expanded={open}
+        aria-controls="ro-form-collapse-panel"
+        onClick={() => setOpen((v) => !v)}
+      >
+        Click to see Form Inspiration &amp; Iterations
+      </button>
+      <div
+        id="ro-form-collapse-panel"
+        className="ro-disclosure__clip"
+        role="region"
+        aria-hidden={!open}
+      >
+        <div className="ro-disclosure__body">{children}</div>
+      </div>
+    </div>
+  );
+}
+
 /** Muted autoplaying loop — behaves like a GIF */
-function LoopClip({ src, label, wide = false }) {
+function LoopClip({ src, label, wide = false, phone = false, plain = false }) {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -174,11 +238,18 @@ function LoopClip({ src, label, wide = false }) {
     return () => el.removeEventListener('canplay', tryPlay);
   }, [src]);
 
+  const figureClass = plain
+    ? 'ro-media'
+    : phone
+      ? 'ro-media ro-media--phone'
+      : `ro-media${wide ? ' ro-media--wide' : ' ro-media--gif-left'}`;
+  const frameClass = plain
+    ? 'ro-media__frame'
+    : `ro-media__frame${phone || !wide ? ' ro-media__frame--gif' : ''}`;
+
   return (
-    <figure
-      className={`ro-media${wide ? ' ro-media--wide' : ' ro-media--gif-left'}`}
-    >
-      <div className={`ro-media__frame${wide ? '' : ' ro-media__frame--gif'}`}>
+    <figure className={figureClass}>
+      <div className={frameClass}>
         <video
           ref={ref}
           src={src}
@@ -195,9 +266,9 @@ function LoopClip({ src, label, wide = false }) {
 }
 
 const REC_FEATURE_CLIPS = [
-  { src: '/rec-o/f-insight.mp4', label: 'Rec Insights tab looping preview' },
-  { src: '/rec-o/f-highlight.mp4', label: 'Rec Highlight tab looping preview' },
-  { src: '/rec-o/f-transcript.mp4', label: 'Rec Transcript tab looping preview' },
+  { src: '/rec-o/reco2.0-contact.mp4', label: 'Rec contact session looping preview' },
+  { src: '/rec-o/Reco2.0-followup.mp4', label: 'Rec Highlight tab looping preview' },
+  { src: '/rec-o/Reco2.0-participant.mp4', label: 'Rec Transcript tab looping preview' },
 ];
 
 export default function RecODetail() {
@@ -220,10 +291,10 @@ export default function RecODetail() {
 
   const project = projects.find((p) => p.slug === 'rec-o');
   const currentIndex = projects.findIndex((p) => p.slug === 'rec-o');
-  const prevProject = projects.find((p) => p.slug === 'siemens') || (currentIndex > 0 ? projects[currentIndex - 1] : projects[projects.length - 1]);
+  const prevProject =
+    currentIndex > 0 ? projects[currentIndex - 1] : projects[projects.length - 1];
   const nextProject =
-    projects.find((p) => p.slug === 'nasa-suit') ||
-    (currentIndex < projects.length - 1 ? projects[currentIndex + 1] : projects[0]);
+    currentIndex < projects.length - 1 ? projects[currentIndex + 1] : projects[0];
 
   return (
     <>
@@ -231,7 +302,7 @@ export default function RecODetail() {
       <TableOfContents
         sections={TOC_SECTIONS}
         projectTitle={project.title}
-        accent="#111111"
+        accent="#554c4c"
         autoHideAfterId="ro-rec"
       />
 
@@ -280,9 +351,9 @@ export default function RecODetail() {
           </div>
 
           <LoopClip
-            src="/rec-o/rec-o-hero.mp4"
+            src="/rec-o/reco2.0-recording.mp4"
             label="REC-O wearable pin and coaching app"
-            wide
+            phone
           />
 
           {/* ── Approach / Method ── */}
@@ -295,14 +366,7 @@ export default function RecODetail() {
           {/* ── REC Software ── */}
           <section id="ro-rec" className="pd-section ro-reveal">
             <p className="pd-section__label">REC · Software</p>
-            <h2 className="pd-section__heading">Before and after the conversation</h2>
-            <p className="pd-section__body">
-              <strong>Rec</strong> supports young professionals before and after
-              networking moments. It helps users prepare introductions, explore
-              conversation strategies, reflect on interactions, and identify specific
-              areas for improvement. It also keeps a record of past conversations and
-              personalized growth insights.
-            </p>
+            <h2 className="pd-section__heading">Tailored to every conversation</h2>
             <div className="ro-gif-row">
               {REC_FEATURE_CLIPS.map((clip) => (
                 <LoopClip key={clip.src} src={clip.src} label={clip.label} />
@@ -310,95 +374,99 @@ export default function RecODetail() {
             </div>
           </section>
 
-          {/* ── How It Works ── */}
-          <section id="ro-how-it-works" className="pd-section ro-reveal">
-            <p className="pd-section__label">Architecture</p>
-            <h2 className="pd-section__heading">How it Works</h2>
-            <RecoPortfolioGraphs />
-          </section>
-
           {/* ── O Hardware ── */}
           <section id="ro-hardware" className="pd-section ro-reveal">
             <p className="pd-section__label">O · Hardware</p>
-            <h2 className="pd-section__heading">Your closest listener</h2>
-            <p className="pd-section__body">
-              <strong>O</strong> is a wearable voice-recording pin worn during networking
-              events. Acting as the user’s closest listener, O captures real-time speech
-              data and sends it to Rec for transcription and detailed analysis, providing
-              an unobtrusive way to understand communication patterns and accelerate
-              growth.
-            </p>
-            <CaseImage
-              src="/rec-o/hardware-strip.jpg"
-              alt="REC-O wearable pin worn on a jacket lapel"
-              caption="O worn during networking — compact, discreet, always listening"
-              wide
-            />
-          </section>
-
-          {/* ── Performance Analysis ── */}
-          <section id="ro-performance" className="pd-section ro-reveal">
-            <p className="pd-section__label">Performance Analysis</p>
-            <h2 className="pd-section__heading">Reflect after every session</h2>
-            <p className="pd-section__body">
-              After recording, O automatically sends recording details to REC for session
-              analysis. The user can reflect on their session for future improvements.
-            </p>
-          </section>
-
-          {/* ── Architecture ── */}
-          <section id="ro-architecture" className="pd-section ro-reveal">
-            <p className="pd-section__label">Development · System Architecture</p>
-            <h2 className="pd-section__heading">How information moves through the system</h2>
-            <p className="pd-section__body">
-              This graph indicates how the software system receives and processes
-              information — from capture on O through transcription, LLM analysis, and
-              feedback surfaced in Rec.
-            </p>
-            <div className="ro-pair ro-pair--stack">
+            <h2 className="pd-section__heading">Paired up with hardware, record anytime</h2>
+            <div className="ro-pair ro-pair--equal">
               <CaseImage
-                src="/rec-o/architecture-detail-1.jpg"
-                alt="Architecture detail — data processing pipeline"
+                src="/rec-o/reco-hardware.png"
+                alt="O wearable pin product render"
               />
-              <CaseImage
-                src="/rec-o/architecture-detail-2.jpg"
-                alt="Architecture detail — feedback delivery"
+              <LoopClip
+                src="/rec-o/reco-pairing.mp4"
+                label="O wearable pin paired and worn during use"
+                plain
               />
             </div>
           </section>
 
-          {/* ── Form Inspiration ── */}
-          <section id="ro-form" className="pd-section ro-reveal">
-            <p className="pd-section__label">Form Inspiration</p>
-            <h2 className="pd-section__heading">Accessory, not apparatus</h2>
-            <p className="pd-section__body">
-              Exploring natural hand-held shape form factors, while considering the
-              aesthetic as something that can become an accessory that doesn’t catch a
-              lot of attention while wearing it.
-            </p>
-            <CaseImage
-              src="/rec-o/form-inspiration.jpg"
-              alt="Form studies and material inspiration for the REC-O pin"
-              caption="Form studies — natural shapes that read as jewelry, not gear"
-              wide
-            />
+          {/* ── How It Works ── */}
+          <section id="ro-how-it-works" className="pd-section ro-reveal">
+            <p className="pd-section__label">How it works</p>
+            <div className="reco-graphs">
+              <div className="reco-graph-stack">
+                <RecoHowItWorksGraph />
+                <FeatureFlowImage
+                  src="/rec-o/reco-featurepage.png"
+                  alt="REC feature pages across Capture, Structure, and Note"
+                />
+              </div>
+              <RecoFollowUpGraph />
+            </div>
+            <div className="ro-pair ro-pair--equal ro-pair--iteration">
+              <FeatureFlowImage
+                src="/rec-o/reco-followup-insights.png"
+                alt="Follow-up insights and advice interface"
+                variant="bridge"
+              />
+              <LoopClip
+                src="/rec-o/Reco2.0-followup.mp4"
+                label="Rec Follow-up tab looping preview"
+                plain
+              />
+            </div>
           </section>
 
-          {/* ── Prototypes ── */}
-          <section id="ro-prototypes" className="pd-section ro-reveal">
-            <p className="pd-section__label">Iterations · Prototypes</p>
-            <h2 className="pd-section__heading">Fitting the stack into something small</h2>
-            <p className="pd-section__body">
-              Exploring different size, shape, and interior arrangements to ensure all of
-              the hardware components fit within the most compact way possible.
-            </p>
-            <CaseImage
-              src="/rec-o/prototypes-1.png"
-              alt="Hardware prototype iterations — size and layout studies"
-              caption="Prototype iterations — size, shape, and component layout"
-              wide
-            />
+          {/* ── Architecture ── */}
+          <section id="ro-architecture" className="pd-section ro-reveal">
+            <p className="pd-section__label">Developement</p>
+            <h2 className="pd-section__heading">Iteration</h2>
+            <div className="ro-pair ro-pair--stack">
+              <CaseImage
+                src="/rec-o/reco-ui-iteration.png"
+                alt="REC UI iterations — wireframe to high-fidelity home screen"
+                frame="white"
+              />
+              <CaseImage
+                src="/rec-o/reco-iteration-home.png"
+                alt="Iterating user flow — REC app screens across design iterations"
+              />
+              <CaseImage
+                src="/rec-o/reco-userflow.png"
+                alt="REC user flow diagram across screens"
+                frame="white"
+                wide
+              />
+            </div>
           </section>
+
+          {/* ── Form Inspiration + Iterations (collapsed) ── */}
+          <FormIterationsDisclosure>
+            <section id="ro-form" className="pd-section">
+              <p className="pd-section__label">Form Inspiration</p>
+              <h2 className="pd-section__heading">Technology as Accessory</h2>
+              <CaseImage
+                src="/rec-o/form-inspiration.jpg"
+                alt="Form studies and material inspiration for the REC-O pin"
+                wide
+              />
+            </section>
+
+            <section id="ro-prototypes" className="pd-section">
+              <CaseImage
+                src="/rec-o/prototypes-1.png"
+                alt="Hardware prototype iterations — size and layout studies"
+                wide
+              />
+            </section>
+          </FormIterationsDisclosure>
+
+          <CaseImage
+            src="/rec-o/reco-hero.png"
+            alt="O wearable pin — product render and worn on a jacket lapel"
+            wide
+          />
         </div>
 
         <NextProjectBanner nextProject={nextProject} prevProject={prevProject} />

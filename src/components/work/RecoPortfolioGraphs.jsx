@@ -2,48 +2,69 @@ import { useEffect, useRef } from 'react';
 import '../../styles/reco-portfolio-graphs.css';
 
 function useGraphReveal() {
-  const ref = useRef(null);
+  const sectionRef = useRef(null);
+  const fieldRef = useRef(null);
 
   useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
+    const section = sectionRef.current;
+    const field = fieldRef.current;
+    if (!section || !field) return undefined;
+
+    const play = () => {
+      section.classList.remove('is-visible');
+      // Force a reflow so CSS animations restart cleanly
+      void section.offsetWidth;
+      section.classList.add('is-visible');
+    };
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          node.classList.add("is-visible");
-          observer.disconnect();
-        }
+        if (!entry.isIntersecting) return;
+        play();
+        observer.disconnect();
       },
-      { threshold: 0.25 },
+      {
+        threshold: 0.4,
+        rootMargin: '0px 0px -12% 0px',
+      },
     );
 
-    observer.observe(node);
+    observer.observe(field);
     return () => observer.disconnect();
   }, []);
 
-  return ref;
+  return { sectionRef, fieldRef };
 }
 
 function GraphSection({ index, eyebrow, title, caption, children }) {
-  const ref = useGraphReveal();
+  const { sectionRef, fieldRef } = useGraphReveal();
+  const titleId = title ? `reco-graph-${index}` : undefined;
+  const hasHeader = Boolean(eyebrow || title || caption);
 
   return (
     <section
-      ref={ref}
+      ref={sectionRef}
       className="reco-graph"
-      aria-labelledby={`reco-graph-${index}`}
+      aria-labelledby={titleId}
     >
-      <header className="reco-graph__header">
-        <p className="reco-graph__eyebrow">
-          {index} / {eyebrow}
-        </p>
-        <h3 id={`reco-graph-${index}`} className="reco-graph__title">
-          {title}
-        </h3>
-        <p className="reco-graph__caption">{caption}</p>
-      </header>
-      <div className="reco-graph__canvas">{children}</div>
+      {hasHeader ? (
+        <header className="reco-graph__header">
+          {eyebrow ? (
+            <p className="reco-graph__eyebrow">
+              {index} / {eyebrow}
+            </p>
+          ) : null}
+          {title ? (
+            <h3 id={titleId} className="reco-graph__title">
+              {title}
+            </h3>
+          ) : null}
+          {caption ? <p className="reco-graph__caption">{caption}</p> : null}
+        </header>
+      ) : null}
+      <div ref={fieldRef} className="reco-graph__canvas">
+        {children}
+      </div>
     </section>
   );
 }
@@ -74,12 +95,7 @@ export function RecoHowItWorksGraph() {
   ];
 
   return (
-    <GraphSection
-      index="02"
-      eyebrow="How it works"
-      title="One conversation, transformed."
-      caption="Audio becomes a durable note, then a useful next move."
-    >
+    <GraphSection index="02">
       <svg
         className="reco-graph__svg"
         viewBox="0 0 960 520"
@@ -93,6 +109,7 @@ export function RecoHowItWorksGraph() {
           pathLength="1"
           markerEnd="url(#reco-system-arrow)"
           className="reco-graph__line reco-graph__line--system"
+          style={{ '--i': 0 }}
         />
         <path
           d="M 165 260 C 270 375 375 375 480 260 C 585 145 690 145 795 260"
@@ -101,7 +118,7 @@ export function RecoHowItWorksGraph() {
         />
 
         {stages.map((stage, index) => (
-          <g key={stage.label} style={{ "--i": index }}>
+          <g key={stage.label} style={{ '--i': index + 1 }}>
             <circle
               cx={stage.x}
               cy="260"
@@ -184,7 +201,7 @@ export function RecoHowItWorksGraph() {
           </g>
         ))}
 
-        <g className="reco-graph__orbit-labels" style={{ "--i": 3 }}>
+        <g className="reco-graph__orbit-labels" style={{ '--i': 4 }}>
           <text x="322.5" y="195" textAnchor="middle">
             Transcript
           </text>
@@ -208,12 +225,7 @@ export function RecoFollowUpGraph() {
   ];
 
   return (
-    <GraphSection
-      index="03"
-      eyebrow="Follow-up logic"
-      title="Grounded first. Generated second."
-      caption="Evidence, intent, and tone converge into an editable draft."
-    >
+    <GraphSection index="03">
       <svg
         className="reco-graph__svg"
         viewBox="0 0 960 520"
@@ -320,7 +332,7 @@ export function RecoFollowUpGraph() {
           textAnchor="middle"
           className="reco-graph__node-label"
         >
-          Draft
+          Follow-up
         </text>
         <text
           x="787"

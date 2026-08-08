@@ -84,26 +84,26 @@
   color: #2bb8b2;
 }
 
-/* REC-O — black chrome on white canvas */
+/* REC-O — warm charcoal chrome on white canvas */
 .navbar--reco .navbar__progress-bar {
-  background: #111111;
+  background: #554c4c;
 }
 
 .navbar--reco .navbar__brand {
-  color: #111111;
+  color: #554c4c;
 }
 
 .navbar--reco .navbar__brand:hover {
-  color: #000000;
+  color: #554c4c;
 }
 
 .navbar--reco .navbar__link {
-  color: #111111;
+  color: #554c4c;
 }
 
 .navbar--reco .navbar__link:hover,
 .navbar--reco .navbar__link--active {
-  color: #000000;
+  color: #554c4c;
 }
 
 /* NASA SUIT — matches deep-space page background */

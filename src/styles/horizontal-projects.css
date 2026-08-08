@@ -410,8 +410,8 @@ html.hx-scroll-snap {
   font-weight: var(--weight-medium);
   letter-spacing: 0.02em;
   color: var(--color-ink);
-  background: rgba(255, 252, 247, 0.92);
-  border: 1px solid rgba(20, 20, 20, 0.08);
+  background: #ffffff;
+  border: 1px solid rgba(20, 20, 20, 0.12);
   /* Explicit pill shape — overrides global sharp-corner reset */
   border-radius: 9999px !important;
 }

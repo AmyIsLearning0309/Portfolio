@@ -20,6 +20,7 @@ export default function Navbar() {
   }, [location.pathname]);
 
   const isHome = location.pathname === '/';
+  const isAbout = location.pathname === '/about';
   const isSiemens = location.pathname === '/work/siemens';
   const isRecO = location.pathname === '/work/rec-o';
   const isNasa = location.pathname === '/work/nasa-suit';
@@ -29,7 +30,7 @@ export default function Navbar() {
       className={[
         'navbar',
         scrolled ? 'navbar--scrolled' : '',
-        isHome ? 'navbar--home' : '',
+        isHome || isAbout ? 'navbar--home' : '',
         isSiemens ? 'navbar--siemens' : '',
         isRecO ? 'navbar--reco' : '',
         isNasa ? 'navbar--nasa' : '',

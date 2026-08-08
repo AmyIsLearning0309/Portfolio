@@ -11,6 +11,12 @@ const photos = [
 
 const experience = [
   {
+    org: 'Mochi Health',
+    role: 'Associate Designer',
+    dates: 'May 2026 – Present',
+    desc: '',
+  },
+  {
     org: 'Siemens Industry Software Inc.',
     role: 'UX-Design System Intern',
     dates: 'June 2025 – September 2025',
@@ -48,31 +54,10 @@ export default function About() {
             <p className="about__bio">
               I&apos;m Amy Ai, a product designer who is passionate about crafting
               experiences that connect people with technology in intuitive ways.
-              Always curious, collaborative, and excited to push ideas into
-              reality 🚀. When I&apos;m not heads down at working on pixels,
+              When I&apos;m not heads down at working on pixels,
               you&apos;ll catch me running outdoor with the sunset, trying to find
               the best speakeasy bar in town, or making random analog sounds with
               ARP2500.
-            </p>
-            <p className="about__edu">
-              Currently pursuing 🎓: Industrial Design at{' '}
-              <a
-                href="https://www.risd.edu/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="about__edu-link"
-              >
-                RISD
-              </a>{' '}
-              + Computer Science at{' '}
-              <a
-                href="https://www.brown.edu/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="about__edu-link"
-              >
-                Brown
-              </a>
             </p>
           </div>
 
@@ -106,7 +91,9 @@ export default function About() {
                   <div className="about__exp-detail">
                     <p className="about__exp-role">{entry.role}</p>
                     <p className="about__exp-dates">{entry.dates}</p>
-                    <p className="about__exp-desc">{entry.desc}</p>
+                    {entry.desc ? (
+                      <p className="about__exp-desc">{entry.desc}</p>
+                    ) : null}
                   </div>
                 </li>
               ))}
