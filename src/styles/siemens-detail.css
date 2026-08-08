@@ -107,6 +107,77 @@ body:has(.siemens-detail) .toc-shell .toc {
 /* Override the default ink color on the title so spans control it */
 .siemens-detail .pd-header__title { color: var(--sd-heading-dark); }
 
+/* Title + credits on one row */
+.siemens-detail .sd-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(16rem, 0.9fr);
+  gap: clamp(var(--space-8), 4vw, var(--space-14));
+  align-items: end;
+  margin-top: var(--space-16);
+  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-8);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.siemens-detail .pd-hero-image--inline {
+  margin-top: var(--space-6);
+  margin-bottom: 0;
+}
+
+.siemens-detail .sd-intro .pd-header {
+  margin: 0;
+}
+
+.siemens-detail .sd-intro .pd-header__subtitle {
+  white-space: normal;
+  max-width: 42ch;
+}
+
+.siemens-detail .sd-intro .pd-credits {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+@media (max-width: 900px) {
+  .siemens-detail .sd-intro {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: var(--space-8);
+  }
+
+  .siemens-detail .sd-intro .pd-credits {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-5);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+@media (max-width: 560px) {
+  .siemens-detail .sd-intro .pd-credits {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .siemens-detail .sd-intro .pd-credits {
+    grid-template-columns: 1fr;
+  }
+
+  .siemens-detail .pd-hero-image--inline {
+    margin-top: var(--space-4);
+  }
+
+  .siemens-detail .sd-intro {
+    margin-top: var(--space-10);
+  }
+}
+
 /* Override pd-section headings to use dark teal */
 .siemens-detail .pd-section__heading {
   color: var(--sd-heading-dark);
@@ -195,6 +266,38 @@ body:has(.siemens-detail) .toc-shell .toc {
   .sd-scrum-pain {
     grid-template-columns: 1fr;
     gap: var(--space-10);
+  }
+
+  .sd-pain-waffle,
+  .sd-pain-spark {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-8);
+  }
+
+  .sd-pain-waffle__grid,
+  .sd-pain-spark__chart {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .sd-pain-waffle__copy,
+  .sd-pain-spark__copy {
+    max-width: none;
+    width: auto;
+    margin-left: 0;
+    text-align: left;
+  }
+
+  .sd-pain-waffle__stat,
+  .sd-pain-spark__stat {
+    width: max-content;
+    margin-left: 0;
+  }
+
+  .sd-pain-waffle__desc,
+  .sd-pain-spark__desc {
+    max-width: none;
   }
 }
 
@@ -493,6 +596,10 @@ body:has(.siemens-detail) .toc-shell .toc {
   border-bottom: 1px solid var(--sd-border);
   border-radius: 0;
   box-shadow: none;
+}
+
+.siemens-detail .sd-intro .pd-credits {
+  border: none;
 }
 
 /* ── Wide-column wrapper ── */
@@ -1975,6 +2082,10 @@ html.sd-howto-scroll-snap {
 
   .sd-howto-hscroll {
     height: auto !important;
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
   }
 
   .sd-howto-hscroll__snap-rail {
@@ -2002,6 +2113,24 @@ html.sd-howto-scroll-snap {
   .sd-howto-hscroll__panel {
     flex: none !important;
     width: 100% !important;
+  }
+
+  .sd-howto-hscroll__panel video,
+  .sd-howto-progress {
+    --sd-howto-video-w: 100%;
+    --sd-howto-progress-w: 100%;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .sd-howto-hscroll__panel video {
+    max-height: none;
+  }
+
+  .sd-howto-progress__title {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
   }
 }
 
@@ -2163,11 +2292,11 @@ html.sd-howto-scroll-snap {
   border: 0;
   border-radius: 0;
   background: transparent;
-  color: #fff;
+  color: var(--sd-teal);
   cursor: pointer;
   transform: translateY(-50%);
   box-shadow: none;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
   transition: opacity 180ms ease, transform 180ms ease;
 }
 

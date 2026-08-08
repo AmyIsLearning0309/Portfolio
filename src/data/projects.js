@@ -25,7 +25,7 @@ export const projects = [
     placeholderColor: '#F3E5F5',
     placeholderAccent: '#7B1FA2',
     heroImage: '/rec-o/reco-thumbnail.png',
-    pills: ['Interaction Design', '0-1 shipped'],
+    pills: ['Shipped', '0-1 Product'],
     images: [
       { label: 'System Overview', aspect: '16/9' },
       { label: 'Feedback Interface', aspect: '4/3' },
@@ -61,7 +61,7 @@ export const projects = [
     placeholderAccent: '#00BFA5',
     heroImage: '/siemens/homepage-thumbnail.png',
     hoverImage: '/siemens/siemens-task-issue.gif',
-    pills: ['AI-native tool', 'User Experience Research', 'B2B'],
+    pills: ['Shipped', 'User Experience Research', 'B2B'],
     images: [
       { label: 'Beta Testing Process', aspect: '16/9' },
       { label: 'Notetaker Assistant Flow', aspect: '16/9' },
@@ -130,7 +130,7 @@ export const projects = [
     placeholderAccent: '#5C4033',
     heroImage: '/memento/memento-thumbnail.jpg',
     previewOnly: true,
-    pills: ['Hardware', 'Interaction Design'],
+    pills: ['Shipped', 'Interaction Design'],
     images: [
       { label: 'Product Overview', aspect: '16/9' },
       { label: 'Control Deck', aspect: '4/3' },

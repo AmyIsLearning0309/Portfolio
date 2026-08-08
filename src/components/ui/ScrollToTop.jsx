@@ -6,28 +6,42 @@ export default function ScrollToTop() {
   const { pathname } = useLocation();
 
   useLayoutEffect(() => {
-    // Keep the browser from re-applying a remembered scroll position
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
 
+    // Homepage scroll-snap can keep a mid-tunnel offset; clear it on leave
+    document.documentElement.classList.remove('hx-scroll-snap');
+
     const jumpToTop = () => {
       const html = document.documentElement;
+      const scrolling = document.scrollingElement || html;
       const prev = html.style.scrollBehavior;
       html.style.scrollBehavior = 'auto';
 
-      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      window.scrollTo(0, 0);
+      scrolling.scrollTop = 0;
       html.scrollTop = 0;
       document.body.scrollTop = 0;
 
       html.style.scrollBehavior = prev;
     };
 
-    // Before paint, then again next frame in case late layout
-    // (scroll-snap classes, media sizing) shifts the position back
     jumpToTop();
-    const raf = requestAnimationFrame(jumpToTop);
-    return () => cancelAnimationFrame(raf);
+    const raf1 = requestAnimationFrame(() => {
+      jumpToTop();
+      requestAnimationFrame(jumpToTop);
+    });
+    const t0 = window.setTimeout(jumpToTop, 0);
+    const t1 = window.setTimeout(jumpToTop, 50);
+    const t2 = window.setTimeout(jumpToTop, 150);
+
+    return () => {
+      cancelAnimationFrame(raf1);
+      window.clearTimeout(t0);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
   }, [pathname]);
 
   return null;

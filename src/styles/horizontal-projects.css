@@ -67,6 +67,11 @@ html.hx-scroll-snap {
   gap: 0.35rem 0;
 }
 
+/* Mobile-only footer contacts — after project cards */
+.hx__contacts--page-end {
+  display: none;
+}
+
 .hx__contacts-link {
   font-size: var(--text-sm);
   font-weight: var(--weight-regular);
@@ -306,6 +311,12 @@ html.hx-scroll-snap {
   cursor: default;
 }
 
+.hx__card--external {
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
 .hx__card-head {
   display: flex;
   flex-direction: row;
@@ -487,9 +498,20 @@ html.hx-scroll-snap {
     padding-bottom: 0;
   }
 
-  .hx .hx__contacts,
-  .hx--stacked .hx__contacts {
-    margin-top: 0;
+  /* Contacts move under the last project card on mobile */
+  .hx .hx__contacts--intro,
+  .hx--stacked .hx__contacts--intro {
+    display: none;
+  }
+
+  .hx .hx__contacts--page-end,
+  .hx--stacked .hx__contacts--page-end {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: var(--space-6);
+    padding: 0 var(--page-pad-x)
+      calc(var(--space-8) + env(safe-area-inset-bottom, 0px));
   }
 
   .hx .hx__intro-heading,

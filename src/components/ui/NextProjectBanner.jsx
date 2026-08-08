@@ -9,7 +9,6 @@ export default function NextProjectBanner({ nextProject, prevProject }) {
       {prevProject && (
         <div className="npb-prev-bar">
           <Link to={`/work/${prevProject.slug}`} className="npb-prev-link">
-            <span className="npb-prev-arrow">←</span>
             <span className="npb-prev-text">
               <span className="npb-prev-label">Previous</span>
               <span className="npb-prev-title">{prevProject.title}</span>
@@ -46,11 +45,6 @@ export default function NextProjectBanner({ nextProject, prevProject }) {
           <div className="npb-content">
             <span className="npb-eyebrow">Next Project</span>
             <h2 className="npb-title">{nextProject.title}</h2>
-            <p className="npb-subtitle">{nextProject.subtitle}</p>
-            <div className="npb-cta">
-              <span className="npb-cta-text">View Case Study</span>
-              <span className="npb-cta-arrow">→</span>
-            </div>
           </div>
 
         </Link>

@@ -11,7 +11,7 @@ import { projects } from '../../data/projects';
 import '../../styles/project-detail.css';
 import '../../styles/reco-detail.css';
 
-const LIVE_URL = 'https://rec-o-production.up.railway.app/';
+const LIVE_URL = 'https://reco-api-production-9d9c.up.railway.app/';
 
 const TOC_SECTIONS = [
   { id: 'ro-overview', label: 'Overview' },
@@ -308,53 +308,66 @@ export default function RecODetail() {
 
       <main className="project-detail reco-detail">
         <div className="pd-container">
-          {/* ── Header ── */}
-          <header className="pd-header" id="ro-overview">
-            <div className="pd-header__meta">
-              <Tag label="Interaction Design" categoryKey="ux" />
-              <Tag label="Accessibility" categoryKey="ux" />
-              <span className="pd-header__year">{project.year}</span>
-            </div>
-            <h1 className="pd-header__title">
-              <a
-                className="ro-title-link"
-                href={LIVE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                REC-O
-              </a>
-            </h1>
-            <p className="pd-header__subtitle">
-              An LLM-backed coaching system that helps young professionals improve
-              communication skills at high-stakes moments.
-            </p>
-          </header>
-
-          <div className="pd-credits">
-            <div className="pd-credits__item">
-              <span className="pd-credits__label">Role</span>
-              <span className="pd-credits__value">
-                Journey Owner · UX Researcher · UI Designer · Developer
-              </span>
-            </div>
-            <div className="pd-credits__item">
-              <span className="pd-credits__label">Tools</span>
-              <span className="pd-credits__value">Claude · Figma · VS Code</span>
-            </div>
-            <div className="pd-credits__item">
-              <span className="pd-credits__label">Deliverables</span>
-              <span className="pd-credits__value">
-                Audio Recording Hardware · LLM-Backed Website
-              </span>
-            </div>
+          <div className="ro-phone-hero">
+            <LoopClip
+              src="/rec-o/reco2.0-recording.mp4"
+              label="REC-O wearable pin and coaching app"
+              phone
+            />
+            <a
+              className="ro-try-link"
+              href={LIVE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Try it <span className="ro-try-link__arrow" aria-hidden="true">↗</span>
+            </a>
           </div>
 
-          <LoopClip
-            src="/rec-o/reco2.0-recording.mp4"
-            label="REC-O wearable pin and coaching app"
-            phone
-          />
+          {/* ── Header + credits ── */}
+          <div className="ro-intro" id="ro-overview">
+            <header className="pd-header">
+              <div className="pd-header__meta">
+                <Tag label="Shipped" categoryKey="ux" />
+                <Tag label="0-1 Product" categoryKey="ux" />
+                <span className="pd-header__year">{project.year}</span>
+              </div>
+              <h1 className="pd-header__title">
+                <a
+                  className="ro-title-link"
+                  href={LIVE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  REC-O
+                </a>
+              </h1>
+              <p className="pd-header__subtitle">
+                Pairs with a wearable clip that turns casual, in{'\u2011'}person
+                conversations into relationships you actually keep tracks and take
+                actions follow through on.
+              </p>
+            </header>
+
+            <div className="pd-credits">
+              <div className="pd-credits__item">
+                <span className="pd-credits__label">Role</span>
+                <span className="pd-credits__value">
+                  Journey Owner · UX Researcher · UI Designer · Developer
+                </span>
+              </div>
+              <div className="pd-credits__item">
+                <span className="pd-credits__label">Tools</span>
+                <span className="pd-credits__value">Claude · Figma · VS Code</span>
+              </div>
+              <div className="pd-credits__item">
+                <span className="pd-credits__label">Deliverables</span>
+                <span className="pd-credits__value">
+                  Audio Recording Hardware · iOS App (WIP)
+                </span>
+              </div>
+            </div>
+          </div>
 
           {/* ── Approach / Method ── */}
           <section id="ro-method" className="pd-section ro-reveal">
@@ -421,7 +434,7 @@ export default function RecODetail() {
           {/* ── Architecture ── */}
           <section id="ro-architecture" className="pd-section ro-reveal">
             <p className="pd-section__label">Developement</p>
-            <h2 className="pd-section__heading">Iteration</h2>
+            <h2 className="pd-section__heading">Iterations</h2>
             <div className="ro-pair ro-pair--stack">
               <CaseImage
                 src="/rec-o/reco-ui-iteration.png"
@@ -461,6 +474,19 @@ export default function RecODetail() {
               />
             </section>
           </FormIterationsDisclosure>
+
+          <div className="ro-pair ro-pair--equal ro-pair--posters">
+            <CaseImage
+              src="/rec-o/reco-poster1.png"
+              alt="REC-O product poster"
+              frame="white"
+            />
+            <CaseImage
+              src="/rec-o/reco-poster2.png"
+              alt="REC-O lifestyle poster"
+              frame="white"
+            />
+          </div>
 
           <CaseImage
             src="/rec-o/reco-hero.png"

@@ -1143,59 +1143,53 @@ export default function SiemensDetail() {
       <main className="project-detail siemens-detail">
         <div className="pd-container">
 
-          {/* ── Header ── */}
-          <header
-            className={`pd-header sd-intro-block${introReady ? ' is-in' : ''}`}
-            id="sd-overview"
-          >
-            <div className="pd-header__meta">
-              <Tag label="UX Research" categoryKey="ux" />
-              <span className="pd-header__year">2025</span>
-            </div>
-            <h1 className="pd-header__title">
-              <span className="sd-heading-dark">Siemens</span>{' '}
-              <span className="sd-heading-mint">× M365 Copilot</span>
-            </h1>
-            <p className="pd-header__subtitle">
-              Redesigning beta testing infrastructure with AI-assisted research tooling
-            </p>
-          </header>
-
-          {/* ── Credits ── */}
-          <div
-            className={`pd-credits sd-intro-block sd-intro-block--delay${introReady ? ' is-in' : ''}`}
-          >
-            <div className="pd-credits__item">
-              <span className="pd-credits__label">Role</span>
-              <span className="pd-credits__value">UX Design Intern</span>
-            </div>
-            <div className="pd-credits__item">
-              <span className="pd-credits__label">Company</span>
-              <span className="pd-credits__value">Siemens Industry Software Inc.</span>
-            </div>
-            <div className="pd-credits__item">
-              <span className="pd-credits__label">Duration</span>
-              <span className="pd-credits__value">3 months — 2025</span>
-            </div>
-          </div>
-
-          {/* ── Tags ── */}
-          <div className="pd-tags">
-            {['User Research', 'AI Tooling', 'M365 Copilot', 'Testing Strategy', 'Figma', 'Enterprise UX'].map((tag) => (
-              <Tag key={tag} label={tag} categoryKey="default" />
-            ))}
-          </div>
-
-          {/* ── Hero image — slides up on scroll ── */}
+          {/* ── Hero image ── */}
           <div
             ref={heroRef}
-            className={`pd-hero-image pd-hero-image--inline sd-hero-slide${heroInView ? ' is-in' : ''}`}
+            className={`pd-hero-image pd-hero-image--inline sd-hero-slide${
+              heroInView || introReady ? ' is-in' : ''
+            }`}
           >
             <img
               src="/siemens/notetaker-ui.png"
               alt="Notetaker Assistant UI — AI-assisted research tooling for beta testing"
               className="pd-hero-img"
             />
+          </div>
+
+          {/* ── Header + credits ── */}
+          <div
+            className={`sd-intro sd-intro-block${introReady ? ' is-in' : ''}`}
+            id="sd-overview"
+          >
+            <header className="pd-header">
+              <div className="pd-header__meta">
+                <Tag label="UX Research" categoryKey="ux" />
+                <span className="pd-header__year">2025</span>
+              </div>
+              <h1 className="pd-header__title">
+                <span className="sd-heading-dark">Siemens</span>{' '}
+                <span className="sd-heading-mint">× M365 Copilot</span>
+              </h1>
+              <p className="pd-header__subtitle">
+                Redesigning beta testing infrastructure with AI-assisted research tooling
+              </p>
+            </header>
+
+            <div className="pd-credits">
+              <div className="pd-credits__item">
+                <span className="pd-credits__label">Role</span>
+                <span className="pd-credits__value">UX Design Intern</span>
+              </div>
+              <div className="pd-credits__item">
+                <span className="pd-credits__label">Company</span>
+                <span className="pd-credits__value">Siemens Industry Software Inc.</span>
+              </div>
+              <div className="pd-credits__item">
+                <span className="pd-credits__label">Duration</span>
+                <span className="pd-credits__value">3 months — 2025</span>
+              </div>
+            </div>
           </div>
 
           {/* ──────────────────────────────────────────

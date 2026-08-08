@@ -122,8 +122,6 @@ export default function About() {
               <nav className="about__connect-col" aria-label="Site">
                 <Link to="/">Work</Link>
                 <Link to="/about">About Me</Link>
-                <Link to="/playground">Playground</Link>
-                <a href="mailto:amy@example.com">Say hello</a>
               </nav>
               <nav className="about__connect-col" aria-label="Social">
                 <a

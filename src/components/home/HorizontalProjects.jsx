@@ -38,6 +38,36 @@ const GIF_HOVER_DELAY_MS = 1000;
 
 const SNAP_COUNT = projects.length;
 
+function ContactsNav({ className }) {
+  return (
+    <nav className={`hx__contacts ${className}`} aria-label="Contact">
+      <a
+        href="tel:+18182556234"
+        className="hx__contacts-link"
+        data-cursor-label="+1 (818) 255-6234"
+      >
+        Phone
+      </a>
+      <a
+        href="mailto:aiamy0309@gmail.com"
+        className="hx__contacts-link"
+        data-cursor-label="aiamy0309@gmail.com"
+      >
+        Email
+      </a>
+      <a
+        href="/resume.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hx__contacts-link"
+        data-cursor-label="View resume"
+      >
+        Resume
+      </a>
+    </nav>
+  );
+}
+
 /**
  * Vertical scroll drives a horizontal track.
  * Scroll progress maps continuously across snap points
@@ -421,7 +451,7 @@ export default function HorizontalProjects() {
                 <span className="hx__intro-name">Amy Ai.</span>
               </h1>
               <p className="hx__intro-tagline">
-                Product Design · Product Manager · Builder
+                Product Design · Builder
               </p>
             </div>
 
@@ -471,54 +501,44 @@ export default function HorizontalProjects() {
                 </span>
               </p>
 
-              <nav className="hx__contacts" aria-label="Contact">
-                <a
-                  href="tel:+18182556234"
-                  className="hx__contacts-link"
-                  data-cursor-label="+1 (818) 255-6234"
-                >
-                  Phone
-                </a>
-                <a
-                  href="mailto:aiamy0309@gmail.com"
-                  className="hx__contacts-link"
-                  data-cursor-label="aiamy0309@gmail.com"
-                >
-                  Email
-                </a>
-                <a
-                  href="/resume.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hx__contacts-link"
-                  data-cursor-label="View resume"
-                >
-                  Resume
-                </a>
-              </nav>
+              <ContactsNav className="hx__contacts--intro" />
             </div>
           </article>
 
           {projects.map((project) => {
             const isGifMounted = gifState?.id === project.id;
             const isGifVisible = isGifMounted && gifState.visible;
-            const isPreviewOnly = Boolean(project.externalUrl) || Boolean(project.previewOnly);
-            const CardTag = isPreviewOnly ? 'div' : Link;
-            const cardProps = isPreviewOnly
+            const isExternal = Boolean(project.externalUrl);
+            const isPreviewOnly = Boolean(project.previewOnly) && !isExternal;
+            const CardTag = isExternal ? 'a' : isPreviewOnly ? 'div' : Link;
+            const cardProps = isExternal
               ? {
-                  'aria-label': project.title,
+                  href: project.externalUrl,
+                  target: '_blank',
+                  rel: 'noopener noreferrer',
+                  'aria-label': `Open ${project.title} (opens in a new tab)`,
                 }
-              : {
-                  to: `/work/${project.slug}`,
-                  'aria-label': `Open ${project.title} case study`,
-                };
+              : isPreviewOnly
+                ? {
+                    'aria-label': project.title,
+                  }
+                : {
+                    to: `/work/${project.slug}`,
+                    'aria-label': `Open ${project.title} case study`,
+                    onClick: () => {
+                      document.documentElement.classList.remove('hx-scroll-snap');
+                      window.scrollTo(0, 0);
+                      document.documentElement.scrollTop = 0;
+                      document.body.scrollTop = 0;
+                    },
+                  };
 
             return (
               <CardTag
                 key={project.id}
                 {...cardProps}
                 className={`hx__card${isGifVisible ? ' hx__card--gif-playing' : ''}${
-                  isPreviewOnly ? ' hx__card--preview' : ''
+                  isExternal ? ' hx__card--external' : isPreviewOnly ? ' hx__card--preview' : ''
                 }`}
                 ref={(el) => {
                   if (el) cardRefs.current[project.id] = el;
@@ -588,6 +608,8 @@ export default function HorizontalProjects() {
               </CardTag>
             );
           })}
+
+          <ContactsNav className="hx__contacts--page-end" />
         </div>
       </div>
     </section>
