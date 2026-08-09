@@ -527,9 +527,15 @@ export default function HorizontalProjects() {
                     'aria-label': `Open ${project.title} case study`,
                     onClick: () => {
                       document.documentElement.classList.remove('hx-scroll-snap');
+                      document.documentElement.classList.remove('sd-howto-scroll-snap');
+                      const html = document.documentElement;
+                      const prev = html.style.scrollBehavior;
+                      html.style.scrollBehavior = 'auto';
                       window.scrollTo(0, 0);
-                      document.documentElement.scrollTop = 0;
+                      document.scrollingElement && (document.scrollingElement.scrollTop = 0);
+                      html.scrollTop = 0;
                       document.body.scrollTop = 0;
+                      html.style.scrollBehavior = prev;
                     },
                   };
 

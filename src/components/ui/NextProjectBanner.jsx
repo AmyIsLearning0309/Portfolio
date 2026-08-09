@@ -1,14 +1,30 @@
 import { Link } from 'react-router-dom';
 import '../../styles/next-project-banner.css';
 
+function scrollPageToTop() {
+  document.documentElement.classList.remove('hx-scroll-snap');
+  document.documentElement.classList.remove('sd-howto-scroll-snap');
+  const html = document.documentElement;
+  const prev = html.style.scrollBehavior;
+  html.style.scrollBehavior = 'auto';
+  window.scrollTo(0, 0);
+  if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+  html.scrollTop = 0;
+  document.body.scrollTop = 0;
+  html.style.scrollBehavior = prev;
+}
+
 export default function NextProjectBanner({ nextProject, prevProject }) {
   return (
     <section className="npb-section">
-
       {/* ── Previous project — slim strip above next banner ── */}
       {prevProject && (
         <div className="npb-prev-bar">
-          <Link to={`/work/${prevProject.slug}`} className="npb-prev-link">
+          <Link
+            to={`/work/${prevProject.slug}`}
+            className="npb-prev-link"
+            onClick={scrollPageToTop}
+          >
             <span className="npb-prev-text">
               <span className="npb-prev-label">Previous</span>
               <span className="npb-prev-title">{prevProject.title}</span>
@@ -19,8 +35,11 @@ export default function NextProjectBanner({ nextProject, prevProject }) {
 
       {/* ── Next project — text-height banner with cover image ── */}
       {nextProject && (
-        <Link to={`/work/${nextProject.slug}`} className="npb-banner">
-
+        <Link
+          to={`/work/${nextProject.slug}`}
+          className="npb-banner"
+          onClick={scrollPageToTop}
+        >
           <div
             className="npb-bg"
             style={
@@ -46,10 +65,8 @@ export default function NextProjectBanner({ nextProject, prevProject }) {
             <span className="npb-eyebrow">Next Project</span>
             <h2 className="npb-title">{nextProject.title}</h2>
           </div>
-
         </Link>
       )}
-
     </section>
   );
 }

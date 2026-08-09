@@ -2091,12 +2091,18 @@ html.sd-howto-scroll-snap {
     scroll-snap-type: none;
   }
 
+  .siemens-detail #sd-solution,
+  .siemens-detail #sd-solution.pd-section {
+    background: #ffffff;
+  }
+
   .sd-howto-hscroll {
     height: auto !important;
     width: 100%;
     max-width: 100%;
     margin-left: 0;
     margin-right: 0;
+    background: #ffffff;
   }
 
   .sd-howto-hscroll__snap-rail {
@@ -2107,6 +2113,13 @@ html.sd-howto-scroll-snap {
     position: relative;
     top: auto;
     overflow: visible;
+    background: #ffffff;
+  }
+
+  .sd-howto-hscroll__viewport,
+  .sd-howto-hscroll__track,
+  .sd-howto-hscroll__panel {
+    background: #ffffff;
   }
 
   .sd-howto-hscroll__viewport {
@@ -2142,6 +2155,7 @@ html.sd-howto-scroll-snap {
   .sd-howto-hscroll__panel video {
     max-height: none;
     border-radius: 12px;
+    box-shadow: none;
   }
 
   .sd-howto-hscroll__caption {
@@ -2151,6 +2165,10 @@ html.sd-howto-scroll-snap {
     margin: 0;
     padding-inline: var(--space-1);
     order: -1;
+    background: #ffffff;
+    border: none;
+    border-top: none;
+    box-shadow: none;
   }
 
   .sd-howto-hscroll__caption-num {
@@ -2169,6 +2187,27 @@ html.sd-howto-scroll-snap {
     color: var(--color-ink);
     letter-spacing: -0.02em;
     line-height: 1.25;
+  }
+
+  .sd-howto-hscroll .sd-journey-figure figcaption,
+  .siemens-detail .sd-howto-hscroll .sd-journey-figure figcaption {
+    border-top: none;
+    background: #ffffff;
+    box-shadow: none;
+  }
+
+  .siemens-detail .sd-howto-progress,
+  .siemens-detail .sd-howto-progress__caption {
+    background: #ffffff;
+    border: none;
+    border-top: none;
+    box-shadow: none;
+  }
+
+  .siemens-detail .sd-howto-hscroll__sticky::before,
+  .siemens-detail .sd-howto-progress::before {
+    content: none;
+    display: none;
   }
 
   .siemens-detail .sd-howto-progress {
@@ -2448,6 +2487,21 @@ html.sd-howto-scroll-snap {
   font-size: var(--text-xs);
   color: var(--sd-text-mid);
   line-height: var(--leading-normal);
+}
+
+.sd-impl-ui {
+  margin: calc(var(--space-10) * 4) 0 0;
+  padding: var(--space-6) var(--space-8);
+  border: 1px solid var(--sd-teal-border);
+  border-radius: var(--radius-lg);
+  background: var(--sd-teal-light);
+}
+
+.sd-impl-ui__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-xl);
 }
 
 /* ── Next Steps cards ── */

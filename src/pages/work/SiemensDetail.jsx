@@ -1695,11 +1695,15 @@ export default function SiemensDetail() {
                 <div className="sd-impl-bullet__body">A single Notetaker and Moderator template — researchers only swap in the Domain Name and tasks. Output stays comparable across the entire beta cycle.</div>
               </div>
             </div>
-          </section>
 
-          {/* ──────────────────────────────────────────
-              SECTION 6 — Impact
-              ────────────────────────────────────────── */}
+            <figure className="sd-impl-ui">
+              <img
+                src="/siemens/notetaker-ui.png"
+                alt="Notetaker Assistant UI — AI-assisted research tooling for beta testing"
+                className="sd-impl-ui__img"
+              />
+            </figure>
+          </section>
           <section id="sd-impact" className="pd-section">
             <p className="pd-section__label">Impact</p>
             <h2 className="pd-section__heading">
