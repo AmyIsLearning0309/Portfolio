@@ -169,7 +169,6 @@ function SolutionHowToHScroll() {
     if (!pin || !track) return undefined;
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const stackedMq = window.matchMedia('(max-width: 1023px)');
     if (reduceMotion) return undefined;
 
     const pauseAll = () => {
@@ -213,7 +212,7 @@ function SolutionHowToHScroll() {
     };
 
     const setSnapEnabled = (on) => {
-      document.documentElement.classList.toggle('sd-howto-scroll-snap', on && !stackedMq.matches);
+      document.documentElement.classList.toggle('sd-howto-scroll-snap', on);
     };
 
     const readProgress = () => {
@@ -233,14 +232,6 @@ function SolutionHowToHScroll() {
     };
 
     const update = () => {
-      if (stackedMq.matches) {
-        setSnapEnabled(false);
-        track.style.transform = 'translate3d(0,0,0)';
-        setProgress(0);
-        // Mobile: play whichever video is in view via IO below
-        return;
-      }
-
       const rect = pin.getBoundingClientRect();
       const vh = window.innerHeight;
       const scrollable = pin.offsetHeight - vh;
@@ -265,7 +256,6 @@ function SolutionHowToHScroll() {
 
     // Release snap immediately on upward intent at the first thumbnail
     const onWheel = (e) => {
-      if (stackedMq.matches) return;
       const p = readProgress();
       if (e.deltaY < 0 && p <= 0.5 / Math.max(1, HOWTO_PANEL_COUNT)) {
         setSnapEnabled(false);
@@ -274,40 +264,18 @@ function SolutionHowToHScroll() {
       }
     };
 
-    // Stacked / mobile: each clip plays only while intersecting the viewport
-    const observers = videoRefs.current.map((video) => {
-      if (!video) return null;
-      const io = new IntersectionObserver(
-        ([entry]) => {
-          if (!stackedMq.matches) return;
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.45) {
-            const play = video.play();
-            if (play?.catch) play.catch(() => {});
-          } else {
-            video.pause();
-          }
-        },
-        { threshold: [0, 0.45, 0.7] }
-      );
-      io.observe(video);
-      return io;
-    });
-
     // Start paused; only play once in view
     pauseAll();
     update();
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
     window.addEventListener('wheel', onWheel, { passive: true });
-    stackedMq.addEventListener?.('change', update);
     return () => {
       setSnapEnabled(false);
       pauseAll();
-      observers.forEach((io) => io?.disconnect());
       window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
       window.removeEventListener('wheel', onWheel);
-      stackedMq.removeEventListener?.('change', update);
     };
   }, []);
 
@@ -1128,7 +1096,7 @@ export default function SiemensDetail() {
   const project = projects.find((p) => p.slug === 'siemens');
   const currentIndex = projects.findIndex((p) => p.slug === 'siemens');
   const prevProject = currentIndex > 0 ? projects[currentIndex - 1] : projects[projects.length - 1];
-  const nextProject = projects.find((p) => p.slug === 'nasa-suit');
+  const nextProject = projects.find((p) => p.slug === 'memento');
 
   return (
     <>

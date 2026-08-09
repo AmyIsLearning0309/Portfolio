@@ -107,16 +107,18 @@ export const projects = [
     id: 'memento',
     slug: 'memento',
     title: 'Memento',
-    subtitle: 'A desktop companion that turns conversations into printed keepsakes',
+    subtitle:
+      'A device that transform digital conversations into tangible and archival ASCII artifacts. It renders chosen text threads as tangible ASCII compositions, translating the ephemeral language of screens into the permanence of print. The result is something closer to a pressed flower or a tucked-away letter than a screenshot.',
     category: 'UX',
     categoryKey: 'ux',
     year: '2026',
-    role: 'Product Designer · Interaction Designer',
-    company: 'Personal project',
-    duration: 'Ongoing',
+    role: 'Product Designer · Interaction Designer · Developer',
+    company:
+      'Sam Zhan — Electronic programming, enclosure design, hardware\nVincent Zhang — Fabrication',
+    duration: 'May 2026',
     tags: ['Hardware', 'Interaction Design', 'Physical Computing', 'Typography'],
     summary:
-      'Memento is a wooden desktop printer that gives meaningful conversations a physical form — dialing through words, then outputting a thermal receipt you can keep, archive, and share.',
+      'Transform your text messages into a physical ASCII artifacts that you can archive through an analogue experience',
     challenge:
       'Digital chats disappear into infinite scroll. Moments worth remembering rarely leave a trace beyond a screenshot buried in a camera roll.',
     approach:
@@ -129,13 +131,22 @@ export const projects = [
     placeholderColor: '#F2EBE3',
     placeholderAccent: '#5C4033',
     heroImage: '/memento/memento-thumbnail.jpg',
-    previewOnly: true,
+    detailHeroImage: '/memento/memento-thumbnail2.jpg',
+    summaryImage: '/memento/memento-hero.jpg',
     pills: ['Shipped', 'Interaction Design'],
     images: [
-      { label: 'Product Overview', aspect: '16/9' },
-      { label: 'Control Deck', aspect: '4/3' },
-      { label: 'Receipt Output', aspect: '16/9' },
-      { label: 'Interaction Flow', aspect: '3/2' },
+      {
+        src: '/memento/memento-reciept-focu.jpg',
+        label: 'Receipt Output',
+      },
+      {
+        src: '/memento/Memento_button_detail.jpg',
+        label: 'Button detail',
+      },
+      {
+        src: '/memento/Memento_dial_detail.jpg',
+        label: 'Dial detail',
+      },
     ],
   },
   {
