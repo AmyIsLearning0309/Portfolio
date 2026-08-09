@@ -169,6 +169,9 @@ function SolutionHowToHScroll() {
     if (!pin || !track) return undefined;
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const stackedMq = window.matchMedia(
+      '(max-width: 1023px), (max-device-width: 1023px)'
+    );
     if (reduceMotion) return undefined;
 
     const pauseAll = () => {
@@ -212,7 +215,10 @@ function SolutionHowToHScroll() {
     };
 
     const setSnapEnabled = (on) => {
-      document.documentElement.classList.toggle('sd-howto-scroll-snap', on);
+      document.documentElement.classList.toggle(
+        'sd-howto-scroll-snap',
+        on && !stackedMq.matches
+      );
     };
 
     const readProgress = () => {
@@ -232,6 +238,12 @@ function SolutionHowToHScroll() {
     };
 
     const update = () => {
+      if (stackedMq.matches) {
+        setSnapEnabled(false);
+        track.style.transform = 'translate3d(0,0,0)';
+        return;
+      }
+
       const rect = pin.getBoundingClientRect();
       const vh = window.innerHeight;
       const scrollable = pin.offsetHeight - vh;
@@ -256,6 +268,7 @@ function SolutionHowToHScroll() {
 
     // Release snap immediately on upward intent at the first thumbnail
     const onWheel = (e) => {
+      if (stackedMq.matches) return;
       const p = readProgress();
       if (e.deltaY < 0 && p <= 0.5 / Math.max(1, HOWTO_PANEL_COUNT)) {
         setSnapEnabled(false);
@@ -264,18 +277,41 @@ function SolutionHowToHScroll() {
       }
     };
 
+    // Mobile stack: each clip plays while intersecting the viewport
+    const observers = videoRefs.current.map((video, index) => {
+      if (!video) return null;
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          if (!stackedMq.matches) return;
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.45) {
+            setProgress(index / Math.max(1, HOWTO_PANEL_COUNT - 1));
+            const play = video.play();
+            if (play?.catch) play.catch(() => {});
+          } else {
+            video.pause();
+          }
+        },
+        { threshold: [0, 0.45, 0.7] }
+      );
+      io.observe(video);
+      return io;
+    });
+
     // Start paused; only play once in view
     pauseAll();
     update();
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
     window.addEventListener('wheel', onWheel, { passive: true });
+    stackedMq.addEventListener?.('change', update);
     return () => {
       setSnapEnabled(false);
       pauseAll();
+      observers.forEach((io) => io?.disconnect());
       window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
       window.removeEventListener('wheel', onWheel);
+      stackedMq.removeEventListener?.('change', update);
     };
   }, []);
 
@@ -341,6 +377,14 @@ function SolutionHowToHScroll() {
                   width: `${100 / HOWTO_PANEL_COUNT}%`,
                 }}
               >
+                <figcaption className="sd-howto-hscroll__caption">
+                  <span className="sd-howto-hscroll__caption-num">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span className="sd-howto-hscroll__caption-title">
+                    {clip.caption}
+                  </span>
+                </figcaption>
                 <video
                   ref={(el) => {
                     videoRefs.current[i] = el;
@@ -1111,17 +1155,21 @@ export default function SiemensDetail() {
       <main className="project-detail siemens-detail">
         <div className="pd-container">
 
-          {/* ── Hero image ── */}
+          {/* ── Hero video ── */}
           <div
             ref={heroRef}
             className={`pd-hero-image pd-hero-image--inline sd-hero-slide${
               heroInView || introReady ? ' is-in' : ''
             }`}
           >
-            <img
-              src="/siemens/notetaker-ui.png"
-              alt="Notetaker Assistant UI — AI-assisted research tooling for beta testing"
+            <video
               className="pd-hero-img"
+              src="/siemens/hero.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              aria-label="Notetaker Assistant UI — AI-assisted research tooling for beta testing"
             />
           </div>
 

@@ -289,6 +289,10 @@ body:has(.siemens-detail) .toc-shell .toc {
     text-align: left;
   }
 
+  .sd-pain-spark__copy {
+    order: -1;
+  }
+
   .sd-pain-waffle__stat,
   .sd-pain-spark__stat {
     width: max-content;
@@ -508,6 +512,7 @@ body:has(.siemens-detail) .toc-shell .toc {
     width: auto;
     margin-left: 0;
     text-align: left;
+    order: -1;
   }
 
   .sd-pain-spark__stat {
@@ -2075,58 +2080,99 @@ html.sd-howto-scroll-snap {
   transform: scale(1.08);
 }
 
-@media (max-width: 1023px) {
-  /* Keep scroll-driven horizontal howto on mobile — don't stack panels */
+/* Per-panel captions are mobile-only; desktop uses shared progress */
+.sd-howto-hscroll__caption {
+  display: none;
+}
+
+@media (max-width: 1023px), (max-device-width: 1023px) {
+  /* Mobile: stack panels vertically — no sticky horizontal scrub */
+  html.sd-howto-scroll-snap {
+    scroll-snap-type: none;
+  }
+
   .sd-howto-hscroll {
-    width: 100vw;
-    max-width: 100vw;
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
+    height: auto !important;
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .sd-howto-hscroll__snap-rail {
+    display: none;
   }
 
   .sd-howto-hscroll__sticky {
-    top: calc(var(--navbar-height) + var(--space-3));
+    position: relative;
+    top: auto;
+    overflow: visible;
+  }
+
+  .sd-howto-hscroll__viewport {
+    overflow: visible;
+  }
+
+  .sd-howto-hscroll__track {
+    display: flex;
+    flex-direction: column;
+    width: 100% !important;
+    transform: none !important;
+    gap: var(--space-10);
   }
 
   .sd-howto-hscroll__panel {
-    padding-block: var(--space-5);
+    display: flex;
+    flex: none !important;
+    width: 100% !important;
+    flex-direction: column;
+    align-items: stretch;
+    padding-block: 0;
+    gap: var(--space-4);
   }
 
   .sd-howto-hscroll__panel video,
   .sd-howto-progress {
-    --sd-howto-video-w: min(100vw - 2 * var(--space-4), 100%);
-    --sd-howto-progress-w: min(100vw - 2 * var(--space-4), 100%);
-    width: var(--sd-howto-video-w);
-    max-width: var(--sd-howto-video-w);
+    --sd-howto-video-w: 100%;
+    --sd-howto-progress-w: 100%;
+    width: 100%;
+    max-width: 100%;
   }
 
   .sd-howto-hscroll__panel video {
-    max-height: calc(100svh - var(--navbar-height) - 7.5rem);
+    max-height: none;
     border-radius: 12px;
   }
 
-  .sd-howto-progress {
-    margin-top: var(--space-4);
+  .sd-howto-hscroll__caption {
+    display: flex;
+    align-items: baseline;
     gap: var(--space-3);
+    margin: 0;
+    padding-inline: var(--space-1);
+    order: -1;
   }
 
-  .sd-howto-progress__caption {
-    gap: var(--space-3);
+  .sd-howto-hscroll__caption-num {
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 5vw, 1.5rem);
+    font-weight: var(--weight-semi);
+    color: var(--sd-teal);
+    letter-spacing: -0.02em;
+    flex-shrink: 0;
   }
 
-  .sd-howto-progress__num,
-  .sd-howto-progress__title {
-    font-size: clamp(1.15rem, 5.5vw, 1.65rem);
+  .sd-howto-hscroll__caption-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 5vw, 1.5rem);
+    font-weight: var(--weight-semi);
+    color: var(--color-ink);
+    letter-spacing: -0.02em;
+    line-height: 1.25;
   }
 
-  .sd-howto-progress__title {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .sd-howto-progress {
-    --sd-howto-dot: 18px;
+  .siemens-detail .sd-howto-progress {
+    display: none !important;
   }
 }
 

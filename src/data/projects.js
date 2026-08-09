@@ -72,7 +72,7 @@ export const projects = [
   {
     id: 'mochi-health-brand',
     slug: 'mochi-health-brand',
-    title: 'Mochi Health Brand',
+    title: 'Mochi Health',
     subtitle: 'Brand System for an AI-Native Telehealth Platform',
     category: 'Brand',
     categoryKey: 'ui',
