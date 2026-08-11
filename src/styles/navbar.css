@@ -182,6 +182,25 @@
   color: var(--color-ink);
 }
 
+/* Homepage — body treatment only (matches hx contacts / copy) */
+.navbar--home .navbar__link {
+  font-size: var(--home-body-size, var(--text-sm));
+  font-weight: var(--weight-regular);
+  color: var(--color-ink);
+  letter-spacing: var(--home-body-tracking, -0.01em);
+  line-height: 1.55;
+  transition: color var(--transition-fast);
+}
+
+.navbar--home .navbar__link:hover,
+.navbar--home .navbar__link--active {
+  color: var(--color-ink);
+  font-weight: var(--weight-regular);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+
 .navbar__cta {
   display: none;
 }
@@ -267,7 +286,7 @@
     width: 1.85rem;
   }
 
-  .navbar__link {
+  .navbar:not(.navbar--home) .navbar__link {
     font-size: var(--text-xs);
   }
 }

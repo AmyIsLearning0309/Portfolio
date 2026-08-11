@@ -34,26 +34,15 @@ body:has(.reco-detail) .toc-shell .toc {
   padding-inline: var(--space-5);
 }
 
-.ro-title-link {
-  color: inherit;
-  text-decoration: none;
-}
-
-.ro-title-link:hover {
-  text-decoration: underline;
-  text-underline-offset: 0.12em;
-}
-
 /* Title + credits on one row */
 .reco-detail .ro-intro {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(16rem, 0.9fr);
   gap: clamp(var(--space-8), 4vw, var(--space-14));
-  align-items: end;
-  margin-top: var(--space-10);
+  align-items: start;
+  margin-top: 0;
   margin-bottom: var(--space-12);
-  padding-top: var(--space-8);
-  border-top: 1px solid var(--color-border);
+  padding-top: 0;
 }
 
 .reco-detail .ro-intro .pd-header {
@@ -62,9 +51,13 @@ body:has(.reco-detail) .toc-shell .toc {
 
 .reco-detail .ro-intro .pd-header__subtitle {
   white-space: normal;
-  max-width: 46ch;
+  max-width: 78ch;
   hyphens: none;
   overflow-wrap: normal;
+}
+
+.reco-detail .ro-intro .pd-header__subtitle + .pd-header__subtitle {
+  margin-top: var(--space-4);
 }
 
 .reco-detail .ro-try-link {
@@ -168,18 +161,121 @@ body:has(.reco-detail) .toc-shell .toc {
   background: #111;
 }
 
-/* Phone loop clip — after general video rules so size caps win */
+/* Feature phone clips — one per viewport, vertical stack */
 .ro-gif-row {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: var(--space-5);
-  margin: var(--space-6) 0 var(--space-8);
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  margin: var(--space-10) 0 var(--space-8);
 }
 
 .ro-gif-row .ro-media--gif-left {
   margin: 0;
-  flex: 0 1 auto;
+  flex: none;
+  width: min(540px, 70vw);
+  max-width: 100%;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-margin-top: var(--navbar-height);
+}
+
+.ro-gif-feature {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(var(--space-6), 4vw, var(--space-12));
+  min-height: 100svh;
+  width: 100%;
+  scroll-margin-top: var(--navbar-height);
+}
+
+.ro-gif-feature .ro-media--gif-left {
+  min-height: 0;
+  width: min(540px, 70vw);
+  max-width: 100%;
+  flex: none;
+}
+
+.ro-gif-feature__copy {
+  max-width: 22rem;
+  padding-block: var(--space-6);
+  flex: none;
+}
+
+.ro-gif-feature-stack {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  gap: clamp(var(--space-6), 4vw, var(--space-12));
+  width: 100%;
+}
+
+.ro-gif-feature-stack__clips {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  width: min(540px, 70vw);
+  max-width: 100%;
+}
+
+.ro-gif-feature-stack__clip {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-margin-top: var(--navbar-height);
+}
+
+.ro-gif-feature-stack__clip .ro-media--gif-left {
+  min-height: 0;
+  width: 100%;
+}
+
+.ro-gif-feature-stack__rail {
+  flex: none;
+  width: min(22rem, 100%);
+  max-width: 22rem;
+  align-self: stretch;
+  /* Sit beside the first centered phone, not at the stack top */
+  padding-top: calc(50svh - 5rem);
+  padding-bottom: calc(50svh - 5rem);
+  box-sizing: border-box;
+}
+
+.ro-gif-feature-stack__copy {
+  position: sticky;
+  top: calc(50svh - 5rem);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.ro-gif-feature-stack__copy--hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.ro-gif-feature__index {
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  letter-spacing: -0.01em;
+  line-height: 1.55;
+  color: var(--color-ink);
+}
+
+.ro-gif-feature__body {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  letter-spacing: -0.01em;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--color-ink-muted) 50%, transparent);
 }
 
 .ro-media--gif-left {
@@ -189,37 +285,37 @@ body:has(.reco-detail) .toc-shell .toc {
   margin-right: auto;
 }
 
-.ro-gif-row .ro-media--gif-left {
-  width: min(450px, calc((100% - 2 * var(--space-5)) / 3));
-  max-width: 450px;
-}
-
 .ro-media__frame--gif {
   background: transparent;
   line-height: 0;
   width: 100%;
 }
 
+.ro-gif-row .ro-media--gif-left .ro-media__frame--gif video,
 .ro-media--gif-left .ro-media__frame--gif video {
   display: block;
   width: 100%;
   height: auto;
-  max-height: min(85vh, 820px);
+  max-height: min(88vh, 980px);
   object-fit: contain;
   object-position: top center;
   pointer-events: none;
 }
 
-/* Centered phone hero loop — portrait clips stay compact */
+/* Hero still — full content width */
 .ro-phone-hero {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin: var(--space-4) 0 var(--space-16);
+  align-items: flex-start;
+  margin: var(--space-16) 0 var(--space-16);
+  width: 100%;
 }
 
+.ro-phone-hero .ro-media,
 .ro-phone-hero .ro-media--phone {
   margin: 0;
+  width: 100%;
+  max-width: none;
 }
 
 .ro-media--phone {
@@ -281,13 +377,24 @@ body:has(.reco-detail) .toc-shell .toc {
   margin: var(--space-6) 0 var(--space-8);
 }
 
+.ro-pair--equal .ro-media {
+  height: 100%;
+}
+
 .ro-pair--equal .ro-media__frame {
+  position: relative;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
   aspect-ratio: 3 / 4;
-  background: #e8eef2;
+  overflow: hidden;
+  background: transparent;
 }
 
 .ro-pair--equal .ro-media__frame img,
 .ro-pair--equal .ro-media__frame video {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -303,6 +410,10 @@ body:has(.reco-detail) .toc-shell .toc {
   align-items: start;
 }
 
+.ro-pair--equal.ro-pair--posters .ro-media {
+  height: auto;
+}
+
 .ro-pair--equal.ro-pair--posters .ro-media__frame {
   aspect-ratio: auto;
   height: auto;
@@ -310,6 +421,8 @@ body:has(.reco-detail) .toc-shell .toc {
 }
 
 .ro-pair--equal.ro-pair--posters .ro-media__frame img {
+  position: static;
+  inset: auto;
   width: 100%;
   height: auto;
   object-fit: contain;
@@ -329,17 +442,24 @@ body:has(.reco-detail) .toc-shell .toc {
 .ro-pair--iteration .ro-media {
   margin: 0;
   width: 100%;
+  height: auto;
 }
 
 .ro-pair--iteration .ro-media__frame {
+  position: relative;
   aspect-ratio: auto;
-  background: #ffffff;
+  height: auto;
   min-height: 0;
   width: 100%;
+  flex: 0 0 auto;
+  overflow: hidden;
+  background: #ffffff;
 }
 
 /* Left image sets the row height and fills its column */
 .ro-pair--iteration .ro-media:first-child .ro-media__frame img {
+  position: static;
+  inset: auto;
   display: block;
   width: 100%;
   height: auto;
@@ -367,6 +487,8 @@ body:has(.reco-detail) .toc-shell .toc {
 }
 
 .ro-pair--iteration .ro-media:last-child .ro-media__frame video {
+  position: static;
+  inset: auto;
   display: block;
   width: 100%;
   height: 100%;
@@ -374,6 +496,55 @@ body:has(.reco-detail) .toc-shell .toc {
   max-height: 100%;
   object-fit: contain;
   object-position: center;
+}
+
+/* Contact pair — phone + frequent nestled together, centered */
+.ro-pair--equal.ro-pair--contact {
+  margin-top: var(--space-8);
+  margin-bottom: 0;
+  gap: var(--space-4);
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+  grid-template-columns: auto auto;
+  container-type: inline-size;
+  /* Same height as iteration: wide column (1.85/2.85) × insights aspect (794/970) */
+  --ro-contact-match-height: calc(100cqw * 1.85 / 2.85 * 794 / 970);
+}
+
+.ro-pair--equal.ro-pair--contact .ro-media {
+  margin: 0;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+}
+
+.ro-pair--equal.ro-pair--contact .ro-media__frame {
+  position: relative;
+  aspect-ratio: auto;
+  height: var(--ro-contact-match-height);
+  min-height: 0;
+  width: auto;
+  flex: 0 0 auto;
+  overflow: hidden;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ro-pair--equal.ro-pair--contact .ro-media__frame img,
+.ro-pair--equal.ro-pair--contact .ro-media__frame video {
+  position: static;
+  inset: auto;
+  display: block;
+  width: auto;
+  height: 100%;
+  max-width: none;
+  object-fit: contain;
+  object-position: center;
+  pointer-events: none;
 }
 
 .ro-pair .ro-media__caption {
@@ -627,6 +798,30 @@ body:has(.reco-detail) .toc-shell .toc {
     max-height: min(72vh, 640px);
   }
 
+  .ro-pair--equal.ro-pair--contact {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+    container-type: normal;
+    justify-content: center;
+  }
+
+  .ro-pair--equal.ro-pair--contact .ro-media {
+    width: 100%;
+  }
+
+  .ro-pair--equal.ro-pair--contact .ro-media__frame {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .ro-pair--equal.ro-pair--contact .ro-media__frame video,
+  .ro-pair--equal.ro-pair--contact .ro-media__frame img {
+    width: 100%;
+    height: auto;
+    max-height: min(72vh, 640px);
+  }
+
   .ro-pair--stack .ro-media__frame {
     aspect-ratio: auto;
   }
@@ -636,17 +831,64 @@ body:has(.reco-detail) .toc-shell .toc {
     object-fit: contain;
   }
 
-  /* Feature phone clips — single column, readable size */
+  /* Feature phone clips — keep viewport stack on small screens */
   .ro-gif-row {
     flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .ro-gif-row .ro-media--gif-left {
+    width: min(340px, 78vw);
+    max-width: 100%;
+    min-height: 100svh;
+    margin-inline: auto;
+  }
+
+  .ro-gif-feature {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-6);
+    min-height: auto;
+    padding-block: var(--space-10);
+  }
+
+  .ro-gif-feature .ro-media--gif-left {
+    min-height: 100svh;
+    width: min(340px, 78vw);
+  }
+
+  .ro-gif-feature__copy {
+    max-width: min(22rem, 100%);
+    text-align: left;
+    width: 100%;
+  }
+
+  .ro-gif-feature-stack {
+    flex-direction: column-reverse;
     align-items: center;
     gap: var(--space-6);
   }
 
-  .ro-gif-row .ro-media--gif-left {
-    width: min(320px, 78vw);
-    max-width: 100%;
-    margin-inline: auto;
+  .ro-gif-feature-stack__clips {
+    width: min(340px, 78vw);
+  }
+
+  .ro-gif-feature-stack__rail {
+    width: min(22rem, 100%);
+    padding-top: 0;
+    padding-bottom: 0;
+    align-self: stretch;
+  }
+
+  .ro-gif-feature-stack__copy {
+    position: sticky;
+    top: calc(var(--navbar-height) + var(--space-4));
+    width: 100%;
+    background: #ffffff;
+    z-index: 2;
+    padding-block: var(--space-4);
   }
 
   .ro-media--gif-left {

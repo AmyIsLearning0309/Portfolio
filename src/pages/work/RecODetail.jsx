@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import Navbar from '../../components/layout/Navbar';
-import Tag from '../../components/ui/Tag';
 import TableOfContents from '../../components/ui/TableOfContents';
 import NextProjectBanner from '../../components/ui/NextProjectBanner';
 import {
@@ -15,7 +14,6 @@ const LIVE_URL = 'https://reco-api-production-9d9c.up.railway.app/';
 
 const TOC_SECTIONS = [
   { id: 'ro-overview', label: 'Overview' },
-  { id: 'ro-method', label: 'Approach' },
   { id: 'ro-rec', label: 'REC (Software)' },
   { id: 'ro-hardware', label: 'O (Hardware)' },
   { id: 'ro-how-it-works', label: 'How it Works' },
@@ -160,9 +158,29 @@ function CaseImage({ src, alt, caption, wide, frame = 'default' }) {
   );
 }
 
-/** Scroll reveal still — left→right wipe when the figure enters view */
+/** Red connector paths traced from reco-featurepage.png (viewBox 2543×1430) */
+const RECO_FLOW_PATHS = [
+  // Bottom branch: Mentions → under phones → up into Participant
+  'M300 827 H489 Q607 827 607 945 V1220 Q607 1332 719 1332 H1968 Q2082 1332 2082 1218 V872',
+  // Top branch: Open Threads → over phones → down into Participant
+  'M477 731 H489 Q600 731 600 620 V246 Q600 136 710 136 H2007 Q2121 136 2121 250 V387',
+  // Mid bridge: Summary ↔ Follow-up
+  'M1129 493 H1413',
+];
+
+const RECO_FLOW_DOTS = [
+  [300, 827],
+  [477, 731],
+  [1129, 493],
+  [1413, 493],
+  [2082, 872],
+  [2121, 387],
+];
+
+/** Scroll reveal still — fade in + optional left→right flow line */
 function FeatureFlowImage({ src, alt, variant = 'flow' }) {
   const ref = useRef(null);
+  const showFlowLine = variant === 'flow';
 
   useEffect(() => {
     const el = ref.current;
@@ -182,10 +200,36 @@ function FeatureFlowImage({ src, alt, variant = 'flow' }) {
   return (
     <figure
       ref={ref}
-      className={`ro-media reco-feature-flow reco-feature-flow--${variant}`}
+      className={`ro-media reco-feature-flow reco-feature-flow--${variant}${showFlowLine ? ' reco-feature-flow--lined' : ''}`}
     >
       <div className="ro-media__frame ro-media__frame--white">
         <img src={src} alt={alt} loading="lazy" />
+        {showFlowLine && (
+          <svg
+            className="reco-flow-line"
+            viewBox="0 0 2543 1430"
+            preserveAspectRatio="xMidYMid meet"
+            aria-hidden="true"
+          >
+            {RECO_FLOW_PATHS.map((d) => (
+              <path
+                key={d}
+                className="reco-flow-line__path"
+                d={d}
+                pathLength="1"
+              />
+            ))}
+            {RECO_FLOW_DOTS.map(([cx, cy]) => (
+              <circle
+                key={`${cx}-${cy}`}
+                className="reco-flow-line__dot"
+                cx={cx}
+                cy={cy}
+                r="5"
+              />
+            ))}
+          </svg>
+        )}
       </div>
     </figure>
   );
@@ -207,7 +251,7 @@ function FormIterationsDisclosure({ children }) {
         aria-controls="ro-form-collapse-panel"
         onClick={() => setOpen((v) => !v)}
       >
-        Click to see Form Inspiration &amp; Iterations
+        More Iterations &amp; testing
       </button>
       <div
         id="ro-form-collapse-panel"
@@ -265,11 +309,120 @@ function LoopClip({ src, label, wide = false, phone = false, plain = false }) {
   );
 }
 
-const REC_FEATURE_CLIPS = [
-  { src: '/rec-o/reco2.0-contact.mp4', label: 'Rec contact session looping preview' },
-  { src: '/rec-o/Reco2.0-followup.mp4', label: 'Rec Highlight tab looping preview' },
-  { src: '/rec-o/Reco2.0-participant.mp4', label: 'Rec Transcript tab looping preview' },
+const REC_INSIGHT_CLIPS = [
+  {
+    src: '/rec-o/reco2.0-recording.mp4',
+    label: 'REC-O recording session looping preview',
+    index: '01 Record or Upload',
+    body:
+      'REC-O listens to your conversation in a private setting to gain context.',
+  },
+  {
+    src: '/rec-o/reco2.0-insight.mp4',
+    label: 'Rec insight tab looping preview',
+    index: '02 Review Insights',
+    body:
+      'See highlights, names mentioned, and questions left unanswered from the conversation.',
+  },
+  {
+    src: '/rec-o/Reco2.0-followup.mp4',
+    label: 'Rec Highlight tab looping preview',
+    index: '03 Collaborate on a Follow-up',
+    body:
+      'Work with the agent to write a follow-up that feels personal and helps maintain the connection.',
+  },
+  {
+    src: '/rec-o/Reco2.0-participant.mp4',
+    label: 'Rec Transcript tab looping preview',
+    index: '04 Save the Contact',
+    body:
+      'Add the connection to your contacts so the next conversation can happen.',
+  },
 ];
+
+function StickyInsightClips({ clips }) {
+  const [active, setActive] = useState(0);
+  const [inView, setInView] = useState(true);
+  const stackRef = useRef(null);
+  const clipRefs = useRef([]);
+
+  useEffect(() => {
+    const stack = stackRef.current;
+    if (!stack) return undefined;
+
+    const updateActive = () => {
+      const mid = window.innerHeight * 0.5;
+      const nodes = clipRefs.current;
+      let best = 0;
+      let bestDist = Infinity;
+      let anyVisible = false;
+
+      nodes.forEach((node, i) => {
+        if (!node) return;
+        const rect = node.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+        anyVisible = true;
+        const center = rect.top + rect.height / 2;
+        const dist = Math.abs(center - mid);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = i;
+        }
+      });
+
+      const stackRect = stack.getBoundingClientRect();
+      const stackVisible =
+        stackRect.bottom > window.innerHeight * 0.15 &&
+        stackRect.top < window.innerHeight * 0.85;
+
+      setInView(stackVisible && anyVisible);
+      if (anyVisible) setActive(best);
+    };
+
+    updateActive();
+    window.addEventListener('scroll', updateActive, { passive: true });
+    window.addEventListener('resize', updateActive);
+    return () => {
+      window.removeEventListener('scroll', updateActive);
+      window.removeEventListener('resize', updateActive);
+    };
+  }, [clips]);
+
+  const current = clips[active] ?? clips[0];
+  const showCopy = Boolean(current?.index) && inView;
+
+  return (
+    <div className="ro-gif-feature-stack" ref={stackRef}>
+      <div className="ro-gif-feature-stack__clips">
+        {clips.map((clip, i) => (
+          <div
+            key={clip.src}
+            className="ro-gif-feature-stack__clip"
+            data-insight-index={i}
+            ref={(el) => {
+              clipRefs.current[i] = el;
+            }}
+          >
+            <LoopClip src={clip.src} label={clip.label} />
+          </div>
+        ))}
+      </div>
+      <div className="ro-gif-feature-stack__rail" aria-hidden={!showCopy}>
+        <aside
+          className={`ro-gif-feature-stack__copy${showCopy ? '' : ' ro-gif-feature-stack__copy--hidden'}`}
+          aria-live="polite"
+        >
+          {current?.index ? (
+            <>
+              <p className="ro-gif-feature__index">{current.index}</p>
+              <p className="ro-gif-feature__body">{current.body}</p>
+            </>
+          ) : null}
+        </aside>
+      </div>
+    </div>
+  );
+}
 
 export default function RecODetail() {
   useEffect(() => {
@@ -309,56 +462,48 @@ export default function RecODetail() {
       <main className="project-detail reco-detail">
         <div className="pd-container">
           <div className="ro-phone-hero">
-            <LoopClip
-              src="/rec-o/reco2.0-recording.mp4"
-              label="REC-O wearable pin and coaching app"
-              phone
+            <CaseImage
+              src="/rec-o/reco-hero2.png"
+              alt="REC-O wearable pin and coaching app"
+              wide
             />
-            <a
-              className="ro-try-link"
-              href={LIVE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Try it <span className="ro-try-link__arrow" aria-hidden="true">↗</span>
-            </a>
           </div>
 
           {/* ── Header + credits ── */}
           <div className="ro-intro" id="ro-overview">
             <header className="pd-header">
-              <div className="pd-header__meta">
-                <Tag label="Shipped" categoryKey="ux" />
-                <Tag label="0-1 Product" categoryKey="ux" />
-                <span className="pd-header__year">{project.year}</span>
-              </div>
-              <h1 className="pd-header__title">
-                <a
-                  className="ro-title-link"
-                  href={LIVE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  REC-O
-                </a>
-              </h1>
+              <h1 className="pd-header__title">REC-O</h1>
               <p className="pd-header__subtitle">
-                Pairs with a wearable clip that turns casual, in{'\u2011'}person
-                conversations into relationships you actually keep tracks and take
-                actions follow through on.
+                We treat every conversation as a relationship building point.
+                Paired with a wearable recording pin to record anywhere,
+                any time. From there, REC-O handles the recap and the
+                follow-through, so nothing gets lost after the moment ends.
               </p>
+              <p className="pd-header__subtitle">
+                A conversation agent is embedded inside the app, designed with a
+                touch of warmth so the AI feels seamless and natural rather than
+                like a chat interface.
+              </p>
+              <a
+                className="ro-try-link"
+                href={LIVE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Try it <span className="ro-try-link__arrow" aria-hidden="true">↗</span>
+              </a>
             </header>
 
             <div className="pd-credits">
+              <div className="pd-credits__item">
+                <span className="pd-credits__label">Date</span>
+                <span className="pd-credits__value">May 2026</span>
+              </div>
               <div className="pd-credits__item">
                 <span className="pd-credits__label">Role</span>
                 <span className="pd-credits__value">
                   Journey Owner · UX Researcher · UI Designer · Developer
                 </span>
-              </div>
-              <div className="pd-credits__item">
-                <span className="pd-credits__label">Tools</span>
-                <span className="pd-credits__value">Claude · Figma · VS Code</span>
               </div>
               <div className="pd-credits__item">
                 <span className="pd-credits__label">Deliverables</span>
@@ -369,28 +514,24 @@ export default function RecODetail() {
             </div>
           </div>
 
-          {/* ── Approach / Method ── */}
-          <section id="ro-method" className="pd-section ro-reveal">
+          {/* ── Approach / Method (hidden) ── */}
+          <section id="ro-method" className="pd-section ro-reveal" hidden aria-hidden="true">
             <p className="pd-section__label">Approach</p>
             <h2 className="pd-section__heading">Method</h2>
             <MethodLoop />
           </section>
 
-          {/* ── REC Software ── */}
           <section id="ro-rec" className="pd-section ro-reveal">
             <p className="pd-section__label">REC · Software</p>
-            <h2 className="pd-section__heading">Tailored to every conversation</h2>
-            <div className="ro-gif-row">
-              {REC_FEATURE_CLIPS.map((clip) => (
-                <LoopClip key={clip.src} src={clip.src} label={clip.label} />
-              ))}
-            </div>
           </section>
+
+          <div className="ro-gif-row">
+            <StickyInsightClips clips={REC_INSIGHT_CLIPS} />
+          </div>
 
           {/* ── O Hardware ── */}
           <section id="ro-hardware" className="pd-section ro-reveal">
             <p className="pd-section__label">O · Hardware</p>
-            <h2 className="pd-section__heading">Paired up with hardware, record anytime</h2>
             <div className="ro-pair ro-pair--equal">
               <CaseImage
                 src="/rec-o/reco-hardware.png"
@@ -410,13 +551,19 @@ export default function RecODetail() {
             <div className="reco-graphs">
               <div className="reco-graph-stack">
                 <RecoHowItWorksGraph />
+                <h2 className="pd-section__heading reco-feature-flow__heading">
+                  Multiple touch points inform follow-up
+                </h2>
                 <FeatureFlowImage
-                  src="/rec-o/reco-featurepage.png"
+                  src="/rec-o/logistic.png"
                   alt="REC feature pages across Capture, Structure, and Note"
                 />
               </div>
               <RecoFollowUpGraph />
             </div>
+            <h2 className="pd-section__heading reco-feature-flow__heading">
+              Tailor every follow-up based on context, make it personal
+            </h2>
             <div className="ro-pair ro-pair--equal ro-pair--iteration">
               <FeatureFlowImage
                 src="/rec-o/reco-followup-insights.png"
@@ -427,6 +574,21 @@ export default function RecODetail() {
                 src="/rec-o/Reco2.0-followup.mp4"
                 label="Rec Follow-up tab looping preview"
                 plain
+              />
+            </div>
+            <h2 className="pd-section__heading reco-feature-flow__heading">
+              Your network, organized your way
+            </h2>
+            <div className="ro-pair ro-pair--equal ro-pair--contact">
+              <LoopClip
+                src="/rec-o/reco2.0-contact.mp4"
+                label="Rec contact session looping preview"
+                plain
+              />
+              <CaseImage
+                src="/rec-o/frequent.png"
+                alt="Frequent contacts from conversations you can follow up with later"
+                frame="white"
               />
             </div>
           </section>
@@ -441,16 +603,6 @@ export default function RecODetail() {
                 alt="REC UI iterations — wireframe to high-fidelity home screen"
                 frame="white"
               />
-              <CaseImage
-                src="/rec-o/reco-iteration-home.png"
-                alt="Iterating user flow — REC app screens across design iterations"
-              />
-              <CaseImage
-                src="/rec-o/reco-userflow.png"
-                alt="REC user flow diagram across screens"
-                frame="white"
-                wide
-              />
             </div>
           </section>
 
@@ -459,19 +611,21 @@ export default function RecODetail() {
             <section id="ro-form" className="pd-section">
               <p className="pd-section__label">Form Inspiration</p>
               <h2 className="pd-section__heading">Technology as Accessory</h2>
-              <CaseImage
-                src="/rec-o/form-inspiration.jpg"
-                alt="Form studies and material inspiration for the REC-O pin"
-                wide
-              />
             </section>
 
-            <section id="ro-prototypes" className="pd-section">
-              <CaseImage
-                src="/rec-o/prototypes-1.png"
-                alt="Hardware prototype iterations — size and layout studies"
-                wide
-              />
+            <section id="ro-flow-iterations" className="pd-section">
+              <div className="ro-pair ro-pair--stack">
+                <CaseImage
+                  src="/rec-o/reco-iteration-home.png"
+                  alt="Iterating user flow — REC app screens across design iterations"
+                />
+                <CaseImage
+                  src="/rec-o/reco-userflow.png"
+                  alt="REC user flow diagram across screens"
+                  frame="white"
+                  wide
+                />
+              </div>
             </section>
           </FormIterationsDisclosure>
 

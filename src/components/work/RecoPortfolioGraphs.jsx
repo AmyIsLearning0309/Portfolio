@@ -133,7 +133,7 @@ export function RecoHowItWorksGraph() {
                     <rect
                       key={barIndex}
                       x={133 + barIndex * 6}
-                      y={240 - height / 2}
+                      y={260 - height / 2}
                       width="3"
                       height={height}
                       rx="1.5"
@@ -147,71 +147,31 @@ export function RecoHowItWorksGraph() {
 
             {index === 1 && (
               <g className="reco-graph__structure-icon" aria-hidden="true">
-                <path d="M 480 216 L 462 234 M 480 216 L 498 234 M 462 234 L 498 234" />
-                <circle cx="480" cy="216" r="4" />
-                <circle cx="462" cy="234" r="4" />
-                <circle cx="498" cy="234" r="4" />
+                <path d="M 480 248 L 462 266 M 480 248 L 498 266 M 462 266 L 498 266" />
+                <circle cx="480" cy="248" r="4" />
+                <circle cx="462" cy="266" r="4" />
+                <circle cx="498" cy="266" r="4" />
               </g>
             )}
 
-            {index === 2 ? (
-              <g className="reco-graph__note-icon" aria-label="Note">
-                <path d="M 779 222 H 801 L 811 232 V 258 H 779 Z" />
-                <path d="M 801 222 V 232 H 811" />
-                <path d="M 786 241 H 804 M 786 248 H 804" />
+            {index === 2 && (
+              <g className="reco-graph__note-icon" aria-hidden="true">
+                <path d="M 779 242 H 801 L 811 252 V 278 H 779 Z" />
+                <path d="M 801 242 V 252 H 811" />
+                <path d="M 786 261 H 804 M 786 268 H 804" />
               </g>
-            ) : (
-              <text
-                x={stage.x}
-                y={index === 0 ? 294 : 274}
-                textAnchor="middle"
-                className={
-                  index === 1
-                    ? "reco-graph__hub-label"
-                    : "reco-graph__node-label"
-                }
-              >
-                {stage.label}
-              </text>
-            )}
-
-            {index !== 0 && (
-              <text
-                x={stage.x}
-                y={index === 1 ? 298 : 294}
-                textAnchor="middle"
-                className={
-                  index === 1
-                    ? "reco-graph__node-sub reco-graph__node-sub--inverse"
-                    : "reco-graph__node-label"
-                }
-              >
-                {index === 1 ? "speech to meaning" : "Note"}
-              </text>
             )}
 
             <text
               x={stage.x}
-              y="360"
+              y={360}
               textAnchor="middle"
-              className="reco-graph__phase"
+              className="reco-graph__node-label"
             >
-              0{index + 1} / {stage.sub}
+              {stage.label}
             </text>
           </g>
         ))}
-
-        <g className="reco-graph__orbit-labels" style={{ '--i': 4 }}>
-          <text x="322.5" y="195" textAnchor="middle">
-            Transcript
-          </text>
-          <text x="637.5" y="195" textAnchor="middle">
-            Summary
-          </text>
-          <text x="637.5" y="334" textAnchor="middle">
-            Insights
-          </text>
-        </g>
       </svg>
     </GraphSection>
   );
@@ -293,22 +253,17 @@ export function RecoFollowUpGraph() {
         </text>
 
         <circle cx="480" cy="260" r="70" className="reco-graph__hub" />
-        <text
-          x="480"
-          y="254"
-          textAnchor="middle"
-          className="reco-graph__hub-label"
+        {/* Context matrix — 2×2 mark from Group 930 */}
+        <g
+          className="reco-graph__composer-icon"
+          aria-label="Context composer"
+          style={{ "--i": 4 }}
         >
-          Context
-        </text>
-        <text
-          x="480"
-          y="278"
-          textAnchor="middle"
-          className="reco-graph__hub-label"
-        >
-          composer
-        </text>
+          <circle cx="469" cy="249" r="9" />
+          <circle cx="491" cy="249" r="9" />
+          <circle cx="469" cy="271" r="9" className="reco-graph__composer-icon__fill" />
+          <circle cx="491" cy="271" r="9" />
+        </g>
 
         <path
           d="M 550 260 C 630 260 648 260 712 260"
@@ -326,22 +281,22 @@ export function RecoFollowUpGraph() {
           rx="24"
           className="reco-graph__surface"
         />
-        <text
-          x="787"
-          y="247"
-          textAnchor="middle"
-          className="reco-graph__node-label"
+        {/* Follow-up editable — page + pencil */}
+        <g
+          className="reco-graph__edit-icon"
+          aria-label="Follow-up editable"
+          style={{ "--i": 5 }}
         >
-          Follow-up
-        </text>
-        <text
-          x="787"
-          y="275"
-          textAnchor="middle"
-          className="reco-graph__node-sub"
-        >
-          editable
-        </text>
+          <rect x="758" y="228" width="44" height="56" rx="6" />
+          <path d="M 768 244 H 792" />
+          <path d="M 768 256 H 792" />
+          <path d="M 768 268 H 784" />
+          <path d="M 820 250 L 830 260" />
+          <path
+            className="reco-graph__edit-icon__fill"
+            d="M 798 272 L 820 250 L 830 260 L 808 282 L 794 284 Z"
+          />
+        </g>
 
         <path
           d="M 537 219 C 566 130 683 130 712 219"

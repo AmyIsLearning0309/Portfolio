@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
-import CursorCircle from './components/ui/CursorCircle';
 import ScrollToTop from './components/ui/ScrollToTop';
 import Home from './pages/Home';
 import About from './pages/About';
@@ -15,7 +14,6 @@ function App() {
   return (
     <>
       <ScrollToTop />
-      <CursorCircle />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />

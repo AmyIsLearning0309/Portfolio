@@ -12,6 +12,12 @@ const TEAL_DIST_SQ = 110 * 110;
 /** When canvas sampling fails, force white over known teal media */
 const TEAL_FALLBACK_SEL =
   '.pd-hero-img, .sd-journey-figure img, .sd-hscroll__item img, .sd-hscroll__progress-bar';
+
+/** Follow tightness — higher = snappier (was 0.12, felt laggy) */
+const FOLLOW_LERP = 0.42;
+/** Sample contrast every N frames to keep the RAF loop light */
+const CONTRAST_SAMPLE_EVERY = 3;
+
 /** WCAG relative luminance — 0 (black) → 1 (white) */
 const relativeLuminance = ({ r, g, b }) => {
   const lin = [r, g, b].map((c) => {
@@ -34,11 +40,12 @@ export default function CursorCircle() {
   const rafRef = useRef(0);
   const contrastPageRef = useRef(null); // 'siemens' | 'home' | null
   const invertRef = useRef(false);
+  const hoveringRef = useRef(false);
+  const labelRef = useRef('');
+  const visibleRef = useRef(false);
+  const frameRef = useRef(0);
   const sampleCache = useRef(new Map()); // img src → { canvas, ctx, w, h }
   const [enabled, setEnabled] = useState(false);
-  const [hovering, setHovering] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const [label, setLabel] = useState('');
   const [invert, setInvert] = useState(false);
   const { pathname } = useLocation();
   const isSiemens = pathname === '/work/siemens';
@@ -64,6 +71,25 @@ export default function CursorCircle() {
       if (!el) return '';
       const labeled = el.closest?.('[data-cursor-label]');
       return labeled?.getAttribute('data-cursor-label')?.trim() || '';
+    };
+
+    const syncClasses = () => {
+      const el = ringRef.current;
+      if (!el) return;
+      el.classList.toggle('is-visible', visibleRef.current);
+      el.classList.toggle('is-hover', hoveringRef.current);
+      el.classList.toggle('is-pill', Boolean(labelRef.current));
+      const pill = el.querySelector('.cursor-circle__pill');
+      if (pill && pill.textContent !== labelRef.current) {
+        pill.textContent = labelRef.current;
+      }
+    };
+
+    const setHoverState = (nextHover, nextLabel) => {
+      if (hoveringRef.current === nextHover && labelRef.current === nextLabel) return;
+      hoveringRef.current = nextHover;
+      labelRef.current = nextLabel;
+      syncClasses();
     };
 
     const parseRgb = (css) => {
@@ -112,7 +138,6 @@ export default function CursorCircle() {
       if (!rgb) return false;
       if (distSq(rgb, SIEMENS_TEAL) <= TEAL_DIST_SQ) return true;
       const { h, s, l } = rgbToHsl(rgb);
-      // Nearby cyan–teal fills in Figma PNG slides
       return s > 0.32 && l > 0.22 && l < 0.78 && h >= 150 && h <= 200;
     };
 
@@ -150,7 +175,6 @@ export default function CursorCircle() {
         if (data[3] < 40) return null;
         return { r: data[0], g: data[1], b: data[2] };
       } catch {
-        // CORS / tainted canvas — caller uses selector fallback
         sampleCache.current.delete(src);
         return null;
       }
@@ -192,9 +216,7 @@ export default function CursorCircle() {
       if (!rgb) return false;
       if (page === 'siemens') return isTealLike(rgb);
       if (page === 'home') {
-        // Dark fills / thumbnails → white cursor for contrast
         if (relativeLuminance(rgb) < 0.42) return true;
-        // Mid teal Siemens card thumbnail
         if (isTealLike(rgb)) return true;
         return false;
       }
@@ -206,7 +228,6 @@ export default function CursorCircle() {
       const rgb = sampleColorUnder(x, y);
       if (rgb && needsLightCursor(rgb, page)) return true;
 
-      // Siemens: selector fallback when canvas is tainted
       if (page === 'siemens') {
         const stack = document.elementsFromPoint?.(x, y) || [];
         const hit = stack.find((n) => n.nodeType === 1 && !n.closest?.('.cursor-circle'));
@@ -221,22 +242,25 @@ export default function CursorCircle() {
     const onMove = (e) => {
       target.current.x = e.clientX;
       target.current.y = e.clientY;
-      setVisible(true);
+
+      if (!visibleRef.current) {
+        visibleRef.current = true;
+        syncClasses();
+      }
 
       const el = e.target.closest?.(INTERACTIVE);
       if (el && !el.closest?.('.cursor-circle')) {
-        setHovering(true);
-        setLabel(readLabel(el));
+        setHoverState(true, readLabel(el));
       } else if (!e.target.closest?.('.cursor-circle')) {
-        setHovering(false);
-        setLabel('');
+        setHoverState(false, '');
       }
     };
 
     const onLeave = () => {
-      setVisible(false);
-      setHovering(false);
-      setLabel('');
+      visibleRef.current = false;
+      hoveringRef.current = false;
+      labelRef.current = '';
+      syncClasses();
       if (invertRef.current) {
         invertRef.current = false;
         setInvert(false);
@@ -246,8 +270,7 @@ export default function CursorCircle() {
     const onOver = (e) => {
       const el = e.target.closest?.(INTERACTIVE);
       if (el && !el.closest?.('.cursor-circle')) {
-        setHovering(true);
-        setLabel(readLabel(el));
+        setHoverState(true, readLabel(el));
       }
     };
 
@@ -255,26 +278,23 @@ export default function CursorCircle() {
       const next = e.relatedTarget;
       const stillHot = next?.closest?.(INTERACTIVE);
       if (stillHot && !stillHot.closest?.('.cursor-circle')) {
-        setHovering(true);
-        setLabel(readLabel(stillHot));
+        setHoverState(true, readLabel(stillHot));
       } else {
-        setHovering(false);
-        setLabel('');
+        setHoverState(false, '');
       }
     };
 
     const tick = () => {
-      // Soft follow — lower lerp = longer, more gradual trail
-      pos.current.x += (target.current.x - pos.current.x) * 0.12;
-      pos.current.y += (target.current.y - pos.current.y) * 0.12;
+      pos.current.x += (target.current.x - pos.current.x) * FOLLOW_LERP;
+      pos.current.y += (target.current.y - pos.current.y) * FOLLOW_LERP;
       const el = ringRef.current;
       if (el) {
         el.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0)`;
       }
 
-      // Contrast-aware pages: sample under pointer once per frame
       const page = contrastPageRef.current;
-      if (page) {
+      frameRef.current += 1;
+      if (page && frameRef.current % CONTRAST_SAMPLE_EVERY === 0) {
         const nextInvert = shouldInvertAt(target.current.x, target.current.y, page);
         if (nextInvert !== invertRef.current) {
           invertRef.current = nextInvert;
@@ -304,8 +324,6 @@ export default function CursorCircle() {
 
   if (!enabled) return null;
 
-  const showPill = Boolean(label);
-
   return (
     <div
       ref={ringRef}
@@ -313,9 +331,6 @@ export default function CursorCircle() {
         'cursor-circle',
         isSiemens ? 'cursor-circle--siemens' : '',
         invert ? 'cursor-circle--invert' : '',
-        visible ? 'is-visible' : '',
-        hovering ? 'is-hover' : '',
-        showPill ? 'is-pill' : '',
       ]
         .filter(Boolean)
         .join(' ')}
@@ -349,7 +364,7 @@ export default function CursorCircle() {
           strokeWidth="2"
         />
       </svg>
-      <div className="cursor-circle__pill">{label}</div>
+      <div className="cursor-circle__pill" />
     </div>
   );
 }

@@ -30,7 +30,17 @@
   height: auto;
 }
 
-/* Feature flow still — simple fade in */
+.reco-graph-stack .reco-feature-flow__heading,
+.reco-detail .reco-feature-flow__heading {
+  margin: 0 0 clamp(0.75rem, 1.5vw, 1.25rem);
+  color: color-mix(in srgb, var(--color-ink-muted) 50%, transparent);
+}
+
+.reco-detail .reco-feature-flow__heading + .ro-pair {
+  margin-top: 0;
+}
+
+/* Feature flow still — fade in + optional red connector draw */
 .reco-feature-flow .ro-media__frame {
   overflow: hidden;
   position: relative;
@@ -66,6 +76,66 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+/* Red logistic connector — traced from reco-featurepage.png, draws L→R */
+.reco-flow-line {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.reco-flow-line__path {
+  fill: none;
+  stroke: #ab5c5c;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+}
+
+.reco-flow-line__dot {
+  fill: #ab5c5c;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0);
+}
+
+.reco-feature-flow--lined.is-visible .reco-flow-line__path {
+  opacity: 1;
+  animation: reco-flow-draw 1.65s cubic-bezier(0.4, 0, 0.2, 1) 0.2s forwards;
+}
+
+/* Start anchors appear as the draw begins; end anchors when it finishes */
+.reco-feature-flow--lined.is-visible .reco-flow-line__dot:nth-child(4),
+.reco-feature-flow--lined.is-visible .reco-flow-line__dot:nth-child(5),
+.reco-feature-flow--lined.is-visible .reco-flow-line__dot:nth-child(6) {
+  animation: reco-flow-dot 0.3s ease 0.15s forwards;
+}
+
+.reco-feature-flow--lined.is-visible .reco-flow-line__dot:nth-child(7),
+.reco-feature-flow--lined.is-visible .reco-flow-line__dot:nth-child(8),
+.reco-feature-flow--lined.is-visible .reco-flow-line__dot:nth-child(9) {
+  animation: reco-flow-dot 0.35s ease 1.55s forwards;
+}
+
+@keyframes reco-flow-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes reco-flow-dot {
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -164,7 +234,9 @@
 .reco-graph__wave,
 .reco-graph__sound-bars,
 .reco-graph__structure-icon,
-.reco-graph__note-icon {
+.reco-graph__note-icon,
+.reco-graph__composer-icon,
+.reco-graph__edit-icon {
   opacity: 0;
 }
 
@@ -206,9 +278,9 @@
 .reco-graph__node-label {
   fill: var(--reco-ink);
   font-family: inherit;
-  font-size: 18px;
+  font-size: var(--text-sm);
   font-weight: var(--weight-regular);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .reco-graph__number,
@@ -273,6 +345,30 @@
   stroke-linejoin: round;
 }
 
+.reco-graph__composer-icon circle {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.88);
+  stroke-width: 2;
+}
+
+.reco-graph__composer-icon__fill {
+  fill: #ffffff;
+  stroke: none;
+}
+
+.reco-graph__edit-icon path,
+.reco-graph__edit-icon rect {
+  fill: none;
+  stroke: var(--reco-ink);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.reco-graph__edit-icon path.reco-graph__edit-icon__fill {
+  fill: #ffffff;
+}
+
 .reco-graph.is-visible .reco-graph__line {
   animation: reco-line-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   animation-delay: calc(0.1s + var(--i, 0) * 0.11s);
@@ -297,7 +393,9 @@
 .reco-graph.is-visible .reco-graph__wave,
 .reco-graph.is-visible .reco-graph__sound-bars,
 .reco-graph.is-visible .reco-graph__structure-icon,
-.reco-graph.is-visible .reco-graph__note-icon {
+.reco-graph.is-visible .reco-graph__note-icon,
+.reco-graph.is-visible .reco-graph__composer-icon,
+.reco-graph.is-visible .reco-graph__edit-icon {
   animation: reco-label-in 0.46s ease forwards;
   animation-delay: calc(0.36s + var(--i, 0) * 0.11s);
 }
@@ -389,7 +487,7 @@
 
   .reco-graph__node-label,
   .reco-graph__hub-label {
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
 
   .reco-graph__node-sub,
@@ -412,7 +510,9 @@
   .reco-graph__wave,
   .reco-graph__sound-bars,
   .reco-graph__structure-icon,
-  .reco-graph__note-icon {
+  .reco-graph__note-icon,
+  .reco-graph__composer-icon,
+  .reco-graph__edit-icon {
     animation: none !important;
     opacity: 1;
     stroke-dashoffset: 0;
@@ -425,7 +525,9 @@
   }
 
   .reco-feature-flow img,
-  .reco-feature-flow .ro-media__frame::after {
+  .reco-feature-flow .ro-media__frame::after,
+  .reco-flow-line__path,
+  .reco-flow-line__dot {
     animation: none !important;
   }
 
@@ -437,5 +539,15 @@
 
   .reco-feature-flow .ro-media__frame::after {
     content: none;
+  }
+
+  .reco-flow-line__path {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  .reco-flow-line__dot {
+    opacity: 1;
+    transform: scale(1);
   }
 }

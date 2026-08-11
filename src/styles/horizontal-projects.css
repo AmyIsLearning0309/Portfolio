@@ -1,11 +1,19 @@
 /* ============================================================
-   HORIZONTAL STAGE — intro + projects on one track (diana.lu)
-   Vertical scroll → translateX on sticky stage
+   SELECTED WORKS — intro + projects stacked vertically
    ============================================================ */
 
 .home-page {
   min-height: 100%;
   background: #ffffff;
+  /* Four type treatments only (display / title / body / meta) */
+  --home-display-size: clamp(2.25rem, 4.8vw, 3.25rem);
+  --home-display-tracking: -0.04em;
+  --home-title-size: clamp(1.25rem, 2.2vw, 1.75rem);
+  --home-title-tracking: -0.03em;
+  --home-body-size: var(--text-sm);
+  --home-body-tracking: -0.01em;
+  --home-meta-size: var(--text-xs);
+  --home-meta-tracking: 0.02em;
 }
 
 .home-page main {
@@ -14,41 +22,26 @@
 
 .hx {
   position: relative;
-}
-
-/* Native y-snap while homepage stage is mounted */
-html.hx-scroll-snap {
-  scroll-snap-type: y mandatory;
+  height: auto;
 }
 
 .hx__snap-rail {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.hx__snap-stop {
-  height: 100vh;
-  height: 100svh;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
+  display: none;
 }
 
 .hx__stage {
-  position: sticky;
-  top: 0;
+  position: relative;
+  top: auto;
   z-index: 1;
-  height: 100svh;
-  display: flex;
-  align-items: stretch;
-  overflow: hidden;
+  height: auto;
+  overflow: visible;
+  display: block;
   background: #ffffff;
-  /* Full-bleed canvas under the navbar */
-  padding-top: var(--navbar-height);
+  /* Full-bleed under navbar; match former left padding for intro */
+  padding: calc(var(--navbar-height) + var(--space-6)) var(--container-pad) var(--space-16);
 }
 
-/* Foot stack — affiliation + contacts pinned to bottom */
+/* Foot stack — affiliation */
 .hx__intro-foot {
   display: flex;
   flex-direction: column;
@@ -59,91 +52,46 @@ html.hx-scroll-snap {
   padding-bottom: var(--space-5);
 }
 
-.hx__contacts {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.35rem 0;
-}
-
-/* Mobile-only footer contacts — after project cards */
-.hx__contacts--page-end {
-  display: none;
-}
-
-.hx__contacts-link {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-regular);
-  color: var(--color-ink-secondary);
-  letter-spacing: -0.01em;
-  transition: color var(--transition-fast);
-}
-
-.hx__contacts-link:not(:last-child)::after {
-  content: '·';
-  margin-inline: 0.65rem;
-  color: var(--color-ink-muted);
-  pointer-events: none;
-}
-
-.hx__contacts-link:hover {
-  color: var(--color-ink);
-}
-
+/* Desktop: intro left + projects column right */
 .hx__track {
-  display: flex;
-  align-items: stretch;
-  gap: clamp(2rem, 4vw, 3.5rem);
-  /* Shared card sizing — keeps intro aligned with thumbnail tops */
-  --hx-card-avail-h: calc(100svh - var(--navbar-height) - 2rem);
-  --hx-card-head-h: 3rem;
-  --hx-card-head-h-align: 2.35rem;
-  --hx-card-scale: 0.8;
-  --hx-card-width: calc(
-    min(
-        calc(100vw - 160px),
-        calc(
-          (var(--hx-card-avail-h) - var(--hx-card-head-h) - var(--space-4)) * 16 / 10
-        )
-      ) * var(--hx-card-scale)
-  );
-  --hx-card-media-h: calc(
-    (var(--hx-card-avail-h) - var(--hx-card-head-h) - var(--space-4)) *
-      var(--hx-card-scale)
-  );
-  --hx-card-media-h-actual: min(
-    var(--hx-card-media-h),
-    calc(var(--hx-card-width) * 10 / 16)
-  );
-  --hx-card-total-h: calc(
-    var(--hx-card-media-h-actual) + var(--space-4) + var(--hx-card-head-h-align)
-  );
-  /* Edge-to-edge; only trailing pad so the last card can clear */
+  display: grid;
+  grid-template-columns: minmax(15rem, 20rem) minmax(0, 1fr);
+  column-gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: start;
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
   padding: 0;
-  padding-right: var(--container-pad);
-  will-change: transform;
-  height: 100%;
+  height: auto;
   box-sizing: border-box;
 }
 
-/* ── Intro panel — pinned left while projects scroll past ── */
+.hx__projects {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(2.5rem, 5vw, 4rem);
+  min-width: 0;
+  width: 100%;
+}
+
+/* ── Intro — sticky left column ── */
 .hx__intro {
-  position: relative;
-  z-index: 3;
-  flex: 0 0 auto;
-  width: max-content;
-  height: 100%;
+  position: sticky;
+  top: calc(var(--navbar-height) + var(--space-6));
+  z-index: 2;
+  flex: none;
+  width: 100%;
+  max-width: none;
+  height: calc(100svh - var(--navbar-height) - var(--space-6) - var(--space-6));
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
   overflow: visible;
-  padding: var(--space-6) var(--space-8) var(--space-6) var(--container-pad);
+  padding: 0;
   box-sizing: border-box;
-  /* Cover cards as they slide underneath */
   background: #ffffff;
-  will-change: transform;
 }
 
 .hx__intro-inner {
@@ -154,37 +102,20 @@ html.hx-scroll-snap {
   align-items: flex-start;
   width: fit-content;
   max-width: min(22rem, 100%);
-  margin: calc(
-      (100svh - var(--navbar-height) - var(--hx-card-total-h)) / 2 -
-        var(--space-6)
-    )
-    0 0;
+  margin: 0;
   gap: 0;
 }
 
 .hx__intro-heading {
-  /* Greeting above; photo then name on the next row */
-  --hx-name-size: clamp(2.25rem, 4.8vw, 3.25rem);
+  /* Name + photo on one row */
   display: grid;
-  grid-template-columns: auto max-content;
+  grid-template-columns: max-content auto;
   column-gap: var(--space-4);
-  row-gap: var(--space-3);
   align-items: center;
   margin: 0 0 var(--space-4);
 }
 
-.hx__intro-greeting {
-  grid-column: 1 / -1;
-  display: block;
-  font-size: clamp(0.95rem, 1.5vw, 1.125rem);
-  font-weight: var(--weight-regular);
-  letter-spacing: -0.01em;
-  line-height: 1.35;
-  color: var(--color-ink-muted);
-}
-
 .hx__intro-photo-link {
-  grid-column: 1;
   display: block;
   line-height: 0;
   transition: opacity var(--transition-fast);
@@ -205,11 +136,10 @@ html.hx-scroll-snap {
 }
 
 .hx__intro-name {
-  grid-column: 2;
   display: block;
-  font-size: var(--hx-name-size);
+  font-size: var(--home-display-size);
   font-weight: var(--weight-regular);
-  letter-spacing: -0.04em;
+  letter-spacing: var(--home-display-tracking);
   line-height: 1;
   color: var(--color-ink);
   white-space: nowrap;
@@ -217,23 +147,23 @@ html.hx-scroll-snap {
 
 .hx__intro-tagline {
   margin: 0;
-  width: 0;
-  min-width: 100%;
-  font-size: clamp(0.875rem, 1.2vw, 0.95rem);
+  width: 100%;
+  min-width: 0;
+  font-size: var(--home-body-size);
   font-weight: var(--weight-regular);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--home-body-tracking);
   line-height: 1.55;
   text-transform: none;
-  color: var(--color-ink-secondary);
+  color: var(--color-ink);
 }
 
 .hx__intro-subtitle {
   text-transform: none;
-  font-size: 0.8125rem;
+  font-size: var(--home-body-size);
   font-weight: var(--weight-regular);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--home-body-tracking);
   line-height: 1.55;
-  color: var(--color-ink-muted);
+  color: var(--color-ink-secondary);
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -290,16 +220,16 @@ html.hx-scroll-snap {
 
 /* ── Project cards ── */
 .hx__card {
-  flex: 0 0 auto;
-  width: var(--hx-card-width);
+  flex: none;
+  width: 100%;
   max-width: none;
-  max-height: calc(var(--hx-card-avail-h) * var(--hx-card-scale));
+  max-height: none;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
   text-decoration: none;
   color: inherit;
-  align-self: center;
+  align-self: stretch;
 }
 
 .hx__card--preview {
@@ -317,48 +247,11 @@ html.hx-scroll-snap {
   color: inherit;
 }
 
-.hx__card-head {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  flex-shrink: 0;
-  width: 100%;
-}
-
-.hx__card-meta {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: var(--space-2);
-  margin-left: auto;
-}
-
-.hx__card-title {
-  font-size: clamp(1.35rem, 2.4vw, 2rem);
-  font-weight: var(--weight-regular);
-  letter-spacing: -0.035em;
-  line-height: var(--leading-snug);
-  color: var(--color-ink);
-  margin: 0;
-}
-
-.hx__card-year {
-  flex-shrink: 0;
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  letter-spacing: 0.04em;
-  color: var(--color-ink-muted);
-  font-variant-numeric: tabular-nums;
-}
-
 .hx__card-media {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
-  max-height: var(--hx-card-media-h-actual);
+  aspect-ratio: 3 / 2;
+  max-height: none;
   border-radius: 0;
   overflow: hidden;
   background: var(--color-bg-surface);
@@ -406,180 +299,64 @@ html.hx-scroll-snap {
   transform: scale(1.03);
 }
 
-.hx__card-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  pointer-events: none;
-}
-
-.hx__card-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.4rem 0.85rem;
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  letter-spacing: 0.02em;
-  color: var(--color-ink);
-  background: #ffffff;
-  border: 1px solid rgba(20, 20, 20, 0.12);
-  /* Explicit pill shape — overrides global sharp-corner reset */
-  border-radius: 9999px !important;
-}
-
-/* ── Tablet + mobile: vertical stack, normal page scroll ──
+/* ── Tablet + mobile tweaks ──
    Also match max-device-width so iOS “Request Desktop Website”
-   still stacks (that mode fakes a ~1024px CSS viewport). */
+   still uses the tighter layout. */
 @media (max-width: 1023px), (max-device-width: 1023px) {
-  html.hx-scroll-snap {
-    scroll-snap-type: none;
-  }
-
-  .hx__snap-rail {
-    display: none;
-  }
-
-  .hx,
-  .hx.hx--stacked {
-    height: auto !important;
-  }
-
-  .hx .hx__stage,
-  .hx--stacked .hx__stage {
-    position: relative;
-    top: auto;
-    height: auto;
-    overflow: visible;
-    display: block;
+  .hx__stage {
     padding: calc(var(--navbar-height) + var(--space-6)) var(--space-5) var(--space-12);
   }
 
-  .hx .hx__track,
-  .hx--stacked .hx__track {
+  .hx__track {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: clamp(2rem, 5vw, 3rem);
-    height: auto;
-    width: 100%;
     max-width: 40rem;
     margin-inline: auto;
-    padding: 0;
-    transform: none !important;
-    will-change: auto;
-    --hx-card-width: 100%;
-    --hx-card-scale: 1;
-    --hx-card-media-h-actual: none;
+    gap: clamp(2rem, 5vw, 3rem);
   }
 
-  .hx .hx__intro,
-  .hx--stacked .hx__intro {
+  .hx__projects {
+    gap: clamp(2rem, 5vw, 3rem);
+  }
+
+  .hx__intro {
     position: relative;
-    flex: none;
-    width: 100%;
-    max-width: none;
+    top: auto;
     height: auto;
+    max-width: none;
     padding: 0 0 var(--space-2);
-    transform: none !important;
     background: transparent;
-    will-change: auto;
   }
 
-  .hx .hx__intro-inner,
-  .hx--stacked .hx__intro-inner {
+  .hx__intro-inner {
     width: 100%;
     max-width: 100%;
-    margin-top: 0;
   }
 
-  .hx .hx__intro-foot,
-  .hx--stacked .hx__intro-foot {
+  .hx__intro-foot {
     margin-top: var(--space-6);
     padding-bottom: 0;
   }
 
-  /* Contacts move under the last project card on mobile */
-  .hx .hx__contacts--intro,
-  .hx--stacked .hx__contacts--intro {
-    display: none;
-  }
-
-  .hx .hx__contacts--page-end,
-  .hx--stacked .hx__contacts--page-end {
-    display: flex;
-    width: 100%;
-    box-sizing: border-box;
-    margin-top: var(--space-6);
-    padding: 0 var(--page-pad-x)
-      calc(var(--space-8) + env(safe-area-inset-bottom, 0px));
-  }
-
-  .hx .hx__intro-heading,
-  .hx--stacked .hx__intro-heading {
+  .hx__intro-heading {
     width: 100%;
     min-width: 0;
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 
-  .hx .hx__intro-tagline,
-  .hx .hx__intro-subtitle,
-  .hx--stacked .hx__intro-tagline,
-  .hx--stacked .hx__intro-subtitle {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .hx .hx__intro-name,
-  .hx--stacked .hx__intro-name {
+  .hx__intro-name {
     font-size: clamp(2.25rem, 8vw, 3.25rem);
     white-space: normal;
     overflow-wrap: anywhere;
   }
 
-  .hx .hx__intro-role,
-  .hx .hx__intro-link,
-  .hx--stacked .hx__intro-role,
-  .hx--stacked .hx__intro-link {
+  .hx__intro-role,
+  .hx__intro-link {
     white-space: normal;
   }
 
-  .hx .hx__card,
-  .hx--stacked .hx__card {
-    flex: none;
-    width: 100%;
-    max-width: none;
-    max-height: none;
-    align-self: stretch;
-  }
-
-  .hx .hx__card-media,
-  .hx--stacked .hx__card-media {
-    max-height: none;
-  }
-
-  .hx .hx__card:hover .hx__card-img,
-  .hx--stacked .hx__card:hover .hx__card-img {
+  .hx__card:hover .hx__card-img {
     transform: none;
-  }
-
-  .hx .hx__card-title,
-  .hx--stacked .hx__card-title {
-    font-size: clamp(0.85rem, 3vw, 1.05rem);
-  }
-
-  .hx .hx__card-pill,
-  .hx--stacked .hx__card-pill {
-    padding: 0.15rem 0.45rem;
-    font-size: 0.6rem;
-  }
-
-  .hx .hx__card-year,
-  .hx--stacked .hx__card-year {
-    font-size: 0.65rem;
-  }
-
-  .hx .hx__card-meta,
-  .hx--stacked .hx__card-meta {
-    gap: 0.35rem;
   }
 }

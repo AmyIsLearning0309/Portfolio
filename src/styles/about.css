@@ -11,27 +11,19 @@
 /* ── Story: sticky copy + scrolling collage ── */
 .about__story {
   position: relative;
-  padding-top: calc(var(--navbar-height) + var(--space-16));
+  padding-top: calc(var(--navbar-height) + var(--space-32));
   padding-bottom: var(--space-24);
   min-height: 220vh;
 }
 
 .about__story-sticky {
   position: sticky;
-  top: calc(var(--navbar-height) + var(--space-10));
+  top: calc(var(--navbar-height) + var(--space-24));
   z-index: 1;
   width: min(42rem, calc(100% - 2 * var(--container-pad)));
   margin: 0 auto;
   padding-inline: var(--container-pad);
   box-sizing: border-box;
-}
-
-.about__label {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  letter-spacing: 0.02em;
-  color: var(--color-ink-muted);
-  margin: 0 0 var(--space-6);
 }
 
 .about__bio {
@@ -106,21 +98,10 @@
 /* ── Experience ── */
 .about__experience {
   padding-block: var(--space-24);
-  border-top: 1px solid var(--color-border);
 }
 
 .about__experience-inner {
   max-width: 960px;
-}
-
-.about__experience-heading {
-  text-align: center;
-  font-size: var(--text-sm);
-  font-weight: var(--weight-bold);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-ink);
-  margin: 0 0 var(--space-16);
 }
 
 .about__exp-list {
@@ -139,35 +120,68 @@
   align-items: start;
 }
 
+.about__exp-company {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
 .about__exp-org {
-  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
-  font-weight: var(--weight-bold);
-  letter-spacing: -0.02em;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+  font-weight: var(--weight-medium);
+  letter-spacing: -0.03em;
+  line-height: 1.45;
   color: var(--color-ink);
   margin: 0;
-  line-height: var(--leading-snug);
 }
 
 .about__exp-role {
-  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
-  font-weight: var(--weight-bold);
-  letter-spacing: -0.02em;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+  font-weight: var(--weight-medium);
+  letter-spacing: -0.03em;
+  line-height: 1.45;
   color: var(--color-ink);
   margin: 0 0 var(--space-2);
 }
 
 .about__exp-dates {
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  letter-spacing: 0.04em;
-  color: var(--color-ink-muted);
-  margin: 0 0 var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  letter-spacing: -0.01em;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--color-ink-muted) 50%, transparent);
+  margin: 0;
+}
+
+.about__exp-resume {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2em;
+  width: fit-content;
+  text-decoration: none;
+  margin: 0 0 var(--space-10);
+  transition: color var(--transition-fast);
+}
+
+.about__exp-resume:hover {
+  color: var(--color-ink);
+}
+
+.about__exp-resume-arrow {
+  display: inline-block;
+  font-size: 0.95em;
+  line-height: 1;
 }
 
 .about__exp-desc {
   font-size: var(--text-sm);
-  line-height: var(--leading-normal);
-  color: var(--color-ink-secondary);
+  font-weight: var(--weight-regular);
+  letter-spacing: -0.01em;
+  line-height: 1.55;
+  color: var(--color-ink);
   margin: 0;
   max-width: 36ch;
 }
@@ -175,51 +189,28 @@
 /* ── Let's Connect ── */
 .about__connect {
   padding-block: var(--space-20) var(--space-24);
-  border-top: 1px solid var(--color-border);
 }
 
 .about__connect-inner {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--space-12);
+  align-items: flex-end;
+  gap: var(--space-8);
   flex-wrap: wrap;
 }
 
-.about__connect-heading {
-  font-size: clamp(1.75rem, 3vw, 2.5rem);
-  font-weight: var(--weight-bold);
-  letter-spacing: -0.035em;
-  color: var(--color-ink);
-  margin: 0 0 var(--space-4);
-}
-
-.about__connect-text {
-  font-size: var(--text-base);
-  line-height: var(--leading-loose);
-  color: var(--color-ink-secondary);
-  margin: 0;
-}
-
-.about__connect-link {
-  color: var(--color-ink);
-  text-decoration: underline;
-  text-underline-offset: 0.18em;
-}
-
-.about__connect-link:hover {
-  color: var(--color-ink-secondary);
-}
-
-.about__connect-nav {
+.about__connect-contact {
   display: flex;
-  gap: var(--space-16);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
 }
 
 .about__connect-col {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-6);
 }
 
 .about__connect-col a {
@@ -272,9 +263,5 @@
   .about__exp-item {
     grid-template-columns: 1fr;
     gap: var(--space-2);
-  }
-
-  .about__connect-inner {
-    flex-direction: column;
   }
 }

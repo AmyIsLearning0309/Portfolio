@@ -4,7 +4,7 @@ import '../../styles/table-of-contents.css';
 /**
  * Fixed left-side table of contents with scroll tracking + back-to-top.
  * Uses Siemens-style auto-hide: slides away once the threshold section is
- * in view; “Show Content” / “<” reveals or tucks it again.
+ * in view; an arrow / “<” reveals or tucks it again.
  *
  * Props:
  *   sections — array of { id: string, label: string }
@@ -23,9 +23,9 @@ export default function TableOfContents({
 
   const [activeId, setActiveId] = useState(sections[0]?.id ?? '');
   const [showTop, setShowTop] = useState(false);
-  /** Once true, TOC stays tucked until the user clicks Show Content (no auto-reopen). */
+  /** Once true, TOC stays tucked until the user clicks the reveal arrow (no auto-reopen). */
   const [dismissed, setDismissed] = useState(false);
-  /** User pinned the panel open via Show Content; cleared when crossing threshold again. */
+  /** User pinned the panel open via reveal; cleared when crossing threshold again. */
   const [manualOpen, setManualOpen] = useState(false);
   const pastRef = useRef(false);
   const observerRef = useRef(null);
@@ -181,12 +181,15 @@ export default function TableOfContents({
       {dismissed && isCollapsed && (
         <button
           type="button"
-          className="toc__reveal toc__reveal--collapsed"
+          className="toc__reveal toc__reveal--collapsed toc__reveal--icon"
           aria-expanded={false}
           aria-controls="toc-panel"
+          aria-label="Show content"
           onClick={handleRevealToggle}
         >
-          Show Content
+          <span className="toc__reveal-chevron" aria-hidden="true">
+            →
+          </span>
         </button>
       )}
     </aside>
