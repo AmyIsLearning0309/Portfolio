@@ -144,9 +144,11 @@ function MethodLoop() {
   );
 }
 
-function CaseImage({ src, alt, caption, wide, frame = 'default' }) {
+function CaseImage({ src, alt, caption, wide, frame = 'default', className = '' }) {
   return (
-    <figure className={`ro-media${wide ? ' ro-media--wide' : ''}`}>
+    <figure
+      className={`ro-media${wide ? ' ro-media--wide' : ''}${className ? ` ${className}` : ''}`}
+    >
       <div
         className={`ro-media__frame${frame === 'white' ? ' ro-media__frame--white' : ''}`}
       >
@@ -533,6 +535,9 @@ function ContactPairScroll() {
     }
     gradStartedRef.current = false;
     setGradReveal(0);
+    if (gradHostRef.current) {
+      gradHostRef.current.style.opacity = '';
+    }
     gradRectsRef.current.forEach((el) => {
       el.style.transition = 'none';
       el.style.opacity = '0';
@@ -567,6 +572,11 @@ function ContactPairScroll() {
       el.style.transition = `opacity ${BAND_DUR}s ease ${i * STAGGER}s`;
       el.style.opacity = '1';
     });
+
+    // Ensure host is visible even if --open class races a tick late.
+    if (gradHostRef.current) {
+      gradHostRef.current.style.opacity = '1';
+    }
 
     const totalMs = (BAND_DUR + Math.max(0, rects.length - 1) * STAGGER) * 1000;
     const start = performance.now();
@@ -622,15 +632,18 @@ function ContactPairScroll() {
     let raf = 0;
     const update = () => {
       raf = 0;
-      // Mobile: gate on the second phone bottom; desktop: whole stage bottom.
-      const target =
-        isMobileContact() && moverRef.current ? moverRef.current : stage;
+      const mobile = isMobileContact();
+      // Mobile: gate on the second phone; desktop: whole stage bottom.
+      const target = mobile && moverRef.current ? moverRef.current : stage;
       const rect = target.getBoundingClientRect();
       const vh = window.innerHeight;
-      const bottomInView = rect.bottom <= vh && rect.bottom > 0;
+      // Tall phones often never get bottom <= vh until late; use in-view band on mobile.
+      const inView = mobile
+        ? rect.top < vh * 0.8 && rect.bottom > vh * 0.2
+        : rect.bottom <= vh && rect.bottom > 0;
       const fullyOut = rect.bottom < 0 || rect.top > vh;
 
-      if (bottomInView) startSequence();
+      if (inView) startSequence();
       else if (fullyOut) resetSequence();
     };
     const onScroll = () => {
@@ -1322,7 +1335,23 @@ export default function RecODetail() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Try it <span className="ro-try-link__arrow" aria-hidden="true">↗</span>
+                Try it{' '}
+                <span className="ro-try-link__arrow" aria-hidden="true">
+                  <svg
+                    width="11"
+                    height="11"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M3.5 2H10V8.5M10 2L2 10"
+                      stroke="currentColor"
+                      strokeWidth="1.25"
+                      strokeLinecap="square"
+                    />
+                  </svg>
+                </span>
               </a>
             </header>
 
@@ -1357,6 +1386,7 @@ export default function RecODetail() {
             src="/rec-o/scenario.png"
             alt="REC in use during a conversation — phone showing CoffeeNotes while recording"
             wide
+            className="ro-media--desktop-only"
           />
 
           <section id="ro-rec" className="pd-section ro-reveal">
