@@ -10,14 +10,16 @@ const photos = [
 ];
 
 /* Paste Google Drive resume URL when ready */
-const RESUME_URL = '#';
+const RESUME_URL =
+  'https://drive.google.com/file/d/1OXkyewR-3xAktKFL-rCaDET8hYSpXcar/view?usp=sharing';
 
 const experience = [
   {
     org: 'Mochi Health',
-    role: 'Associate Designer',
+    role: 'Product Designer',
     dates: 'May 2026 – Present',
-    desc: '',
+    desc:
+      'Owned the redesign of key marketplace experiences across web & mobile, improving onboarding workflows, medication request, and conversion by 20%.',
   },
   {
     org: 'Siemens Industry Software Inc.',
@@ -54,7 +56,7 @@ export default function About() {
         <section className="about__story" aria-label="About Amy">
           <div className="about__story-sticky">
             <p className="about__bio">
-              I&apos;m Amy Ai, a product designer who is passionate about crafting
+              Hi! I&apos;m Amy Ai, a product designer who is passionate about crafting
               experiences that connect people with technology in intuitive ways.
               <br />
               <br />
@@ -113,6 +115,24 @@ export default function About() {
                 </li>
               ))}
             </ul>
+
+            <ul className="about__exp-list about__exp-list--education" aria-label="Education">
+              <li className="about__exp-item">
+                <div className="about__exp-company">
+                  <p className="about__exp-org">Education</p>
+                </div>
+                <div className="about__exp-detail">
+                  <div className="about__exp-school">
+                    <p className="about__exp-role">Rhode Island School of Design</p>
+                    <p className="about__exp-desc">2022–2026</p>
+                  </div>
+                  <div className="about__exp-school">
+                    <p className="about__exp-role">Brown University</p>
+                    <p className="about__exp-desc">2022–2026</p>
+                  </div>
+                </div>
+              </li>
+            </ul>
           </div>
         </section>
 
@@ -139,10 +159,10 @@ export default function About() {
                   Email
                 </a>
                 <a
-                  href="/resume.pdf"
+                  href={RESUME_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="View resume (PDF)"
+                  aria-label="View resume (opens in a new tab)"
                   title="View resume"
                 >
                   Resume

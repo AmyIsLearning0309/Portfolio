@@ -10,30 +10,33 @@
 
 /* ── Story: sticky copy + scrolling collage ── */
 .about__story {
+  /* Keep sticky engaged for the full collage scroll (no end drift). */
+  --about-bio-lock: calc(var(--navbar-height) + 48vh);
   position: relative;
-  padding-top: calc(var(--navbar-height) + var(--space-32));
-  padding-bottom: var(--space-24);
-  min-height: 220vh;
+  padding-top: var(--about-bio-lock);
+  padding-bottom: var(--space-16);
 }
 
 .about__story-sticky {
+  /* Same as padding-top → already locked on first paint; no slide-up. */
   position: sticky;
-  top: calc(var(--navbar-height) + var(--space-24));
+  top: var(--about-bio-lock);
   z-index: 1;
-  width: min(42rem, calc(100% - 2 * var(--container-pad)));
+  width: min(960px, calc(100% - 2 * var(--container-pad)));
   margin: 0 auto;
   padding-inline: var(--container-pad);
   box-sizing: border-box;
 }
 
 .about__bio {
-  font-family: var(--font-display);
-  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
-  font-weight: var(--weight-medium);
-  letter-spacing: -0.03em;
-  line-height: 1.45;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  letter-spacing: -0.01em;
+  line-height: var(--leading-normal);
   color: var(--color-ink);
   margin: 0 0 var(--space-8);
+  width: 100%;
+  max-width: none;
 }
 
 .about__edu {
@@ -64,7 +67,7 @@
   gap: clamp(4rem, 10vh, 8rem);
   width: min(1100px, calc(100% - 2 * var(--container-pad)));
   margin: 0 auto;
-  padding: 35vh 0 var(--space-16);
+  padding: 35vh 0 var(--space-8);
   pointer-events: none;
 }
 
@@ -89,8 +92,7 @@
   height: auto;
   aspect-ratio: 5 / 6;
   object-fit: cover;
-  /* Intentional soft photo corners (Framer reference) */
-  border-radius: 25px !important;
+  border-radius: 0;
   box-shadow: 0 18px 50px rgba(20, 20, 20, 0.12);
   pointer-events: auto;
 }
@@ -113,6 +115,10 @@
   gap: var(--space-12);
 }
 
+.about__exp-list--education {
+  margin-top: var(--space-24);
+}
+
 .about__exp-item {
   display: grid;
   grid-template-columns: minmax(10rem, 1fr) minmax(14rem, 1.15fr);
@@ -128,23 +134,32 @@
 }
 
 .about__exp-org {
-  font-family: var(--font-display);
-  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
-  font-weight: var(--weight-medium);
-  letter-spacing: -0.03em;
-  line-height: 1.45;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  letter-spacing: -0.01em;
+  line-height: var(--leading-normal);
   color: var(--color-ink);
   margin: 0;
 }
 
 .about__exp-role {
-  font-family: var(--font-display);
-  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
-  font-weight: var(--weight-medium);
-  letter-spacing: -0.03em;
-  line-height: 1.45;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  letter-spacing: -0.01em;
+  line-height: var(--leading-normal);
   color: var(--color-ink);
   margin: 0 0 var(--space-2);
+}
+
+.about__exp-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.about__exp-school {
+  min-width: 0;
 }
 
 .about__exp-dates {
@@ -181,7 +196,7 @@
   font-weight: var(--weight-regular);
   letter-spacing: -0.01em;
   line-height: 1.55;
-  color: var(--color-ink);
+  color: color-mix(in srgb, var(--color-ink-muted) 50%, transparent);
   margin: 0;
   max-width: 36ch;
 }

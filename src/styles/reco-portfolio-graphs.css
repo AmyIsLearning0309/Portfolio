@@ -40,6 +40,15 @@
   margin-top: 0;
 }
 
+.reco-detail .ro-gif-row + .ro-contact-scroll {
+  margin-top: clamp(6rem, 20vh, 11rem);
+}
+
+.reco-detail .reco-feature-flow__index {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-ink-muted) 50%, transparent);
+}
+
 /* Feature flow still — fade in + optional red connector draw */
 .reco-feature-flow .ro-media__frame {
   overflow: hidden;
@@ -141,7 +150,7 @@
 
 .reco-graph {
   color: var(--reco-ink);
-  font-family: "Satoshi", "Helvetica Neue", sans-serif;
+  font-family: var(--font-body);
 }
 
 .reco-graph__header {
@@ -277,7 +286,7 @@
 
 .reco-graph__node-label {
   fill: var(--reco-ink);
-  font-family: inherit;
+  font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: var(--weight-regular);
   letter-spacing: -0.01em;

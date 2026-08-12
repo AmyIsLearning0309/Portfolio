@@ -90,8 +90,8 @@ function ArrowMarker({ id }) {
 export function RecoHowItWorksGraph() {
   const stages = [
     { label: "Capture", sub: "preserve", x: 165 },
-    { label: "Structure", sub: "understand", x: 480 },
-    { label: "Note", sub: "act", x: 795 },
+    { label: "Synthesize", sub: "understand", x: 480 },
+    { label: "Actionable Insights", sub: "act", x: 795 },
   ];
 
   return (
@@ -100,7 +100,7 @@ export function RecoHowItWorksGraph() {
         className="reco-graph__svg"
         viewBox="0 0 960 520"
         role="img"
-        aria-label="Capture flows through Structure into a Note and action."
+        aria-label="Capture flows through Synthesize into Actionable Insights."
       >
         <ArrowMarker id="reco-system-arrow" />
 
@@ -168,7 +168,19 @@ export function RecoHowItWorksGraph() {
               textAnchor="middle"
               className="reco-graph__node-label"
             >
-              {stage.label}
+              {stage.label.includes(' ') ? (
+                stage.label.split(' ').map((word, wi, words) => (
+                  <tspan
+                    key={word}
+                    x={stage.x}
+                    dy={wi === 0 ? 0 : '1.15em'}
+                  >
+                    {word}
+                  </tspan>
+                ))
+              ) : (
+                stage.label
+              )}
             </text>
           </g>
         ))}
@@ -298,20 +310,6 @@ export function RecoFollowUpGraph() {
           />
         </g>
 
-        <path
-          d="M 537 219 C 566 130 683 130 712 219"
-          pathLength="1"
-          className="reco-graph__line reco-graph__line--loop"
-          style={{ "--i": 6 }}
-        />
-        <text
-          x="624.5"
-          y="126"
-          textAnchor="middle"
-          className="reco-graph__phase"
-        >
-          refine
-        </text>
       </svg>
     </GraphSection>
   );

@@ -6,16 +6,31 @@
   --ro-accent: #c45c6a;
   --ro-muted: rgba(85, 76, 76, 0.55);
   --color-ink: #554c4c;
+  --font-display: 'Kumbh Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Kumbh Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: var(--font-body);
   background: #ffffff;
   color: #554c4c;
+  font-family: var(--font-body);
+}
+
+.reco-detail .reco-graph__svg text {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  letter-spacing: -0.01em;
 }
 
 /* Full-page white canvas while on Rec-O */
 body:has(.reco-detail) {
   --color-ink: #554c4c;
+  --font-display: 'Kumbh Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Kumbh Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: var(--font-body);
   background-color: #ffffff;
   background-image: none;
   color: #554c4c;
+  font-family: var(--font-body);
 }
 
 body:has(.reco-detail) .navbar,
@@ -66,15 +81,15 @@ body:has(.reco-detail) .toc-shell .toc {
   gap: 0.35em;
   margin-top: var(--space-5);
   font-size: var(--text-sm);
-  font-weight: 700;
+  font-weight: var(--weight-regular);
   letter-spacing: -0.01em;
+  line-height: var(--leading-normal);
   color: var(--color-ink);
   text-decoration: none;
 }
 
 .reco-detail .ro-try-link__arrow {
-  font-weight: 700;
-  -webkit-text-stroke: 0.4px currentColor;
+  font-weight: var(--weight-regular);
 }
 
 .reco-detail .ro-try-link:hover {
@@ -135,6 +150,22 @@ body:has(.reco-detail) .toc-shell .toc {
   margin-inline: 0;
 }
 
+.ro-insights-draw {
+  margin-top: var(--space-10);
+}
+
+.ro-insights-draw__frame {
+  background: #ffffff;
+  line-height: 0;
+}
+
+.ro-insights-draw__frame svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
 .ro-media__frame {
   overflow: hidden;
   background: #eceae6;
@@ -167,7 +198,12 @@ body:has(.reco-detail) .toc-shell .toc {
   flex-direction: column;
   align-items: stretch;
   gap: 0;
-  margin: var(--space-10) 0 var(--space-8);
+  margin: var(--space-4) 0 var(--space-8);
+}
+
+#ro-rec.pd-section {
+  margin-top: var(--space-16);
+  margin-bottom: var(--space-4);
 }
 
 .ro-gif-row .ro-media--gif-left {
@@ -221,6 +257,7 @@ body:has(.reco-detail) .toc-shell .toc {
   flex: none;
   width: min(540px, 70vw);
   max-width: 100%;
+  gap: 0;
 }
 
 .ro-gif-feature-stack__clip {
@@ -255,6 +292,11 @@ body:has(.reco-detail) .toc-shell .toc {
   padding: 0;
 }
 
+/* Per-clip copy is mobile-only; desktop uses the sticky rail. */
+.ro-gif-feature-stack__copy--inline {
+  display: none;
+}
+
 .ro-gif-feature-stack__copy--hidden {
   visibility: hidden;
   pointer-events: none;
@@ -262,10 +304,11 @@ body:has(.reco-detail) .toc-shell .toc {
 
 .ro-gif-feature__index {
   margin: 0 0 var(--space-4);
-  font-size: var(--text-sm);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
   font-weight: var(--weight-regular);
-  letter-spacing: -0.01em;
-  line-height: 1.55;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
   color: var(--color-ink);
 }
 
@@ -406,8 +449,12 @@ body:has(.reco-detail) .toc-shell .toc {
 /* Poster stills — show full frame, no crop */
 .ro-pair--equal.ro-pair--posters {
   gap: var(--space-4);
-  margin-bottom: var(--space-4);
+  margin-bottom: 0;
   align-items: start;
+}
+
+.reco-detail .ro-in-use {
+  margin-bottom: clamp(var(--space-16), 12vw, var(--space-20));
 }
 
 .ro-pair--equal.ro-pair--posters .ro-media {
@@ -547,6 +594,186 @@ body:has(.reco-detail) .toc-shell .toc {
   pointer-events: none;
 }
 
+/* In-view auto-play: stacked contact phones → slide apart → gradient */
+.ro-contact-scroll {
+  position: relative;
+  height: auto;
+  width: 100%;
+  margin-top: var(--space-8);
+}
+
+.ro-contact-scroll__sticky {
+  position: relative;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding-block: clamp(1.5rem, 4vh, 3rem);
+}
+
+.ro-contact-stage {
+  --ro-contact-phone: min(345px, 38vw);
+  --ro-contact-gap: clamp(4.5rem, 9vw, 7.5rem);
+  --ro-contact-h: min(72vh, 640px);
+  --ro-contact-grad: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(1.75rem, 5vh, 3rem);
+}
+
+.reco-feature-flow__intro-above {
+  margin: 0;
+  width: min(42rem, 92vw);
+  text-align: center;
+  flex-shrink: 0;
+  color: color-mix(in srgb, var(--color-ink-muted) 50%, transparent);
+}
+
+.reco-feature-flow__intro-accent {
+  color: color-mix(
+    in srgb,
+    var(--color-ink) calc(var(--ro-contact-grad, 0) * 100%),
+    color-mix(in srgb, var(--color-ink-muted) 50%, transparent)
+      calc((1 - var(--ro-contact-grad, 0)) * 100%)
+  );
+}
+
+.ro-contact-stage__cluster {
+  position: relative;
+  width: calc(var(--ro-contact-phone) * 2 + var(--ro-contact-gap));
+  height: var(--ro-contact-h);
+  max-width: 100%;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.ro-contact-stage__phone {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ro-contact-stage__phone--base {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--ro-contact-phone);
+  height: 100%;
+  z-index: 3;
+  overflow: visible;
+}
+
+.ro-contact-stage__mover {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--ro-contact-phone);
+  height: 100%;
+  z-index: 2;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  transition: none;
+}
+
+.ro-contact-stage--open .ro-contact-stage__mover {
+  transform: translate3d(calc(100% + var(--ro-contact-gap)), 0, 0);
+  transition: transform 1.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ro-contact-stage--open .ro-contact-stage__mover {
+    transition: none;
+  }
+
+  .ro-contact-stage__grad,
+  .ro-contact-stage--open .ro-contact-stage__grad {
+    transition: none;
+    transition-delay: 0s;
+  }
+}
+
+.ro-contact-stage__frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ro-contact-stage__frame--white {
+  background: transparent;
+  position: relative;
+  z-index: 2;
+}
+
+.ro-contact-stage__phone--base .ro-contact-stage__frame {
+  overflow: visible;
+}
+
+.ro-contact-stage__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 118% !important;
+  height: 100% !important;
+  max-width: none;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  transform: translateX(-2%);
+}
+
+.ro-contact-stage__frame img:not(.ro-contact-stage__bg),
+.ro-contact-stage__frame video {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: auto;
+  height: 100%;
+  max-width: none;
+  object-fit: contain;
+  object-position: center;
+  pointer-events: none;
+}
+
+/* Gradient sits under the sliding phone, mostly peeking out to the left */
+.ro-contact-stage__grad {
+  position: absolute;
+  right: 72%;
+  top: 22%;
+  width: 78%;
+  height: 78%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: visible;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.ro-contact-stage--open .ro-contact-stage__grad {
+  opacity: 1;
+  transition-delay: 1.25s;
+}
+
+.ro-contact-stage__grad svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ro-contact-stage__phone--slide {
+  position: relative;
+  z-index: 2;
+}
+
 .ro-pair .ro-media__caption {
   flex-shrink: 0;
 }
@@ -573,6 +800,267 @@ body:has(.reco-detail) .toc-shell .toc {
   object-position: center;
 }
 
+/* Sticky scroll scrub for UI-iteration phones */
+.ro-iter-scroll {
+  position: relative;
+  height: 660vh;
+  width: 100%;
+}
+
+.ro-iter-scroll__sticky {
+  position: sticky;
+  top: var(--navbar-height);
+  min-height: calc(100svh - var(--navbar-height));
+  display: flex;
+  align-items: flex-start;
+  padding-top: clamp(0.75rem, 2.5vh, 1.5rem);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Five UI-iteration phones — even horizontal spread */
+.ro-iter-phones {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: center;
+  gap: clamp(0.5rem, 1.2vw, 1rem);
+  width: 100%;
+  margin: 0;
+  padding: clamp(0.5rem, 1.5vw, 1rem) clamp(0.75rem, 2vw, 1.5rem);
+  background: #ffffff;
+  box-sizing: border-box;
+  overflow: visible;
+  position: relative;
+}
+
+.ro-iter-phones__item {
+  margin: 0;
+  width: 100%;
+  min-width: 0;
+  position: relative;
+  will-change: transform, opacity;
+}
+
+.ro-iter-phones__item img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  object-position: center center;
+}
+
+.ro-iter-phones__item--stay {
+  z-index: 2;
+  transform-origin: center center;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.ro-iter-phones__final {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ro-iter-phones__lines {
+  position: absolute;
+  left: 68%;
+  top: 38%;
+  width: 92%;
+  height: 78%;
+  pointer-events: none;
+  z-index: 3;
+  transition: opacity 0.2s ease;
+}
+
+.ro-iter-phones__lines svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Wide left+right callouts for phone 5 — nudge like .ro-iter-phones__lines */
+.ro-iter-phones__lines5 {
+  position: absolute;
+  left: 44%;
+  top: 72%;
+  width: 260%;
+  height: 36%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 4;
+  transition: opacity 0.2s ease;
+}
+
+.ro-iter-phones__lines5 svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Match annotation SVG ink (#5C4B4B) — under enlarged stay phone */
+.ro-iter-phones__caption {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 0.65rem);
+  transform: translateX(-50%);
+  margin: 0;
+  z-index: 5;
+  pointer-events: none;
+  font-family: inherit;
+  font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+  font-weight: var(--weight-regular);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--color-ink-muted) 50%, transparent);
+  transition: opacity 0.2s ease;
+}
+
+.ro-iter-phones__item--morph {
+  isolation: isolate;
+}
+
+.ro-iter-phones__item--morph .ro-iter-phones__morph {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  pointer-events: none;
+}
+
+.ro-iter-phones__item--enter {
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.ro-iter-phones__item--enter .ro-iter-phones__enter {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+@media (max-width: 720px) {
+  .ro-iter-scroll {
+    height: auto;
+  }
+
+  .ro-iter-scroll__sticky {
+    position: static;
+    min-height: 0;
+  }
+
+  .ro-iter-phones {
+    gap: 0.35rem;
+    padding: 0.75rem 0.5rem;
+    overflow: visible;
+  }
+
+  .ro-iter-phones__item--exit {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .ro-iter-phones__item--stay {
+    transform: none !important;
+  }
+
+  .ro-iter-phones__lines {
+    display: none;
+  }
+
+  .ro-iter-phones__lines5 {
+    display: none;
+  }
+
+  .ro-iter-phones__caption {
+    display: none;
+  }
+
+  .ro-iter-phones__item--stay img {
+    opacity: 1 !important;
+  }
+
+  .ro-iter-phones__final {
+    display: none;
+  }
+
+  .ro-iter-phones__item--morph img {
+    opacity: 1 !important;
+  }
+
+  .ro-iter-phones__item--morph .ro-iter-phones__morph {
+    display: none;
+  }
+
+  .ro-iter-phones__item--enter img:first-of-type {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .ro-iter-phones__item--enter .ro-iter-phones__enter {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ro-iter-scroll {
+    height: auto;
+  }
+
+  .ro-iter-scroll__sticky {
+    position: static;
+    min-height: 0;
+  }
+
+  .ro-iter-phones__item--exit {
+    display: none;
+  }
+
+  .ro-iter-phones {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 28rem;
+    margin-inline: auto;
+  }
+
+  .ro-iter-phones__item--morph img:first-of-type {
+    opacity: 0 !important;
+    position: absolute;
+    inset: 0;
+  }
+
+  .ro-iter-phones__item--morph .ro-iter-phones__morph {
+    position: static;
+    opacity: 1 !important;
+    height: auto;
+  }
+
+  .ro-iter-phones__item--enter img:first-of-type {
+    opacity: 0 !important;
+    position: absolute;
+    inset: 0;
+  }
+
+  .ro-iter-phones__item--enter .ro-iter-phones__enter {
+    position: static;
+    opacity: 1 !important;
+    transform: none !important;
+    height: auto;
+  }
+}
+
 .ro-split {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -597,6 +1085,18 @@ body:has(.reco-detail) .toc-shell .toc {
   font-size: var(--text-sm);
   line-height: 1.6;
   color: var(--color-ink-secondary);
+}
+
+.ro-color-after-collapse {
+  margin: var(--space-6) 0 var(--space-8);
+  width: 100%;
+  display: none;
+}
+
+.ro-color-after-collapse img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .ro-reveal {
@@ -822,6 +1322,80 @@ body:has(.reco-detail) .toc-shell .toc {
     max-height: min(72vh, 640px);
   }
 
+  .ro-contact-scroll {
+    height: auto;
+  }
+
+  .ro-contact-scroll__sticky {
+    position: static;
+    min-height: 0;
+  }
+
+  .ro-contact-stage {
+    --ro-contact-phone: min(340px, 78vw);
+    --ro-contact-h: auto;
+  }
+
+  .ro-contact-stage__cluster {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-6);
+    width: 100%;
+    height: auto;
+  }
+
+  .ro-contact-stage__phone--base {
+    position: static;
+    width: var(--ro-contact-phone);
+    height: auto;
+  }
+
+  .ro-contact-stage__mover {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: var(--ro-contact-phone);
+    height: auto;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .ro-contact-stage--open .ro-contact-stage__mover {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .ro-contact-stage__frame {
+    height: auto;
+  }
+
+  .ro-contact-stage__frame img,
+  .ro-contact-stage__frame video {
+    width: 100%;
+    height: auto;
+    max-height: min(72vh, 640px);
+  }
+
+  /* Keep gradient; pin it to the bottom of the contacts phone */
+  .ro-contact-stage__grad {
+    display: block;
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: 0;
+    width: 88%;
+    height: 58%;
+    transform: translateX(-50%);
+    transition-delay: 0s;
+  }
+
+  .ro-contact-stage--open .ro-contact-stage__grad {
+    opacity: 1;
+    transition-delay: 0s;
+  }
+
   .ro-pair--stack .ro-media__frame {
     aspect-ratio: auto;
   }
@@ -831,7 +1405,7 @@ body:has(.reco-detail) .toc-shell .toc {
     object-fit: contain;
   }
 
-  /* Feature phone clips — keep viewport stack on small screens */
+  /* Feature phone clips — stack each mp4 with its copy underneath */
   .ro-gif-row {
     flex-direction: column;
     align-items: center;
@@ -841,7 +1415,7 @@ body:has(.reco-detail) .toc-shell .toc {
   .ro-gif-row .ro-media--gif-left {
     width: min(340px, 78vw);
     max-width: 100%;
-    min-height: 100svh;
+    min-height: 0;
     margin-inline: auto;
   }
 
@@ -855,7 +1429,7 @@ body:has(.reco-detail) .toc-shell .toc {
   }
 
   .ro-gif-feature .ro-media--gif-left {
-    min-height: 100svh;
+    min-height: 0;
     width: min(340px, 78vw);
   }
 
@@ -866,29 +1440,48 @@ body:has(.reco-detail) .toc-shell .toc {
   }
 
   .ro-gif-feature-stack {
-    flex-direction: column-reverse;
+    flex-direction: column;
     align-items: center;
-    gap: var(--space-6);
+    gap: var(--space-12);
   }
 
   .ro-gif-feature-stack__clips {
-    width: min(340px, 78vw);
+    width: min(340px, 92vw);
+    gap: var(--space-12);
+  }
+
+  .ro-gif-feature-stack__clip {
+    min-height: 0;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: var(--space-5);
+    padding-block: 0;
+  }
+
+  .ro-gif-feature-stack__clip .ro-media--gif-left {
+    width: 100%;
   }
 
   .ro-gif-feature-stack__rail {
-    width: min(22rem, 100%);
-    padding-top: 0;
-    padding-bottom: 0;
-    align-self: stretch;
+    display: none;
+  }
+
+  .ro-gif-feature-stack__copy--inline {
+    display: block;
+    position: static;
+    width: 100%;
+    max-width: none;
+    visibility: visible;
   }
 
   .ro-gif-feature-stack__copy {
-    position: sticky;
-    top: calc(var(--navbar-height) + var(--space-4));
+    position: static;
+    top: auto;
     width: 100%;
-    background: #ffffff;
-    z-index: 2;
-    padding-block: var(--space-4);
+    background: transparent;
+    z-index: auto;
+    padding-block: 0;
   }
 
   .ro-media--gif-left {
