@@ -647,31 +647,6 @@ body:has(.reco-detail) .toc-shell .toc {
   color: color-mix(in srgb, var(--color-ink-muted) 50%, transparent);
 }
 
-.reco-feature-flow__intro-below-scenario {
-  margin: clamp(5rem, 14vh, 9rem) auto clamp(5rem, 14vh, 9rem);
-  width: 100%;
-  max-width: none;
-}
-
-.reco-detail .ro-media--desktop-only {
-  margin-bottom: 0;
-}
-
-.reco-detail #ro-rec.pd-section {
-  margin-top: 0;
-}
-
-.ro-contact-stage__scenario {
-  width: 100%;
-  margin: 0;
-}
-
-.ro-contact-stage__scenario .ro-media__frame img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
 .reco-feature-flow__intro-accent {
   color: color-mix(
     in srgb,
@@ -1015,11 +990,26 @@ body:has(.reco-detail) .toc-shell .toc {
     overflow: visible;
   }
 
-  /* Grow the stay phone’s layout box (not a tiny upscale) so 3/5 stay sharp. */
+  /*
+    Enlarge the stay phone, but cap so phone + callouts stay on-screen.
+    Phone 3 callouts hang ~60% past the right edge (span 1.6×).
+    Phone 5 callouts span ~2.6× and are roughly centered.
+    Shift phone 3 left so its right-side notes remain visible.
+  */
   .ro-iter-phones__item--stay {
-    transform: none !important;
+    --ro-iter-stay-max: calc(
+      82vw
+        - var(--ro-iter-annot3, 0) * 26vw * (1 - var(--ro-iter-annot5, 0))
+        - var(--ro-iter-annot5, 0) * 48vw
+    );
+    transform: translateX(
+      calc(var(--ro-iter-annot3, 0) * (1 - var(--ro-iter-annot5, 0)) * -28%)
+    ) !important;
     width: calc(100% + var(--ro-iter-enlarge, 0) * 310%);
-    max-width: min(82vw, calc((100svh - var(--navbar-height) - 4.5rem) * 0.52));
+    max-width: min(
+      var(--ro-iter-stay-max),
+      calc((100svh - var(--navbar-height) - 5.5rem) * 0.5)
+    );
     justify-self: center;
     z-index: 4;
   }
@@ -1037,18 +1027,19 @@ body:has(.reco-detail) .toc-shell .toc {
     object-fit: contain;
   }
 
+  /* Keep desktop annotation proportions so the fit math holds. */
   .ro-iter-phones__lines {
-    left: 62%;
-    top: 36%;
-    width: 110%;
-    height: 82%;
+    left: 68%;
+    top: 38%;
+    width: 92%;
+    height: 78%;
   }
 
   .ro-iter-phones__lines5 {
-    left: 50%;
-    top: 74%;
-    width: 280%;
-    height: 42%;
+    left: 44%;
+    top: 72%;
+    width: 260%;
+    height: 36%;
   }
 
   .ro-iter-phones__caption {
@@ -1366,17 +1357,24 @@ body:has(.reco-detail) .toc-shell .toc {
 
   .ro-contact-scroll {
     height: auto;
+    overflow: visible;
+    max-width: 100%;
   }
 
   .ro-contact-scroll__sticky {
     position: static;
     min-height: 0;
+    overflow: visible;
+    max-width: 100%;
   }
 
   .ro-contact-stage {
-    --ro-contact-phone: min(42vw, 168px);
-    --ro-contact-gap: clamp(1.25rem, 6vw, 2.25rem);
-    --ro-contact-h: min(52vh, 380px);
+    /* Two phones + gap always fit the content column (no right-phone clip). */
+    --ro-contact-phone: 47%;
+    --ro-contact-gap: 6%;
+    --ro-contact-h: auto;
+    max-width: 100%;
+    overflow: visible;
   }
 
   .ro-contact-stage .reco-feature-flow__intro-above {
@@ -1392,9 +1390,10 @@ body:has(.reco-detail) .toc-shell .toc {
   .ro-contact-stage__cluster {
     position: relative;
     display: block;
-    width: calc(var(--ro-contact-phone) * 2 + var(--ro-contact-gap));
-    height: var(--ro-contact-h);
+    width: 100%;
     max-width: 100%;
+    height: auto;
+    aspect-ratio: 1.15;
     overflow: visible;
   }
 
@@ -1414,7 +1413,7 @@ body:has(.reco-detail) .toc-shell .toc {
     height: 100%;
     margin-bottom: 0;
     overflow: visible;
-    /* Parked side-by-side; no slide on mobile. */
+    /* Final state only — parked side-by-side. */
     transform: translate3d(calc(100% + var(--ro-contact-gap)), 0, 0) !important;
     transition: none !important;
   }
@@ -1436,7 +1435,7 @@ body:has(.reco-detail) .toc-shell .toc {
     object-fit: contain;
   }
 
-  /* Same left-peek gradient as desktop, scaled for the pair. */
+  /* Same left-peek gradient as desktop — final state visible. */
   .ro-contact-stage__grad {
     display: block;
     right: 72%;
@@ -1447,12 +1446,14 @@ body:has(.reco-detail) .toc-shell .toc {
     height: 78%;
     transform: none;
     z-index: 1;
-    opacity: 0;
+    opacity: 1;
+    transition: none;
     transition-delay: 0s;
   }
 
   .ro-contact-stage--open .ro-contact-stage__grad {
     opacity: 1;
+    transition: none;
     transition-delay: 0s;
   }
 

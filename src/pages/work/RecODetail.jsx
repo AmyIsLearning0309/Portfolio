@@ -551,12 +551,13 @@ function ContactPairScroll() {
 
     gradStartedRef.current = true;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) {
+    if (reduce || isMobileContact()) {
       rects.forEach((el) => {
         el.style.transition = 'none';
         el.style.opacity = '1';
       });
       setGradReveal(1);
+      if (gradHostRef.current) gradHostRef.current.style.opacity = '1';
       return;
     }
 
@@ -593,6 +594,9 @@ function ContactPairScroll() {
   };
 
   const resetSequence = () => {
+    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches) {
+      return;
+    }
     if (startDelayRef.current) {
       clearTimeout(startDelayRef.current);
       startDelayRef.current = 0;
@@ -611,7 +615,7 @@ function ContactPairScroll() {
     slideStartedRef.current = true;
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // Mobile: no slide — park open and play gradient immediately.
+    // Mobile: last state only — parked open, gradient fully shown.
     if (reduce || isMobileContact()) {
       setOpen(true);
       slideDoneRef.current = true;
@@ -629,18 +633,17 @@ function ContactPairScroll() {
     const stage = stageRef.current;
     if (!stage) return undefined;
 
+    if (isMobileContact()) {
+      startSequence();
+      return undefined;
+    }
+
     let raf = 0;
     const update = () => {
       raf = 0;
-      const mobile = isMobileContact();
-      // Mobile: gate on the second phone; desktop: whole stage bottom.
-      const target = mobile && moverRef.current ? moverRef.current : stage;
-      const rect = target.getBoundingClientRect();
+      const rect = stage.getBoundingClientRect();
       const vh = window.innerHeight;
-      // Tall phones often never get bottom <= vh until late; use in-view band on mobile.
-      const inView = mobile
-        ? rect.top < vh * 0.8 && rect.bottom > vh * 0.2
-        : rect.bottom <= vh && rect.bottom > 0;
+      const inView = rect.bottom <= vh && rect.bottom > 0;
       const fullyOut = rect.bottom < 0 || rect.top > vh;
 
       if (inView) startSequence();
@@ -756,12 +759,6 @@ function ContactPairScroll() {
             The more you connect, the more it{' '}
             <span className="reco-feature-flow__intro-accent">shows</span>.
           </p>
-          <CaseImage
-            src="/rec-o/scenario.png"
-            alt="REC in use during a conversation — phone showing CoffeeNotes while recording"
-            wide
-            className="ro-contact-stage__scenario"
-          />
           <div className="ro-contact-stage__cluster">
             <figure className="ro-contact-stage__phone ro-contact-stage__phone--base">
               <div className="ro-contact-stage__frame">
@@ -1130,6 +1127,8 @@ function IterationPhonesScroll() {
                 style={{
                   transform: `scale(${stayScale})`,
                   '--ro-iter-enlarge': phase1,
+                  '--ro-iter-annot3': linesOpacity,
+                  '--ro-iter-annot5': lines5Opacity,
                 }}
               >
                 <img
@@ -1395,12 +1394,6 @@ export default function RecODetail() {
             wide
             className="ro-media--desktop-only"
           />
-          <p className="ro-gif-feature__index reco-feature-flow__intro-above reco-feature-flow__intro-below-scenario">
-            Notes are easy to forget. So are the small details that made the
-            conversation matter.
-            <br />
-            REC-O remembers them, so every follow-up feels like you never forgot.
-          </p>
 
           <section id="ro-rec" className="pd-section ro-reveal">
             <p className="pd-section__label">REC · Software</p>
