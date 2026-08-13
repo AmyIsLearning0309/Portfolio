@@ -991,23 +991,15 @@ body:has(.reco-detail) .toc-shell .toc {
   }
 
   /*
-    Enlarge the stay phone, but cap so phone + callouts stay on-screen.
-    Phone 3 callouts hang ~60% past the right edge (span 1.6×).
-    Phone 5 callouts span ~2.6× and are roughly centered.
-    Shift phone 3 left so its right-side notes remain visible.
+    One enlarged size/place for phones 3 and 5.
+    Cap to ~1/2.65 of the row so phone 5’s 2.6× callouts (and phone 3’s
+    right-side notes) stay on-screen without shifting.
   */
   .ro-iter-phones__item--stay {
-    --ro-iter-stay-max: calc(
-      82vw
-        - var(--ro-iter-annot3, 0) * 26vw * (1 - var(--ro-iter-annot5, 0))
-        - var(--ro-iter-annot5, 0) * 48vw
-    );
-    transform: translateX(
-      calc(var(--ro-iter-annot3, 0) * (1 - var(--ro-iter-annot5, 0)) * -28%)
-    ) !important;
+    transform: none !important;
     width: calc(100% + var(--ro-iter-enlarge, 0) * 310%);
     max-width: min(
-      var(--ro-iter-stay-max),
+      calc(100% / 2.65),
       calc((100svh - var(--navbar-height) - 5.5rem) * 0.5)
     );
     justify-self: center;

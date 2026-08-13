@@ -1127,8 +1127,6 @@ function IterationPhonesScroll() {
                 style={{
                   transform: `scale(${stayScale})`,
                   '--ro-iter-enlarge': phase1,
-                  '--ro-iter-annot3': linesOpacity,
-                  '--ro-iter-annot5': lines5Opacity,
                 }}
               >
                 <img
