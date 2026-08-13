@@ -1016,11 +1016,16 @@ body:has(.reco-detail) .toc-shell .toc {
   .ro-iter-phones__stay-stage {
     position: absolute;
     left: 50%;
-    top: 0;
+    top: 50%;
     width: calc(
       100% + var(--ro-iter-enlarge, 0) * (100cqw / 2.65 - 100%)
     );
-    transform: translateX(-50%);
+    /* Override desktop height: 100% — that boxed the stage to the 1/5
+       cell while the enlarged image was taller, so callouts sat on the
+       wrong part of the phone. */
+    height: auto;
+    transform: translate(-50%, -50%);
+    overflow: visible;
     z-index: 5;
   }
 
@@ -1285,6 +1290,11 @@ body:has(.reco-detail) .toc-shell .toc {
 }
 
 @media (max-width: 900px) {
+  .reco-detail .pd-section__label,
+  .reco-detail .pd-section__heading {
+    text-align: center;
+  }
+
   .ro-media--wide {
     margin-inline: 0;
   }
