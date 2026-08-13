@@ -869,6 +869,12 @@ body:has(.reco-detail) .toc-shell .toc {
   isolation: isolate;
 }
 
+.ro-iter-phones__stay-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .ro-iter-phones__final {
   position: absolute;
   inset: 0;
@@ -965,7 +971,7 @@ body:has(.reco-detail) .toc-shell .toc {
   will-change: transform, opacity;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 900px) {
   /* Keep the sticky scrub on mobile (same sequence as desktop). */
   .ro-iter-scroll {
     height: 560vh;
@@ -979,31 +985,43 @@ body:has(.reco-detail) .toc-shell .toc {
   .ro-iter-scroll__sticky {
     position: sticky;
     top: var(--navbar-height);
-    min-height: 0;
-    align-items: flex-start;
+    min-height: calc(100svh - var(--navbar-height));
+    align-items: center;
     padding-top: var(--space-3);
+    overflow: visible;
   }
 
   .ro-iter-phones {
     gap: 0.3rem;
     padding: 0.5rem 0.25rem;
     overflow: visible;
+    container-type: inline-size;
+    container-name: iter-phones;
   }
 
   /*
-    One enlarged size/place for phones 3 and 5.
-    Cap to ~1/2.65 of the row so phone 5’s 2.6× callouts (and phone 3’s
-    right-side notes) stay on-screen without shifting.
+    Grid cell stays 1/5 wide (holds the row). The inner stage grows to a
+    fixed share of the FULL row (cqw), not the cell — so 100%/2.65 isn’t
+    37% of a tiny column. Same size/place for phones 3 and 5.
   */
   .ro-iter-phones__item--stay {
     transform: none !important;
-    width: calc(100% + var(--ro-iter-enlarge, 0) * 310%);
-    max-width: min(
-      calc(100% / 2.65),
-      calc((100svh - var(--navbar-height) - 5.5rem) * 0.5)
+    width: 100%;
+    max-width: none;
+    z-index: 5;
+    overflow: visible;
+    aspect-ratio: 680 / 1309;
+  }
+
+  .ro-iter-phones__stay-stage {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: calc(
+      100% + var(--ro-iter-enlarge, 0) * (100cqw / 2.65 - 100%)
     );
-    justify-self: center;
-    z-index: 4;
+    transform: translateX(-50%);
+    z-index: 5;
   }
 
   .ro-iter-phones__item--stay img,
@@ -1019,7 +1037,6 @@ body:has(.reco-detail) .toc-shell .toc {
     object-fit: contain;
   }
 
-  /* Keep desktop annotation proportions so the fit math holds. */
   .ro-iter-phones__lines {
     left: 68%;
     top: 38%;
@@ -1511,7 +1528,7 @@ body:has(.reco-detail) .toc-shell .toc {
   .ro-gif-feature-stack__clip {
     min-height: 0;
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
     justify-content: flex-start;
     gap: var(--space-5);
     padding-block: 0;
@@ -1531,6 +1548,15 @@ body:has(.reco-detail) .toc-shell .toc {
     width: 100%;
     max-width: none;
     visibility: visible;
+    text-align: center;
+  }
+
+  .ro-gif-feature-stack__copy--inline .ro-gif-feature__index {
+    margin-bottom: 0;
+  }
+
+  .ro-gif-feature-stack .ro-gif-feature__body {
+    display: none;
   }
 
   .ro-gif-feature-stack__copy {

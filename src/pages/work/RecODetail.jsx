@@ -1129,45 +1129,47 @@ function IterationPhonesScroll() {
                   '--ro-iter-enlarge': phase1,
                 }}
               >
-                <img
-                  src={phone.src}
-                  alt={phone.alt}
-                  loading="lazy"
-                  style={{ opacity: 1 - phase3 }}
-                />
-                <img
-                  className="ro-iter-phones__final"
-                  src="/rec-o/5.png"
-                  alt="REC UI iteration screen 5"
-                  loading="lazy"
-                  style={{ opacity: phase3 }}
-                />
-                <div
-                  className="ro-iter-phones__lines"
-                  ref={linesHostRef}
-                  aria-hidden="true"
-                  style={{ opacity: linesOpacity }}
-                />
-                <div
-                  className="ro-iter-phones__lines5"
-                  ref={lines5HostRef}
-                  aria-hidden="true"
-                  style={{ opacity: lines5Opacity }}
-                />
-                <p
-                  className="ro-iter-phones__caption"
-                  aria-hidden={beforeLabelOpacity < 0.05}
-                  style={{ opacity: beforeLabelOpacity }}
-                >
-                  Before
-                </p>
-                <p
-                  className="ro-iter-phones__caption ro-iter-phones__caption--current"
-                  aria-hidden={currentLabelOpacity < 0.05}
-                  style={{ opacity: currentLabelOpacity }}
-                >
-                  Current
-                </p>
+                <div className="ro-iter-phones__stay-stage">
+                  <img
+                    src={phone.src}
+                    alt={phone.alt}
+                    loading="lazy"
+                    style={{ opacity: 1 - phase3 }}
+                  />
+                  <img
+                    className="ro-iter-phones__final"
+                    src="/rec-o/5.png"
+                    alt="REC UI iteration screen 5"
+                    loading="lazy"
+                    style={{ opacity: phase3 }}
+                  />
+                  <div
+                    className="ro-iter-phones__lines"
+                    ref={linesHostRef}
+                    aria-hidden="true"
+                    style={{ opacity: linesOpacity }}
+                  />
+                  <div
+                    className="ro-iter-phones__lines5"
+                    ref={lines5HostRef}
+                    aria-hidden="true"
+                    style={{ opacity: lines5Opacity }}
+                  />
+                  <p
+                    className="ro-iter-phones__caption"
+                    aria-hidden={beforeLabelOpacity < 0.05}
+                    style={{ opacity: beforeLabelOpacity }}
+                  >
+                    Before
+                  </p>
+                  <p
+                    className="ro-iter-phones__caption ro-iter-phones__caption--current"
+                    aria-hidden={currentLabelOpacity < 0.05}
+                    style={{ opacity: currentLabelOpacity }}
+                  >
+                    Current
+                  </p>
+                </div>
               </figure>
             );
           })}

@@ -242,6 +242,7 @@
 
 @media (max-width: 767px) {
   .about__story {
+    --about-bio-lock: calc(var(--navbar-height) + var(--space-6));
     min-height: 0;
     padding-bottom: var(--space-12);
   }
