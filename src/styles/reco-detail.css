@@ -647,6 +647,31 @@ body:has(.reco-detail) .toc-shell .toc {
   color: color-mix(in srgb, var(--color-ink-muted) 50%, transparent);
 }
 
+.reco-feature-flow__intro-below-scenario {
+  margin: clamp(5rem, 14vh, 9rem) auto clamp(5rem, 14vh, 9rem);
+  width: 100%;
+  max-width: none;
+}
+
+.reco-detail .ro-media--desktop-only {
+  margin-bottom: 0;
+}
+
+.reco-detail #ro-rec.pd-section {
+  margin-top: 0;
+}
+
+.ro-contact-stage__scenario {
+  width: 100%;
+  margin: 0;
+}
+
+.ro-contact-stage__scenario .ro-media__frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .reco-feature-flow__intro-accent {
   color: color-mix(
     in srgb,
@@ -969,20 +994,47 @@ body:has(.reco-detail) .toc-shell .toc {
   /* Keep the sticky scrub on mobile (same sequence as desktop). */
   .ro-iter-scroll {
     height: 560vh;
+    margin-top: 0;
+  }
+
+  #ro-architecture > .pd-section__heading:first-of-type {
+    margin-bottom: var(--space-3);
   }
 
   .ro-iter-scroll__sticky {
     position: sticky;
     top: var(--navbar-height);
-    min-height: calc(100svh - var(--navbar-height));
-    align-items: center;
-    padding-top: 0;
+    min-height: 0;
+    align-items: flex-start;
+    padding-top: var(--space-3);
   }
 
   .ro-iter-phones {
     gap: 0.3rem;
     padding: 0.5rem 0.25rem;
     overflow: visible;
+  }
+
+  /* Grow the stay phone’s layout box (not a tiny upscale) so 3/5 stay sharp. */
+  .ro-iter-phones__item--stay {
+    transform: none !important;
+    width: calc(100% + var(--ro-iter-enlarge, 0) * 310%);
+    max-width: min(82vw, calc((100svh - var(--navbar-height) - 4.5rem) * 0.52));
+    justify-self: center;
+    z-index: 4;
+  }
+
+  .ro-iter-phones__item--stay img,
+  .ro-iter-phones__item--stay .ro-iter-phones__final {
+    width: 100%;
+    height: auto;
+  }
+
+  .ro-iter-phones__final {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    object-fit: contain;
   }
 
   .ro-iter-phones__lines {
@@ -1322,8 +1374,9 @@ body:has(.reco-detail) .toc-shell .toc {
   }
 
   .ro-contact-stage {
-    --ro-contact-phone: min(340px, 78vw);
-    --ro-contact-h: auto;
+    --ro-contact-phone: min(42vw, 168px);
+    --ro-contact-gap: clamp(1.25rem, 6vw, 2.25rem);
+    --ro-contact-h: min(52vh, 380px);
   }
 
   .ro-contact-stage .reco-feature-flow__intro-above {
@@ -1337,61 +1390,62 @@ body:has(.reco-detail) .toc-shell .toc {
   }
 
   .ro-contact-stage__cluster {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-6);
-    width: 100%;
-    height: auto;
+    position: relative;
+    display: block;
+    width: calc(var(--ro-contact-phone) * 2 + var(--ro-contact-gap));
+    height: var(--ro-contact-h);
+    max-width: 100%;
     overflow: visible;
   }
 
   .ro-contact-stage__phone--base {
-    position: static;
+    position: absolute;
+    left: 0;
+    top: 0;
     width: var(--ro-contact-phone);
-    height: auto;
+    height: 100%;
   }
 
   .ro-contact-stage__mover {
-    position: relative;
-    left: auto;
-    top: auto;
+    position: absolute;
+    left: 0;
+    top: 0;
     width: var(--ro-contact-phone);
-    height: auto;
-    transform: none !important;
-    transition: none !important;
+    height: 100%;
+    margin-bottom: 0;
     overflow: visible;
-    /* Room for gradient peeking under the phone */
-    margin-bottom: clamp(3.5rem, 12vw, 5.5rem);
+    /* Parked side-by-side; no slide on mobile. */
+    transform: translate3d(calc(100% + var(--ro-contact-gap)), 0, 0) !important;
+    transition: none !important;
   }
 
   .ro-contact-stage--open .ro-contact-stage__mover {
-    transform: none !important;
+    transform: translate3d(calc(100% + var(--ro-contact-gap)), 0, 0) !important;
     transition: none !important;
   }
 
   .ro-contact-stage__frame {
-    height: auto;
+    height: 100%;
   }
 
   .ro-contact-stage__frame img,
   .ro-contact-stage__frame video {
     width: 100%;
-    height: auto;
-    max-height: min(72vh, 640px);
+    height: 100%;
+    max-height: none;
+    object-fit: contain;
   }
 
-  /* Peek gradient out under the contacts phone (desktop peeks left). */
+  /* Same left-peek gradient as desktop, scaled for the pair. */
   .ro-contact-stage__grad {
     display: block;
-    left: 50%;
-    right: auto;
-    top: auto;
-    bottom: 0;
-    width: 100%;
-    height: 55%;
-    transform: translate(-50%, 48%);
+    right: 72%;
+    left: auto;
+    top: 22%;
+    bottom: auto;
+    width: 78%;
+    height: 78%;
+    transform: none;
     z-index: 1;
     opacity: 0;
     transition-delay: 0s;

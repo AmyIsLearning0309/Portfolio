@@ -756,6 +756,12 @@ function ContactPairScroll() {
             The more you connect, the more it{' '}
             <span className="reco-feature-flow__intro-accent">shows</span>.
           </p>
+          <CaseImage
+            src="/rec-o/scenario.png"
+            alt="REC in use during a conversation — phone showing CoffeeNotes while recording"
+            wide
+            className="ro-contact-stage__scenario"
+          />
           <div className="ro-contact-stage__cluster">
             <figure className="ro-contact-stage__phone ro-contact-stage__phone--base">
               <div className="ro-contact-stage__frame">
@@ -1123,6 +1129,7 @@ function IterationPhonesScroll() {
                 className="ro-iter-phones__item ro-iter-phones__item--stay"
                 style={{
                   transform: `scale(${stayScale})`,
+                  '--ro-iter-enlarge': phase1,
                 }}
               >
                 <img
@@ -1242,13 +1249,13 @@ function StickyInsightClips({ clips }) {
               clipRefs.current[i] = el;
             }}
           >
-            <LoopClip src={clip.src} label={clip.label} />
             {clip.index ? (
               <aside className="ro-gif-feature-stack__copy ro-gif-feature-stack__copy--inline">
                 <p className="ro-gif-feature__index">{clip.index}</p>
                 <p className="ro-gif-feature__body">{clip.body}</p>
               </aside>
             ) : null}
+            <LoopClip src={clip.src} label={clip.label} />
           </div>
         ))}
       </div>
@@ -1388,6 +1395,12 @@ export default function RecODetail() {
             wide
             className="ro-media--desktop-only"
           />
+          <p className="ro-gif-feature__index reco-feature-flow__intro-above reco-feature-flow__intro-below-scenario">
+            Notes are easy to forget. So are the small details that made the
+            conversation matter.
+            <br />
+            REC-O remembers them, so every follow-up feels like you never forgot.
+          </p>
 
           <section id="ro-rec" className="pd-section ro-reveal">
             <p className="pd-section__label">REC · Software</p>
